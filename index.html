@@ -643,6 +643,24 @@ a.hall-link{text-decoration:none;color:inherit}
 .about-id p{font-size:13.5px;line-height:1.55;color:var(--muted)}
 .about-ver{font-family:var(--fm);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .about-links{display:flex;flex-direction:column;gap:9px;padding-top:18px}
+.toast{
+  position:absolute;left:50%;bottom:26px;transform:translate(-50%,14px);
+  z-index:60;max-width:86%;
+  padding:12px 18px;border-radius:12px;
+  background:var(--ink);color:var(--bg);
+  font-size:13.5px;font-weight:600;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+.share-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line-2);
+  font-size:14.5px;font-weight:600;color:var(--ink);
+}
+.share-btn:active{transform:scale(.985)}
+
 .about-foot{
   padding:18px 0 4px;font-size:12.5px;line-height:1.6;color:var(--muted);
   border-top:1px solid var(--line);margin-top:18px;
@@ -768,6 +786,9 @@ a.hall-link{text-decoration:none;color:inherit}
       <button type="button" class="cta ghost" id="hallClear" data-i18n="hall.clear">Effacer le palmarès</button>
     </footer>
   </section>
+
+  <input type="file" id="importFile" accept="application/json,.json" hidden>
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
 
   <!-- ============ À PROPOS ============ -->
   <div class="sheet-wrap" id="aboutWrap">
@@ -1107,6 +1128,18 @@ fr:{
   "about.privacy":"Confidentialité", "about.privacy.label":"Ce que l'application fait de vos données",
   "about.source":"Code source", "about.source.label":"Le projet sur GitHub",
   "about.foot":"Aucune donnée ne quitte votre téléphone. Les parties, les tournois et le palmarès sont enregistrés localement, ne sont jamais transmis, et disparaissent si vous désinstallez l'application.",
+  "data.title":"Vos données",
+  "data.export":"Exporter une sauvegarde",
+  "data.import":"Restaurer une sauvegarde",
+  "data.hint":"La sauvegarde contient le palmarès, le tournoi en cours et la partie en cours. Gardez-la avant de changer de téléphone.",
+  "data.done":"Sauvegarde enregistrée",
+  "data.imported":"Sauvegarde restaurée",
+  "data.bad":"Fichier illisible",
+  "data.confirm":"Remplacer les données actuelles ?",
+  "share.result":"Partager le résultat",
+  "share.game":"{a} {sa} – {sb} {b} · {n} manches · Cornscore",
+  "share.bracket":"Partager le tableau",
+  "share.copied":"Copié dans le presse-papiers",
   "color.rouge":"Rouge","color.ambre":"Ambre","color.or":"Or","color.vert":"Vert",
   "color.sarcelle":"Sarcelle","color.bleu":"Bleu","color.violet":"Violet",
   "color.rose":"Rose","color.ardoise":"Ardoise"
@@ -1221,6 +1254,18 @@ en:{
   "about.privacy":"Privacy", "about.privacy.label":"What the app does with your data",
   "about.source":"Source code", "about.source.label":"The project on GitHub",
   "about.foot":"No data leaves your phone. Games, tournaments and records are stored locally, are never transmitted, and disappear if you uninstall the app.",
+  "data.title":"Your data",
+  "data.export":"Export a backup",
+  "data.import":"Restore a backup",
+  "data.hint":"The backup holds your records, the running tournament and the current game. Keep one before switching phones.",
+  "data.done":"Backup saved",
+  "data.imported":"Backup restored",
+  "data.bad":"Unreadable file",
+  "data.confirm":"Replace the current data?",
+  "share.result":"Share the result",
+  "share.game":"{a} {sa} – {sb} {b} · {n} frames · Cornscore",
+  "share.bracket":"Share the bracket",
+  "share.copied":"Copied to the clipboard",
   "color.rouge":"Red","color.ambre":"Amber","color.or":"Gold","color.vert":"Green",
   "color.sarcelle":"Teal","color.bleu":"Blue","color.violet":"Purple",
   "color.rose":"Pink","color.ardoise":"Slate"
@@ -2046,6 +2091,11 @@ function renderOver(){
   var acts=el("div","over-acts reveal");
   acts.style.animationDelay="160ms";
 
+  var share=el("button","share-btn",t("share.result"));
+  share.type="button";
+  share.addEventListener("click",shareGame);
+  acts.appendChild(share);
+
   if(tour){
     var nx=nextMatch();
     if(T.champion>=0){
@@ -2308,13 +2358,150 @@ function fillAbout(){
   links.appendChild(aboutRow(t("about.source"),t("about.source.label"),SOURCE_URL));
   body.appendChild(links);
 
+  var data=el("div","block");
+  data.style.paddingTop="18px";
+  data.appendChild(el("p","eyebrow",t("data.title")));
+  var ex=el("button","act",t("data.export"));
+  ex.type="button";
+  ex.addEventListener("click",exportData);
+  var im=el("button","act",t("data.import"));
+  im.type="button";
+  im.addEventListener("click",importData);
+  data.appendChild(ex);
+  data.appendChild(im);
+  data.appendChild(el("p","hint",t("data.hint")));
+  body.appendChild(data);
+
   body.appendChild(langPicker());
   body.appendChild(el("p","about-foot",t("about.foot")));
+}
+
+/* ------------------------------------------------------------------
+   Sauvegarde, restauration, partage
+
+   Dans l'APK, la coquille Android expose un pont : elle sait écrire un
+   fichier et ouvrir le partage natif. Sur le web, on retombe sur le
+   téléchargement, l'API de partage ou le presse-papiers.
+------------------------------------------------------------------ */
+function bridge(){ return (typeof window.Cornscore!=="undefined") ? window.Cornscore : null; }
+
+function toast(msg){
+  var n=$("toast");
+  n.textContent=msg;
+  n.classList.add("on");
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){ n.classList.remove("on"); },2200);
+}
+
+function exportName(){
+  var d=new Date();
+  function p(v){ return String(v).padStart(2,"0"); }
+  return "cornscore-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+".json";
+}
+
+function exportData(){
+  var payload=JSON.stringify({v:1, at:Date.now(), s:S, ts:TS, t:T, g:G, h:H}, null, 1);
+  var name=exportName();
+  var b=bridge();
+  if(b && b.saveFile){
+    b.saveFile(name, payload);
+    return;                       /* la coquille affiche son propre retour */
+  }
+  try{
+    var blob=new Blob([payload],{type:"application/json"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download=name;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+    toast(t("data.done"));
+  }catch(e){ toast(t("data.bad")); }
+}
+
+function applyImport(text){
+  var d;
+  try{ d=JSON.parse(text); }catch(e){ toast(t("data.bad")); return; }
+  if(!d || typeof d!=="object" || (!d.h && !d.s && !d.t)){ toast(t("data.bad")); return; }
+  if(!window.confirm(t("data.confirm"))) return;
+
+  if(d.s && d.s.teams && d.s.teams.length===2) S=d.s;
+  if(d.ts && d.ts.teams && d.ts.teams.length===16){ TS=d.ts; TS.open=-1; }
+  T = (d.t && d.t.matches && d.t.teams) ? d.t : null;
+  H = (d.h && d.h.length) ? d.h : [];
+  G = (d.g && d.g.teams) ? d.g : null;
+  if(G){ if(!G.entry) G.entry=[{h:0,b:0},{h:0,b:0}]; recompute(); }
+
+  save();
+  closeAbout();
+  renderCards(); renderRules(); renderTSetup();
+  refreshTourBtn(); refreshHallLink();
+  if(G && !G.over){ show("game"); renderGame(true); }
+  else show("setup");
+  toast(t("data.imported"));
+}
+
+function importData(){
+  var inp=$("importFile");
+  inp.value="";
+  inp.click();
+}
+
+function shareText(text){
+  var b=bridge();
+  if(b && b.share){ b.share(text); return; }
+  if(navigator.share){
+    navigator.share({text:text}).catch(function(){});
+    return;
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ toast(t("share.copied")); },function(){});
+    return;
+  }
+  toast(text);
+}
+
+function shareGame(){
+  if(!G) return;
+  var w=G.winner>=0 ? G.winner : 0, l=1-w;
+  shareText(tf("share.game",{
+    a:G.teams[w].label, sa:G.scores[w],
+    b:G.teams[l].label, sb:G.scores[l],
+    n:G.rounds.length
+  }));
+}
+
+function shareBracket(){
+  if(!T) return;
+  var lines=[t("tour.title")+" · "+tf(T.teams.length>1?"tour.head_p":"tour.head",{t:T.teams.length,m:0}).split("·")[0].trim()];
+  for(var r=0;r<T.rounds;r++){
+    lines.push("");
+    lines.push(roundName(r).toUpperCase());
+    var count=T.size>>(r+1);
+    for(var i=0;i<count;i++){
+      var m=matchAt(r,i);
+      if(!m) continue;
+      if(m.bye){ lines.push("  "+tName(m.winner===0?m.a:m.b)+" — "+t("tour.bye")); continue; }
+      var a=m.a==null ? t("tour.tbd") : tName(m.a);
+      var b=m.b==null ? t("tour.tbd") : tName(m.b);
+      lines.push("  "+a+(m.done?" "+m.score[0]:"")+" – "+(m.done?m.score[1]+" ":"")+b);
+    }
+  }
+  if(T.champion>=0){ lines.push(""); lines.push(t("tour.winner")+" : "+tName(T.champion)); }
+  shareText(lines.join("\n"));
 }
 
 function openAbout(){ fillAbout(); $("aboutWrap").classList.add("on"); }
 function closeAbout(){ $("aboutWrap").classList.remove("on"); }
 $("openAbout").addEventListener("click",openAbout);
+$("importFile").addEventListener("change",function(){
+  var f=this.files && this.files[0];
+  if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){ applyImport(String(r.result)); };
+  r.onerror=function(){ toast(t("data.bad")); };
+  r.readAsText(f);
+});
 $("aboutClose").addEventListener("click",closeAbout);
 $("aboutScrim").addEventListener("click",closeAbout);
 
@@ -2742,6 +2929,12 @@ function openBkSheet(){
   body.appendChild(el("p","eyebrow",t("tour.state")));
   body.appendChild(el("p","sheet-note",
     tf(played>1?"tour.summary_p":"tour.summary",{t:T.teams.length,m:played,s:etat})));
+  var sh=el("button","share-btn",t("share.bracket"));
+  sh.type="button";
+  sh.style.marginTop="16px";
+  sh.addEventListener("click",shareBracket);
+  body.appendChild(sh);
+
   body.appendChild(el("p","hint",t("tour.warn")));
 
   armAbandon(false);

@@ -5,6 +5,8 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -12,6 +14,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewAssetLoader;
@@ -54,6 +59,17 @@ public class MainActivity extends AppCompatActivity {
     private WebView web;
     private long lastBack = 0L;
 
+    private ValueCallback<Uri[]> pendingFile;
+    private final ActivityResultLauncher<String> picker =
+        registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
+            @Override
+            public void onActivityResult(Uri uri) {
+                if (pendingFile == null) return;
+                pendingFile.onReceiveValue(uri == null ? null : new Uri[]{uri});
+                pendingFile = null;
+            }
+        });
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +109,27 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = request.getUrl();
                 if (uri != null && HOST.equals(uri.getHost())) return false;
                 openExternally(uri);
+                return true;
+            }
+        });
+
+        web.addJavascriptInterface(new Bridge(this), "Cornscore");
+
+        /* Le champ de fichier de la page ne s'ouvre pas tout seul dans une
+           WebView : c'est à l'activité de présenter le sélecteur. */
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView view,
+                                             ValueCallback<Uri[]> callback,
+                                             FileChooserParams params) {
+                if (pendingFile != null) pendingFile.onReceiveValue(null);
+                pendingFile = callback;
+                try {
+                    picker.launch("application/json");
+                } catch (Exception e) {
+                    pendingFile = null;
+                    return false;
+                }
                 return true;
             }
         });
