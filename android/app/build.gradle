@@ -33,14 +33,19 @@ def keystore = file("${rootProject.projectDir}/debug.keystore")
 def buildCode = ((project.findProperty("vc") ?: "1") as String).toInteger()
 def buildName = (project.findProperty("vn") ?: "1.0") as String
 
+/* Clé d'envoi vers Play : fournie par la CI, jamais dans le dépôt.
+   Absente, la variante release se construit sans signature — utile pour
+   vérifier qu'elle compile, inutilisable pour publier. */
+def uploadStore = System.getenv("RELEASE_KEYSTORE")
+
 android {
     namespace 'com.lilkuririn.cornscore'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.lilkuririn.cornscore"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode buildCode
         versionName buildName
     }
@@ -54,11 +59,23 @@ android {
                 keyPassword 'cornscore'
             }
         }
+        release {
+            if (uploadStore) {
+                storeFile file(uploadStore)
+                storePassword System.getenv("RELEASE_STORE_PASSWORD")
+                keyAlias System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword System.getenv("RELEASE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+        }
+        release {
+            minifyEnabled false
+            if (uploadStore) signingConfig signingConfigs.release
         }
     }
 

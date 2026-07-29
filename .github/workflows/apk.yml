@@ -45,14 +45,14 @@ jobs:
       - name: Plateforme Android
         run: |
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-            "platforms;android-34" "build-tools;34.0.0" > /dev/null || true
+            "platforms;android-35" "build-tools;35.0.0" > /dev/null || true
 
       - name: Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.7'
+          gradle-version: '8.9'
 
-      - name: Construire
+      - name: Construire l'APK installable
         working-directory: android
         run: |
           set -o pipefail
@@ -89,3 +89,41 @@ jobs:
             --title "Cornscore — APK" \
             --notes "Dernier APK installable, reconstruit à chaque modification de l'application. Fichier : cornscore.apk"
           gh release upload apk cornscore.apk --clobber
+
+      # ---- Paquet destiné au Play Store -------------------------------
+      # Ne s'active qu'une fois les quatre secrets renseignés. L'AAB n'est
+      # pas installable : il part dans les artefacts, à téléverser dans la
+      # console Play, et surtout pas dans une release publique.
+      - name: Clé d'envoi
+        id: upload_key
+        env:
+          KS: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            echo "ready=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=no" >> "$GITHUB_OUTPUT"
+            echo "Secret RELEASE_KEYSTORE_B64 absent : bundle release ignoré."
+          fi
+
+      - name: Construire le bundle
+        if: steps.upload_key.outputs.ready == 'yes'
+        working-directory: android
+        env:
+          RELEASE_KEYSTORE: ${{ runner.temp }}/upload.jks
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          gradle bundleRelease --no-daemon --stacktrace \
+            -Pvc=${{ github.run_number }} \
+            -Pvn=1.0.${{ github.run_number }}
+
+      - name: Déposer le bundle
+        if: steps.upload_key.outputs.ready == 'yes'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cornscore-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
