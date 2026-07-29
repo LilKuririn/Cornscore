@@ -511,6 +511,61 @@ h1,h2,h3,p{margin:0}
 }
 .toss:disabled{opacity:.45}
 
+/* --- le rouleau ------------------------------------------------- */
+.toss-wrap{position:absolute;inset:0;z-index:30;display:grid;place-items:center}
+.toss-wrap[hidden]{display:none}
+.toss-scrim{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(115% 70% at 50% 50%,color-mix(in oklab,var(--flash,#000) 26%,transparent),transparent 68%),
+    rgba(0,0,0,.66);
+  animation:fade .22s ease;
+}
+.toss-box{
+  position:relative;display:flex;flex-direction:column;align-items:center;
+  gap:20px;padding:0 24px;width:100%;
+  animation:tossIn .32s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes tossIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+
+.reel{
+  position:relative;width:min(304px,84%);height:72px;
+  border-radius:16px;overflow:hidden;
+  background:var(--panel);border:1px solid var(--line-2);
+  box-shadow:0 24px 60px rgba(0,0,0,.55),inset 0 0 40px rgba(0,0,0,.28);
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+.reel-strip{position:absolute;left:0;right:0;top:0;will-change:transform,filter}
+.cell{
+  height:72px;display:flex;align-items:center;justify-content:center;gap:11px;
+  background:color-mix(in oklab,var(--c) 13%,var(--panel));
+}
+.cell i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:0 0 auto}
+.cell span{
+  font-size:18px;font-weight:700;letter-spacing:-.02em;
+  color:color-mix(in oklab,var(--c) 62%,var(--tone));
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;
+}
+.notch{
+  position:absolute;top:50%;width:0;height:0;transform:translateY(-50%);
+  border-top:6px solid transparent;border-bottom:6px solid transparent;z-index:2;
+}
+.notch.l{left:0;border-left:7px solid var(--ink);opacity:.55}
+.notch.r{right:0;border-right:7px solid var(--ink);opacity:.55}
+
+.reel.locked{
+  border-color:color-mix(in oklab,var(--win) 60%,transparent);
+  box-shadow:0 0 0 4px color-mix(in oklab,var(--win) 16%,transparent),0 24px 60px rgba(0,0,0,.55);
+  animation:lock .42s cubic-bezier(.2,1.5,.4,1);
+}
+@keyframes lock{0%{transform:scale(1)}38%{transform:scale(1.045)}100%{transform:scale(1)}}
+
+.toss-out{
+  font-size:15px;font-weight:600;color:var(--muted);text-align:center;
+  min-height:22px;letter-spacing:-.01em;
+}
+.toss-out b{font-weight:800;letter-spacing:-.02em}
+
 .log tbody tr{cursor:pointer}
 .log tbody tr:active td{background:var(--panel-2)}
 .hint{font-size:12px;line-height:1.5;color:var(--muted);padding:12px 0 0}
@@ -762,6 +817,20 @@ h1,h2,h3,p{margin:0}
         <button type="button" class="validate" id="validate">Valider</button>
       </div>
     </section>
+
+    <!-- tirage au sort -->
+    <div class="toss-wrap" id="tossWrap" hidden>
+      <div class="toss-scrim"></div>
+      <div class="toss-box" role="dialog" aria-modal="true" aria-label="Tirage au sort">
+        <p class="eyebrow">Qui lance en premier</p>
+        <div class="reel" id="reel">
+          <div class="reel-strip" id="reelStrip"></div>
+          <span class="notch l"></span>
+          <span class="notch r"></span>
+        </div>
+        <p class="toss-out" id="tossOut" aria-live="polite">Tirage en cours</p>
+      </div>
+    </div>
 
     <!-- feuille de match -->
     <div class="sheet-wrap" id="sheetWrap">
@@ -1125,32 +1194,90 @@ function paintHonor(){
     if(h) h.hidden = !(G.first===i && !G.over);
   }
 }
+var CELL=72;          /* hauteur d'une case du rouleau, cf. .cell */
+var tossLanded=false;
+
+function closeToss(){
+  if(!tossLanded) return;
+  $("tossWrap").hidden=true;
+}
+$("tossWrap").addEventListener("click",closeToss);
+
 function doToss(){
   if(!G || G.tossed || G.rounds.length) return;
   G.tossed=true;
-  var btn=$("consoleTitle").querySelector(".toss");
-  if(btn) btn.disabled=true;
+  tossLanded=false;
 
-  var steps=13+Math.floor(Math.random()*4);
   var final=Math.random()<0.5 ? 0 : 1;
-  var delay=65;
+  var wrap=$("tossWrap"), strip=$("reelStrip"), reel=$("reel"), out=$("tossOut");
 
-  (function tick(k){
-    if(k>=steps){
-      G.first=final;
-      G.tossFirst=final;
-      paintHonor();
-      buzz([12,50,22]);
-      save();
-      renderGame();
-      return;
-    }
-    G.first=k%2;
+  /* la case d'arrivée doit porter l'équipe tirée : les paires alternent */
+  var cells=22+Math.floor(Math.random()*4)*2;
+  if(cells%2 !== final) cells+=1;
+
+  strip.innerHTML="";
+  strip.style.transform="translateY(0)";
+  strip.style.filter="none";
+  reel.classList.remove("locked");
+  out.textContent="Tirage en cours";
+  wrap.style.setProperty("--flash",G.teams[0].hex);
+
+  for(var i=0;i<=cells;i++){
+    var t=G.teams[i%2];
+    var c=el("div","cell");
+    c.style.setProperty("--c",t.hex);
+    c.appendChild(el("i"));
+    c.appendChild(el("span",null,t.label));
+    strip.appendChild(c);
+  }
+  wrap.hidden=false;
+
+  function land(){
+    strip.style.filter="none";
+    strip.style.transform="translateY("+(-cells*CELL)+"px)";
+    G.first=final;
+    G.tossFirst=final;
+    tossLanded=true;
+
+    reel.style.setProperty("--win",G.teams[final].hex);
+    reel.classList.add("locked");
+    wrap.style.setProperty("--flash",G.teams[final].hex);
+
+    out.innerHTML="";
+    var b=el("b",null,G.teams[final].label);
+    b.style.color="color-mix(in oklab,"+G.teams[final].hex+" 62%,var(--tone))";
+    out.appendChild(b);
+    out.appendChild(document.createTextNode(" lance en premier"));
+
+    buzz([16,55,30]);
     paintHonor();
-    buzz(4);
-    setTimeout(function(){ tick(k+1); }, delay);
-    delay*=1.13;
-  })(0);
+    save();
+    renderGame();
+    setTimeout(function(){ if(tossLanded) wrap.hidden=true; }, 1600);
+  }
+
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  if(reduce){ land(); return; }
+
+  var dur=2500, t0=null, prev=0, idx=-1;
+  function frame(now){
+    if(t0===null) t0=now;
+    var t=Math.min(1,(now-t0)/dur);
+    var off=(1-Math.pow(1-t,4))*cells*CELL;
+    var v=off-prev; prev=off;
+
+    strip.style.transform="translateY("+(-off)+"px)";
+    strip.style.filter = v>1.5 ? "blur("+Math.min(5,v*0.22)+"px)" : "none";
+
+    var i=Math.round(off/CELL);
+    if(i!==idx){
+      idx=i;
+      wrap.style.setProperty("--flash",G.teams[i%2].hex);
+      if(v<14) buzz(3);      /* le cliquetis n'apparaît qu'au ralenti */
+    }
+    if(t<1) requestAnimationFrame(frame); else land();
+  }
+  requestAnimationFrame(frame);
 }
 
 function renderConsole(){

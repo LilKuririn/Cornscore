@@ -20,8 +20,8 @@ En local, il suffit d'ouvrir [`index.html`](index.html) dans un navigateur.
   automatique des matchs. Entièrement optionnel : l'accueil reste la partie simple ou double.
 - **Saisie par manche** — un compteur *trou* (3 points) et un compteur *planche* (1 point) par
   équipe, plafonnés à 4 sacs. L'annulation est calculée en direct avant validation.
-- **Suivi de l'honneur** — l'équipe qui a marqué lance en premier à la manche suivante, et un
-  tirage au sort attribue la première manche.
+- **Suivi de l'honneur** — l'équipe qui a marqué lance en premier à la manche suivante. La première
+  manche est attribuée par un tirage au sort présenté comme un rouleau de machine à sous.
 - **Feuille de match** — historique manche par manche avec score courant. Chaque manche peut être
   corrigée ou supprimée après coup : l'historique est rejoué et le score recalculé sur toute la
   partie.
