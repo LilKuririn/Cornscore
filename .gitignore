@@ -1,3 +1,9 @@
+# Clé d'envoi vers le Play Store : ne doit jamais être versionnée.
+# (android/debug.keystore est suivi volontairement : il ne signe que
+#  l'APK d'installation directe, et son mot de passe est public.)
+*.jks
+*.b64
+
 # Android
 android/.gradle/
 android/build/

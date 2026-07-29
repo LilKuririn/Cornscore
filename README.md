@@ -46,18 +46,38 @@ d'un don** : une contrepartie numérique en ferait un achat, que Google impose d
 propre facturation.
 
 **2. La clé d'envoi.** Le bundle destiné à Play doit être signé par une clé qui, contrairement à
-celle de l'APK, n'a rien à faire dans le dépôt :
+celle de l'APK, n'a rien à faire dans le dépôt. `keytool` vient avec un JDK, à installer une fois :
 
-```
-keytool -genkeypair -v -keystore upload.jks -alias upload \
-  -keyalg RSA -keysize 2048 -validity 10000
-base64 -w0 upload.jks > upload.b64
+```powershell
+winget install Microsoft.OpenJDK.21
 ```
 
-Dans *Settings → Secrets and variables → Actions*, ajoute `RELEASE_KEYSTORE_B64` (le contenu de
-`upload.b64`), `RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS` et `RELEASE_KEY_PASSWORD`. La CI
-produira alors un `.aab` dans ses artefacts, à téléverser dans la console Play. **Sauvegarde
-`upload.jks` ailleurs que sur ta machine** : la perdre interdit toute mise à jour.
+Dans un **nouveau** terminal, hors du dépôt pour ne rien risquer de committer :
+
+```powershell
+keytool -genkeypair -v -keystore upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
+```
+
+L'outil demande un mot de passe puis quelques identités — n'importe quelle réponse convient, elles
+n'apparaissent nulle part. À la question du mot de passe de la clé, entrée vide = le même que celui
+du magasin. Puis, pour obtenir la valeur du secret directement dans le presse-papiers :
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("upload.jks")) | Set-Clipboard
+```
+
+Dans *Settings → Secrets and variables → Actions*, quatre secrets :
+
+| Nom | Valeur |
+| --- | --- |
+| `RELEASE_KEYSTORE_B64` | le contenu du presse-papiers |
+| `RELEASE_STORE_PASSWORD` | le mot de passe choisi |
+| `RELEASE_KEY_ALIAS` | `upload` |
+| `RELEASE_KEY_PASSWORD` | le même mot de passe |
+
+**Sauvegarde `upload.jks` et son mot de passe ailleurs que sur ta machine.** La CI ne peut pas
+générer cette clé à ta place : le dépôt étant public, tout ce qui transite par les journaux ou les
+artefacts d'Actions est lisible par n'importe qui.
 
 **3. Le compte développeur.** 25 $ une fois, vérification d'identité, puis un test fermé auprès
 d'une douzaine de testeurs pendant environ deux semaines avant l'accès à la production. La
