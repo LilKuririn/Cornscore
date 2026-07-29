@@ -35,6 +35,34 @@ Le build tourne dans GitHub Actions (`.github/workflows/apk.yml`), aucune chaîn
 n'est nécessaire en local. La clé de signature est créée au premier passage et conservée dans le
 dépôt, pour que chaque nouvelle version s'installe par-dessus la précédente.
 
+## Publier sur le Play Store
+
+Trois choses restent à faire de ton côté, elles ne peuvent pas l'être depuis le dépôt.
+
+**1. Le lien de soutien.** Ouvre un compte Ko-fi, Buy Me a Coffee, Liberapay ou GitHub Sponsors,
+puis colle son adresse dans `SUPPORT_URL`, en tête du script de [`index.html`](index.html). Tant
+qu'elle est vide, la ligne n'apparaît pas dans l'écran *À propos*. **Ne rien offrir en échange
+d'un don** : une contrepartie numérique en ferait un achat, que Google impose de passer par sa
+propre facturation.
+
+**2. La clé d'envoi.** Le bundle destiné à Play doit être signé par une clé qui, contrairement à
+celle de l'APK, n'a rien à faire dans le dépôt :
+
+```
+keytool -genkeypair -v -keystore upload.jks -alias upload \
+  -keyalg RSA -keysize 2048 -validity 10000
+base64 -w0 upload.jks > upload.b64
+```
+
+Dans *Settings → Secrets and variables → Actions*, ajoute `RELEASE_KEYSTORE_B64` (le contenu de
+`upload.b64`), `RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS` et `RELEASE_KEY_PASSWORD`. La CI
+produira alors un `.aab` dans ses artefacts, à téléverser dans la console Play. **Sauvegarde
+`upload.jks` ailleurs que sur ta machine** : la perdre interdit toute mise à jour.
+
+**3. Le compte développeur.** 25 $ une fois, vérification d'identité, puis un test fermé auprès
+d'une douzaine de testeurs pendant environ deux semaines avant l'accès à la production. La
+politique de confidentialité est déjà en ligne : <https://lilkuririn.github.io/Cornscore/privacy.html>
+
 ## Fonctionnalités
 
 - **Simple (1v1) ou double (2v2)** — nom d'équipe, noms des joueurs, couleur au choix parmi neuf.
@@ -49,6 +77,10 @@ dépôt, pour que chaque nouvelle version s'installe par-dessus la précédente.
   partie.
 - **Palmarès** — les parties terminées sont archivées : confrontations directes, classement par
   victoires, dernières rencontres.
+- **Français et anglais** — la langue suit celle du téléphone au premier lancement, et se change
+  depuis la fiche *À propos*.
+- **Sauvegarde et partage** — export et restauration des données en JSON, partage du score final
+  ou de l'arbre du tournoi en texte.
 - **Fin de partie** — vainqueur, score final, sacs dans le trou, meilleure manche, revanche.
 - **Confort** — partie sauvegardée en local, écran maintenu allumé, retour haptique, thèmes
   clair et sombre.
