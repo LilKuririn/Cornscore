@@ -68,6 +68,10 @@ final, le prochain match est mis en avant et rappelé dans la barre du bas. À l
 enchaîne directement sur le suivant ou on revient au tableau. Le tournoi et la partie en cours sont
 sauvegardés séparément : on peut jouer un 1v1 improvisé sans perdre le tournoi commencé.
 
+Rien n'oblige à aller au bout. Le menu du tableau donne l'état en cours, puis deux sorties :
+repartir d'un nouveau tableau, ou abandonner — en deux appuis, pour éviter la fausse manœuvre. Les
+matchs déjà joués restent au palmarès dans les deux cas.
+
 ## Palmarès
 
 Chaque partie terminée est archivée localement (200 au maximum, tournoi compris). Un lien apparaît

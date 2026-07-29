@@ -497,6 +497,7 @@ h1,h2,h3,p{margin:0}
   transition:transform .12s ease;
 }
 .bk-play:active{transform:scale(.97)}
+.sheet-note{font-size:15px;font-weight:600;letter-spacing:-.01em;padding-top:6px}
 .bk-champ{--team:#E14434}
 .bk-champ .bk-vs{font-size:19px;font-weight:800;letter-spacing:-.03em;color:color-mix(in oklab,var(--team) 62%,var(--tone))}
 
@@ -778,9 +779,9 @@ h1,h2,h3,p{margin:0}
       <p class="eyebrow" id="bkTitle">Tournoi</p>
       <div class="sep"></div>
       <button type="button" class="ghost-btn" id="bkHome">Accueil</button>
-      <button type="button" class="icon-btn" id="bkNew" aria-label="Nouveau tournoi">
-        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
-          <path d="M8.5 3.5v10M3.5 8.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <button type="button" class="icon-btn" id="bkMenu" aria-label="Options du tournoi">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M2.5 4h13M2.5 9h13M2.5 14h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
       </button>
     </header>
@@ -788,6 +789,26 @@ h1,h2,h3,p{margin:0}
     <div class="bk-scroll" id="bkScroll"></div>
 
     <footer class="bk-bar" id="bkBar"></footer>
+
+    <!-- options du tournoi -->
+    <div class="sheet-wrap" id="bkSheetWrap">
+      <div class="scrim" id="bkScrim"></div>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Options du tournoi">
+        <div class="sheet-head">
+          <h3>Tournoi</h3>
+          <button type="button" class="icon-btn" id="bkSheetClose" aria-label="Fermer">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sheet-body" id="bkSheetBody"></div>
+        <div class="sheet-acts">
+          <button type="button" class="act" id="bkRestart">Repartir d'un nouveau tableau</button>
+          <button type="button" class="act danger" id="bkAbandon">Abandonner le tournoi</button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ PARTIE ============ -->
@@ -1535,7 +1556,11 @@ function openSheet(){
   $("quit").textContent = (G && G.tour) ? "Abandonner le match" : "Terminer la partie";
   $("sheetWrap").classList.add("on");
 }
-function closeSheet(){ $("sheetWrap").classList.remove("on"); }
+function closeSheet(){
+  $("sheetWrap").classList.remove("on");
+  var bk=$("bkSheetWrap");
+  if(bk) bk.classList.remove("on");
+}
 $("openSheet").addEventListener("click",openSheet);
 $("closeSheet").addEventListener("click",closeSheet);
 $("scrim").addEventListener("click",closeSheet);
@@ -2184,17 +2209,71 @@ function applyMatchResult(){
    Navigation, persistance, écran allumé
 ------------------------------------------------------------------ */
 $("openTour").addEventListener("click",function(){
-  if(T && T.champion<0){ openBracket(); }
+  if(T){ openBracket(); }
   else { show("tsetup"); renderTSetup(); }
 });
 $("tsBack").addEventListener("click",function(){ show("setup"); });
 $("bkHome").addEventListener("click",function(){ show("setup"); });
-$("bkNew").addEventListener("click",function(){ show("tsetup"); renderTSetup(); });
+
+/* --- options du tournoi, dont la sortie ------------------------- */
+function armAbandon(on){
+  var b=$("bkAbandon");
+  b.dataset.armed = on ? "1" : "0";
+  b.textContent = on ? "Confirmer l'abandon" : "Abandonner le tournoi";
+}
+function openBkSheet(){
+  if(!T) return;
+  var body=$("bkSheetBody");
+  body.innerHTML="";
+
+  var played=0;
+  for(var k=0;k<T.matches.length;k++){
+    if(T.matches[k].done && !T.matches[k].bye) played++;
+  }
+  var next=nextMatch();
+  var etat = T.champion>=0 ? "terminé"
+           : (next>=0 ? roundName(T.matches[next].r).toLocaleLowerCase("fr") : "en attente");
+
+  body.appendChild(el("p","eyebrow","État du tableau"));
+  body.appendChild(el("p","sheet-note",
+    T.teams.length+" équipes · "+played+" match"+(played>1?"s":"")+" joué"+(played>1?"s":"")+" · "+etat));
+  body.appendChild(el("p","hint",
+    "Abandonner efface le tableau et ses résultats. Les parties déjà jouées restent au palmarès."));
+
+  armAbandon(false);
+  $("bkSheetWrap").classList.add("on");
+}
+function closeBkSheet(){
+  $("bkSheetWrap").classList.remove("on");
+  armAbandon(false);
+}
+$("bkMenu").addEventListener("click",openBkSheet);
+$("bkSheetClose").addEventListener("click",closeBkSheet);
+$("bkScrim").addEventListener("click",closeBkSheet);
+$("bkRestart").addEventListener("click",function(){
+  closeBkSheet();
+  show("tsetup");
+  renderTSetup();
+});
+$("bkAbandon").addEventListener("click",function(){
+  var b=$("bkAbandon");
+  if(b.dataset.armed!=="1"){
+    armAbandon(true);
+    setTimeout(function(){ if(b.dataset.armed==="1") armAbandon(false); },4000);
+    return;
+  }
+  closeBkSheet();
+  T=null;
+  if(G && G.tour) G=null;      /* un match du tournoi n'a plus de tableau */
+  buzz(12);
+  save();
+  show("setup");
+});
 
 function refreshTourBtn(){
   var live = !!(T && T.champion<0);
   $("tourPip").hidden = !live;
-  $("tourBtnLabel").textContent = live ? "Tournoi en cours" : "Tournoi";
+  $("tourBtnLabel").textContent = T ? (live ? "Tournoi en cours" : "Tournoi terminé") : "Tournoi";
 }
 
 function show(name){
