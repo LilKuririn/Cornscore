@@ -55,8 +55,8 @@ dépôt, pour que chaque nouvelle version s'installe par-dessus la précédente.
 
 ## Tournoi
 
-Accessible par le bouton *Tournoi* de l'accueil, et sans effet sur le reste de l'application : une
-partie rapide en 1v1 ou 2v2 reste toujours à un appui.
+Accessible par le bouton en forme de tableau, en haut de l'accueil, et sans effet sur le reste de
+l'application : une partie rapide en 1v1 ou 2v2 reste toujours à un appui.
 
 On choisit le nombre d'équipes (2 à 16), on les nomme, on leur donne une couleur, et le tableau se
 construit en élimination directe. Quand le nombre d'équipes n'est pas une puissance de deux, les
@@ -74,8 +74,9 @@ matchs déjà joués restent au palmarès dans les deux cas.
 
 ## Palmarès
 
-Chaque partie terminée est archivée localement (200 au maximum, tournoi compris). Un lien apparaît
-en bas de l'accueil dès la première partie enregistrée.
+Chaque partie terminée est archivée localement (200 au maximum, tournoi compris). Le bouton en
+forme d'histogramme, en haut de l'accueil, apparaît dès la première partie enregistrée — à côté de
+celui du tournoi, qui porte une pastille verte tant qu'un tableau est en cours.
 
 Le regroupement se fait sur le nom saisi, insensible à la casse : deux parties jouées par « marc »
 et « Marc » comptent pour la même personne. En double, c'est le nom de l'équipe qui fait foi.
