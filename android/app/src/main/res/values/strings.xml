@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Cornscore</string>
     <string name="quit_hint">Appuyez à nouveau pour quitter</string>
+    <string name="no_browser">Aucun navigateur disponible</string>
 </resources>

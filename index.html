@@ -628,6 +628,25 @@ h1,h2,h3,p{margin:0}
 .hall-link b{display:block;font-size:15px;font-weight:700;letter-spacing:-.01em;margin-top:5px}
 .hall-link svg{color:var(--muted);flex:0 0 auto}
 .hall-link:active{border-color:var(--line-2)}
+a.hall-link{text-decoration:none;color:inherit}
+
+.about-link{
+  align-self:center;padding:9px 14px;border-radius:9px;
+  font-family:var(--fm);font-size:10px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  transition:color .16s ease;
+}
+.about-link:active{color:var(--ink)}
+
+.about-id{display:flex;flex-direction:column;gap:6px;padding-top:16px}
+.about-id h4{margin:0;font-size:26px;font-weight:800;letter-spacing:-.035em}
+.about-id p{font-size:13.5px;line-height:1.55;color:var(--muted)}
+.about-ver{font-family:var(--fm);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.about-links{display:flex;flex-direction:column;gap:9px;padding-top:18px}
+.about-foot{
+  padding:18px 0 4px;font-size:12.5px;line-height:1.6;color:var(--muted);
+  border-top:1px solid var(--line);margin-top:18px;
+}
 
 .hall-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:20px}
 .hall-body > *{flex:0 0 auto}
@@ -725,6 +744,7 @@ h1,h2,h3,p{margin:0}
         </svg>
       </button>
 
+      <button type="button" class="about-link" id="openAbout">Cornscore · À propos</button>
     </div>
 
     <footer class="cta-bar">
@@ -748,6 +768,22 @@ h1,h2,h3,p{margin:0}
       <button type="button" class="cta ghost" id="hallClear">Effacer le palmarès</button>
     </footer>
   </section>
+
+  <!-- ============ À PROPOS ============ -->
+  <div class="sheet-wrap" id="aboutWrap">
+    <div class="scrim" id="aboutScrim"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="À propos">
+      <div class="sheet-head">
+        <h3>À propos</h3>
+        <button type="button" class="icon-btn" id="aboutClose" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="sheet-body" id="aboutBody"></div>
+    </div>
+  </div>
 
   <!-- ============ RÈGLES DU JEU (par-dessus l'écran courant) ============ -->
   <div class="sheet-wrap" id="rulesWrap">
@@ -1635,6 +1671,8 @@ function closeSheet(){
   if(bk) bk.classList.remove("on");
   var ru=$("rulesWrap");
   if(ru) ru.classList.remove("on");
+  var ab=$("aboutWrap");
+  if(ab) ab.classList.remove("on");
 }
 $("openSheet").addEventListener("click",openSheet);
 $("closeSheet").addEventListener("click",closeSheet);
@@ -1890,6 +1928,74 @@ function refreshHallLink(){
   btn.title = H.length===1 ? "Palmarès · 1 partie" : "Palmarès · "+H.length+" parties";
   btn.setAttribute("aria-label", btn.title);
 }
+
+/* ------------------------------------------------------------------
+   À propos
+------------------------------------------------------------------ */
+var APP_VERSION = "1.0";
+
+/* ▸ Colle ici l'adresse de ta page de soutien (Ko-fi, Buy Me a Coffee,
+     Liberapay, GitHub Sponsors…). Tant qu'elle est vide, la ligne
+     n'apparaît pas : mieux vaut rien qu'un lien mort.
+     Ne rien offrir en échange d'un don : une contrepartie transformerait
+     le don en achat, que Google impose de passer par sa facturation. */
+var SUPPORT_URL = "";
+
+var SOURCE_URL  = "https://github.com/LilKuririn/Cornscore";
+var PRIVACY_URL = "https://lilkuririn.github.io/Cornscore/privacy.html";
+
+function aboutRow(eyebrow, label, href){
+  var a=document.createElement("a");
+  a.className="hall-link";
+  a.href=href;
+  a.target="_blank";
+  a.rel="noopener noreferrer";
+  var box=document.createElement("span");
+  box.appendChild(el("span","eyebrow",eyebrow));
+  box.appendChild(el("b",null,label));
+  a.appendChild(box);
+
+  var svg=document.createElementNS(SVGNS,"svg");
+  svg.setAttribute("width","16"); svg.setAttribute("height","16");
+  svg.setAttribute("viewBox","0 0 16 16"); svg.setAttribute("fill","none");
+  svg.setAttribute("aria-hidden","true");
+  var p=document.createElementNS(SVGNS,"path");
+  p.setAttribute("d","M4 12L12 4M6 4h6v6");
+  p.setAttribute("stroke","currentColor");
+  p.setAttribute("stroke-width","1.6");
+  p.setAttribute("stroke-linecap","round");
+  p.setAttribute("stroke-linejoin","round");
+  svg.appendChild(p);
+  a.appendChild(svg);
+  return a;
+}
+
+function fillAbout(){
+  var body=$("aboutBody");
+  body.innerHTML="";
+
+  var id=el("div","about-id");
+  id.appendChild(el("h4",null,"Cornscore"));
+  id.appendChild(el("p",null,"Compteur de points pour le jeu de cornhole. Parties en simple ou en double, tournois à élimination directe et palmarès entre joueurs."));
+  id.appendChild(el("p","about-ver","Version "+APP_VERSION));
+  body.appendChild(id);
+
+  var links=el("div","about-links");
+  if(SUPPORT_URL){
+    links.appendChild(aboutRow("Soutenir","Offrir un café au développeur",SUPPORT_URL));
+  }
+  links.appendChild(aboutRow("Confidentialité","Ce que l'application fait de vos données",PRIVACY_URL));
+  links.appendChild(aboutRow("Code source","Le projet sur GitHub",SOURCE_URL));
+  body.appendChild(links);
+
+  body.appendChild(el("p","about-foot","Aucune donnée ne quitte votre téléphone. Les parties, les tournois et le palmarès sont enregistrés localement, ne sont jamais transmis, et disparaissent si vous désinstallez l'application."));
+}
+
+function openAbout(){ fillAbout(); $("aboutWrap").classList.add("on"); }
+function closeAbout(){ $("aboutWrap").classList.remove("on"); }
+$("openAbout").addEventListener("click",openAbout);
+$("aboutClose").addEventListener("click",closeAbout);
+$("aboutScrim").addEventListener("click",closeAbout);
 
 function openRules(){ $("rulesWrap").classList.add("on"); }
 function closeRules(){ $("rulesWrap").classList.remove("on"); }
