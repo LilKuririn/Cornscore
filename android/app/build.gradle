@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+}
+
+/* Les fichiers web vivent à la racine du dépôt et ne sont pas dupliqués :
+   ils sont copiés dans les assets au moment de la compilation. */
+def webRoot = rootProject.projectDir.parentFile
+def webOut  = layout.buildDirectory.dir("webassets").get().asFile
+
+def copyWeb = tasks.register('copyWeb', Copy) {
+    from(webRoot) {
+        include 'index.html'
+        include 'manifest.webmanifest'
+        include 'icon-192.png'
+        include 'icon-512.png'
+        include 'icon-maskable-512.png'
+        include 'apple-touch-icon.png'
+    }
+    into webOut
+}
+
+/* Clé de signature stable, créée par la CI au premier passage.
+   Sans elle, chaque build serait signé différemment et refuserait
+   de s'installer par-dessus le précédent. */
+def keystore = file("${rootProject.projectDir}/debug.keystore")
+
+android {
+    namespace 'com.lilkuririn.cornscore'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.lilkuririn.cornscore"
+        minSdk 24
+        targetSdk 34
+        versionCode (project.findProperty("vc") ?: "1").toString().toInteger()
+        versionName (project.findProperty("vn") ?: "1.0").toString()
+    }
+
+    signingConfigs {
+        debug {
+            if (keystore.exists()) {
+                storeFile keystore
+                storePassword 'cornscore'
+                keyAlias 'cornscore'
+                keyPassword 'cornscore'
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs += webOut
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.webkit:webkit:1.11.0'
+}
+
+tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn copyWeb }

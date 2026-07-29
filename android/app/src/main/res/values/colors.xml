@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fond clair, aligné sur le thème clair de la page web -->
+    <color name="ground">#EFF2F2</color>
+    <color name="ic_launcher_background">#0D1012</color>
+</resources>
