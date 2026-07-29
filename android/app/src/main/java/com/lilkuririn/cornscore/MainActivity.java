@@ -118,20 +118,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /* À partir d'Android 15, une application visant l'API 35 s'affiche
-           bord à bord : sans cette marge, la page passerait sous la barre
-           d'état et sous la barre de navigation. Sur les versions
-           antérieures les valeurs sont nulles, le rendu ne change pas. */
-        ViewCompat.setOnApplyWindowInsetsListener(web, new OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-                Insets bars = insets.getInsets(
-                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-                return WindowInsetsCompat.CONSUMED;
-            }
-        });
-
         web.addJavascriptInterface(new Bridge(this), "Cornscore");
 
         /* Le champ de fichier de la page ne s'ouvre pas tout seul dans une
@@ -154,6 +140,25 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setContentView(web);
+
+        /* Android 15 impose le bord à bord aux applications visant l'API 35.
+           Le thème demande à en être exempté, ce qui suffit aujourd'hui ;
+           cette marge prend le relais le jour où l'exemption disparaîtra.
+           Elle s'applique à la racine du contenu — et non à la WebView avant
+           son rattachement, où l'écouteur n'était jamais appelé — puis on
+           réclame explicitement une distribution des marges. */
+        final View root = findViewById(android.R.id.content);
+        ViewCompat.setOnApplyWindowInsetsListener(root, new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                Insets bars = insets.getInsets(
+                        WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                return WindowInsetsCompat.CONSUMED;
+            }
+        });
+        ViewCompat.requestApplyInsets(root);
+
         web.loadUrl(ORIGIN + "/assets/index.html");
     }
 
