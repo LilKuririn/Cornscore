@@ -32,6 +32,7 @@
   --muted:#8D999E;
   --tone:#FFFFFF;          /* sens du mélange des couleurs d'équipe */
   --danger:#E5645A;
+  --live:#4FB07A;
   --shadow:0 24px 60px rgba(0,0,0,.55);
   --ff:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --fm:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
@@ -42,7 +43,7 @@
   :root{
     --bg:#EFF2F2; --panel:#FFFFFF; --panel-2:#E7EBEC;
     --line:rgba(13,20,22,.10); --line-2:rgba(13,20,22,.20);
-    --ink:#0E1618; --muted:#5D6A6E; --tone:#070C0D; --danger:#C2372C;
+    --ink:#0E1618; --muted:#5D6A6E; --tone:#070C0D; --danger:#C2372C; --live:#2C8A56;
     --shadow:0 24px 60px rgba(13,20,22,.14);
     color-scheme:light;
   }
@@ -50,14 +51,14 @@
 :root[data-theme="dark"]{
   --bg:#0D1012; --panel:#14181B; --panel-2:#1B2124;
   --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
-  --ink:#EAEEF0; --muted:#8D999E; --tone:#FFFFFF; --danger:#E5645A;
+  --ink:#EAEEF0; --muted:#8D999E; --tone:#FFFFFF; --danger:#E5645A; --live:#4FB07A;
   --shadow:0 24px 60px rgba(0,0,0,.55);
   color-scheme:dark;
 }
 :root[data-theme="light"]{
   --bg:#EFF2F2; --panel:#FFFFFF; --panel-2:#E7EBEC;
   --line:rgba(13,20,22,.10); --line-2:rgba(13,20,22,.20);
-  --ink:#0E1618; --muted:#5D6A6E; --tone:#070C0D;
+  --ink:#0E1618; --muted:#5D6A6E; --tone:#070C0D; --danger:#C2372C; --live:#2C8A56;
   --shadow:0 24px 60px rgba(13,20,22,.14);
   color-scheme:light;
 }
@@ -395,6 +396,109 @@ h1,h2,h3,p{margin:0}
 .reveal{animation:reveal .5s cubic-bezier(.2,.8,.3,1) backwards}
 @keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
+/* =============================================================
+   5. TOURNOI — préparation
+   ============================================================= */
+.brand-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.ghost-btn{
+  display:flex;align-items:center;gap:7px;flex:0 0 auto;
+  padding:9px 13px;border-radius:11px;
+  background:var(--panel);border:1px solid var(--line);
+  font-size:13.5px;font-weight:600;color:var(--ink);
+  transition:border-color .16s ease;
+}
+.ghost-btn svg{color:var(--muted)}
+.ghost-btn:active{border-color:var(--line-2)}
+.ghost-btn .pip{width:6px;height:6px;border-radius:50%;background:var(--live);display:block}
+.ghost-btn .pip[hidden]{display:none}
+
+.tcount{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;
+}
+.tcount .note{margin-top:5px}
+.step.wide{grid-template-columns:42px 1fr 42px;height:48px;flex:0 0 132px}
+.step.wide .v{font-size:20px;color:var(--ink)}
+
+.trow{display:flex;align-items:center;gap:9px}
+.trow + .trow,.trow-sw + .trow{margin-top:8px}
+.trow .seed{
+  font-family:var(--fm);font-size:10.5px;letter-spacing:.06em;color:var(--muted);
+  width:19px;flex:0 0 auto;
+}
+.pick{
+  width:34px;height:34px;flex:0 0 auto;border-radius:10px;
+  background:color-mix(in oklab,var(--c) 16%,var(--panel));
+  border:1px solid color-mix(in oklab,var(--c) 34%,transparent);
+  display:grid;place-items:center;transition:transform .14s ease;
+}
+.pick i{width:13px;height:13px;border-radius:50%;background:var(--c);display:block}
+.pick:active{transform:scale(.92)}
+.trow .field-input{flex:1;min-width:0;padding:10px 12px;font-size:15px}
+.trow-sw{
+  margin-top:8px;padding:11px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--line);
+}
+.trow-sw[hidden]{display:none}
+
+/* =============================================================
+   6. TOURNOI — tableau
+   ============================================================= */
+.bk-scroll{flex:1;min-height:0;overflow:auto;display:flex;padding:14px 16px;-webkit-overflow-scrolling:touch}
+.bk-canvas{position:relative;margin:auto}
+.bk-links{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.bk-links path{fill:none;stroke:var(--line-2);stroke-width:1.25}
+
+.bk-col{
+  position:absolute;top:0;
+  font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);
+}
+.bk-match{
+  position:absolute;display:flex;flex-direction:column;justify-content:center;gap:2px;
+  padding:8px 10px;border-radius:11px;text-align:left;
+  background:var(--panel);border:1px solid var(--line);
+  transition:border-color .18s ease,background .18s ease;
+}
+.bk-match.playable{
+  background:color-mix(in oklab,var(--ink) 5%,var(--panel));
+  border-color:var(--line-2);
+}
+.bk-match.playable:active{transform:scale(.985)}
+.bk-match:disabled{cursor:default}
+.bk-side{display:flex;align-items:center;gap:7px;min-width:0;height:20px}
+.bk-side i{width:7px;height:7px;border-radius:50%;background:var(--c,var(--line-2));flex:0 0 auto}
+.bk-side span{
+  flex:1;min-width:0;font-size:12.5px;font-weight:600;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.bk-side b{
+  font-family:var(--fm);font-size:12px;font-weight:600;color:var(--muted);
+  font-variant-numeric:tabular-nums;flex:0 0 auto;
+}
+.bk-side.named span{color:var(--ink);font-weight:600}
+.bk-side.won span,.bk-side.won b{color:color-mix(in oklab,var(--c) 62%,var(--tone));font-weight:700}
+.bk-side.lost span,.bk-side.lost b{color:var(--muted);font-weight:500}
+.bk-side.tbd span{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+.bk-rule{height:1px;background:var(--line);margin:2px 0}
+
+.bk-bar{
+  border-top:1px solid var(--line);background:var(--panel);
+  padding:12px 16px calc(13px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:12px;
+}
+.bk-next{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.bk-vs{font-size:14.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-vs em{font-style:normal;font-family:var(--fm);font-size:11px;letter-spacing:.08em;color:var(--muted);padding:0 5px}
+.bk-play{
+  flex:0 0 auto;padding:14px 22px;border-radius:12px;
+  background:var(--ink);color:var(--bg);font-size:15px;font-weight:700;
+  transition:transform .12s ease;
+}
+.bk-play:active{transform:scale(.97)}
+.bk-champ{--team:#E14434}
+.bk-champ .bk-vs{font-size:19px;font-weight:800;letter-spacing:-.03em;color:color-mix(in oklab,var(--team) 62%,var(--tone))}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
 }
@@ -405,8 +509,20 @@ h1,h2,h3,p{margin:0}
   <!-- ============ PRÉPARATION ============ -->
   <section class="screen on" id="s-setup">
     <header class="brand">
-      <p class="eyebrow">Compteur de points</p>
-      <h1>Cornhole<span>.</span></h1>
+      <div class="brand-row">
+        <div>
+          <p class="eyebrow">Compteur de points</p>
+          <h1>Cornhole<span>.</span></h1>
+        </div>
+        <button type="button" class="ghost-btn" id="openTour">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+            <path d="M1.5 2.5h3.2v5h3.1v-5h3.2M11 7.5h2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1.5 12.5h3.2v-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="tourBtnLabel">Tournoi</span>
+          <i class="pip" id="tourPip" hidden></i>
+        </button>
+      </div>
     </header>
 
     <div class="setup-body">
@@ -443,6 +559,84 @@ h1,h2,h3,p{margin:0}
     <footer class="cta-bar">
       <button type="button" class="cta" id="start">Commencer la partie</button>
     </footer>
+  </section>
+
+  <!-- ============ TOURNOI · PRÉPARATION ============ -->
+  <section class="screen" id="s-tsetup">
+    <header class="brand">
+      <div class="brand-row">
+        <div>
+          <p class="eyebrow">Élimination directe</p>
+          <h1>Tournoi<span>.</span></h1>
+        </div>
+        <button type="button" class="ghost-btn" id="tsBack">Accueil</button>
+      </div>
+    </header>
+
+    <div class="setup-body">
+      <div class="tcount">
+        <div>
+          <p class="eyebrow">Équipes engagées</p>
+          <p class="note" id="tcNote">Tableau à 4 · aucune exemption</p>
+        </div>
+        <div class="step wide" id="tcStep">
+          <button type="button" id="tcMinus" aria-label="Retirer une équipe">−</button>
+          <div class="v" id="tcVal">4</div>
+          <button type="button" id="tcPlus" aria-label="Ajouter une équipe">+</button>
+        </div>
+      </div>
+
+      <div class="seg" id="tmode">
+        <button type="button" data-mode="simple" class="on">Simple <span>1 v 1</span></button>
+        <button type="button" data-mode="double">Double <span>2 v 2</span></button>
+      </div>
+
+      <div id="trows"></div>
+
+      <details class="rules">
+        <summary>Règles des matchs</summary>
+        <div class="rules-body">
+          <div class="opt">
+            <p class="eyebrow">Score à atteindre</p>
+            <div class="opt-row" id="ttarget">
+              <button type="button" class="chip" data-target="11">11</button>
+              <button type="button" class="chip" data-target="15">15</button>
+              <button type="button" class="chip on" data-target="21">21</button>
+            </div>
+          </div>
+          <div class="opt">
+            <p class="eyebrow">En cas de dépassement</p>
+            <div class="opt-row" id="tbust">
+              <button type="button" class="chip on" data-bust="0">La partie est gagnée</button>
+              <button type="button" class="chip" data-bust="1">Retour à <b id="tbustBack">15</b></button>
+            </div>
+          </div>
+          <p class="note">Ces règles s'appliquent à tous les matchs du tournoi. Quand le nombre d'équipes n'est pas une puissance de deux, les premières du tableau sont exemptées du premier tour.</p>
+        </div>
+      </details>
+    </div>
+
+    <footer class="cta-bar">
+      <button type="button" class="cta" id="tstart">Créer le tableau</button>
+    </footer>
+  </section>
+
+  <!-- ============ TOURNOI · TABLEAU ============ -->
+  <section class="screen" id="s-bracket">
+    <header class="top">
+      <p class="eyebrow" id="bkTitle">Tournoi</p>
+      <div class="sep"></div>
+      <button type="button" class="ghost-btn" id="bkHome">Accueil</button>
+      <button type="button" class="icon-btn" id="bkNew" aria-label="Nouveau tournoi">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+          <path d="M8.5 3.5v10M3.5 8.5h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="bk-scroll" id="bkScroll"></div>
+
+    <footer class="bk-bar" id="bkBar"></footer>
   </section>
 
   <!-- ============ PARTIE ============ -->
@@ -729,7 +923,7 @@ function validateRound(){
   G.entry=[{h:0,b:0},{h:0,b:0}];
   buzz(gain[0]||gain[1] ? 18 : 8);
 
-  if(G.over){ renderGame(); setTimeout(renderOver, 620); }
+  if(G.over){ applyMatchResult(); renderGame(); setTimeout(renderOver, 620); }
   else renderGame(false, [G.scores[0]-before[0], G.scores[1]-before[1]]);
   save();
 }
@@ -858,7 +1052,8 @@ function renderConsole(){
 function renderGame(rebuild, gains){
   if(rebuild){ buildFields(); buildRows(); }
 
-  $("roundLabel").textContent = "Manche "+(G.rounds.length+1);
+  var ctx = (G.tour && T && T.matches[G.tour.mid]) ? roundName(T.matches[G.tour.mid].r)+" · " : "";
+  $("roundLabel").textContent = ctx+"Manche "+(G.rounds.length+1);
   $("targetLabel").textContent = "Objectif "+G.target;
 
   var fields=$("fields").children;
@@ -936,7 +1131,11 @@ function renderSheet(){
   $("undo").disabled=false;
 }
 
-function openSheet(){ renderSheet(); $("sheetWrap").classList.add("on"); }
+function openSheet(){
+  renderSheet();
+  $("quit").textContent = (G && G.tour) ? "Abandonner le match" : "Terminer la partie";
+  $("sheetWrap").classList.add("on");
+}
 function closeSheet(){ $("sheetWrap").classList.remove("on"); }
 $("openSheet").addEventListener("click",openSheet);
 $("closeSheet").addEventListener("click",closeSheet);
@@ -944,8 +1143,9 @@ $("scrim").addEventListener("click",closeSheet);
 $("undo").addEventListener("click",function(){ undoRound(); });
 $("quit").addEventListener("click",function(){
   closeSheet();
+  var wasTour = !!(G && G.tour);
   G=null; save();
-  show("setup");
+  if(wasTour && T) openBracket(); else show("setup");
 });
 $("validate").addEventListener("click",validateRound);
 
@@ -958,8 +1158,12 @@ function renderOver(){
   box.innerHTML="";
   box.style.setProperty("--team",G.teams[w].hex);
 
+  var tour = G.tour && T ? T.matches[G.tour.mid] : null;
+
   var head=el("div","over-head reveal");
-  head.appendChild(el("p","eyebrow","Partie terminée en "+G.rounds.length+" manches"));
+  head.appendChild(el("p","eyebrow", tour
+    ? roundName(tour.r)+" · "+G.rounds.length+" manches"
+    : "Partie terminée en "+G.rounds.length+" manches"));
   head.appendChild(el("h2",null,G.teams[w].label+" l'emporte"));
   var fin=el("div","final");
   fin.appendChild(el("span","a",String(G.scores[w])));
@@ -988,31 +1192,441 @@ function renderOver(){
 
   var acts=el("div","over-acts reveal");
   acts.style.animationDelay="160ms";
-  var again=el("button","cta","Revanche");
-  again.type="button";
-  again.addEventListener("click",function(){ newGame(); });
-  var back=el("button","cta ghost","Nouvelle configuration");
-  back.type="button";
-  back.addEventListener("click",function(){ G=null; save(); show("setup"); });
-  acts.appendChild(again); acts.appendChild(back);
+
+  if(tour){
+    var nx=nextMatch();
+    if(T.champion>=0){
+      var crown=el("button","cta","Voir le vainqueur du tournoi");
+      crown.type="button";
+      crown.addEventListener("click",function(){ G=null; save(); openBracket(); });
+      acts.appendChild(crown);
+    }else if(nx>=0){
+      var nm=T.matches[nx];
+      var go=el("button","cta","Match suivant");
+      go.type="button";
+      head.appendChild(el("p","note","Ensuite : "+tName(nm.a)+" contre "+tName(nm.b)+"."));
+      go.addEventListener("click",function(){ playMatch(nx); });
+      acts.appendChild(go);
+    }
+    var toBk=el("button","cta ghost","Retour au tableau");
+    toBk.type="button";
+    toBk.addEventListener("click",function(){ G=null; save(); openBracket(); });
+    acts.appendChild(toBk);
+  }else{
+    var again=el("button","cta","Revanche");
+    again.type="button";
+    again.addEventListener("click",function(){ newGame(); });
+    var back=el("button","cta ghost","Nouvelle configuration");
+    back.type="button";
+    back.addEventListener("click",function(){ G=null; save(); show("setup"); });
+    acts.appendChild(again); acts.appendChild(back);
+  }
   box.appendChild(acts);
 
   show("over");
   buzz([14,60,26]);
 }
 
+/* ==================================================================
+   TOURNOI — élimination directe
+================================================================== */
+var TS = { count:4, mode:"simple", target:21, bust:false, open:-1, teams:[] };
+for(var _i=0;_i<16;_i++) TS.teams.push({name:"", color:COLORS[_i%COLORS.length].id});
+
+var T = null;   /* tournoi en cours */
+
+function tName(k){
+  if(k==null || !T) return null;
+  return (T.teams[k].name||"").trim() || ("Équipe "+(k+1));
+}
+function tHex(k){ return color(T.teams[k].color).hex; }
+
+/* ordre de placement classique : 1 contre le dernier, etc. */
+function seedOrder(n){
+  var o=[1];
+  while(o.length<n){
+    var m=o.length*2+1, next=[];
+    for(var i=0;i<o.length;i++){ next.push(o[i]); next.push(m-o[i]); }
+    o=next;
+  }
+  return o;
+}
+function matchAt(r,i){
+  for(var k=0;k<T.matches.length;k++){
+    if(T.matches[k].r===r && T.matches[k].i===i) return T.matches[k];
+  }
+  return null;
+}
+function propagate(m){
+  if(m.r+1>=T.rounds) return;
+  var win = m.winner===0 ? m.a : m.b;
+  var p = matchAt(m.r+1, m.i>>1);
+  if(!p) return;
+  if(m.i%2===0) p.a=win; else p.b=win;
+}
+function nextMatch(){
+  for(var k=0;k<T.matches.length;k++){
+    var m=T.matches[k];
+    if(!m.done && m.a!=null && m.b!=null) return k;
+  }
+  return -1;
+}
+function roundName(r){
+  var left=T.rounds-r;
+  if(left===1) return "Finale";
+  if(left===2) return "Demi-finales";
+  if(left===3) return "Quarts de finale";
+  if(left===4) return "Huitièmes";
+  return "Tour "+(r+1);
+}
+
+function buildTournament(){
+  var n=TS.count;
+  var size=2; while(size<n) size*=2;
+  var rounds=Math.round(Math.log(size)/Math.log(2));
+  var order=seedOrder(size);
+
+  var matches=[];
+  for(var r=0;r<rounds;r++){
+    var count=size>>(r+1);
+    for(var i=0;i<count;i++) matches.push({r:r,i:i,a:null,b:null,winner:-1,score:[0,0],done:false,bye:false});
+  }
+  T={
+    teams:TS.teams.slice(0,n).map(function(t,k){
+      return {name:(t.name||"").trim() || ("Équipe "+(k+1)), color:t.color};
+    }),
+    size:size, rounds:rounds, matches:matches,
+    mode:TS.mode, target:TS.target, bust:TS.bust, champion:-1
+  };
+
+  /* placement du 1er tour, les rangs au-delà de n étant des exemptions */
+  for(var j=0;j<size/2;j++){
+    var m=matchAt(0,j);
+    var sa=order[j*2], sb=order[j*2+1];
+    m.a = sa<=n ? sa-1 : null;
+    m.b = sb<=n ? sb-1 : null;
+  }
+  for(var k=0;k<matches.length;k++){
+    var mm=matches[k];
+    if(mm.r!==0) continue;
+    if(mm.a!=null && mm.b==null){ mm.winner=0; mm.done=true; mm.bye=true; propagate(mm); }
+    else if(mm.a==null && mm.b!=null){ mm.winner=1; mm.done=true; mm.bye=true; propagate(mm); }
+  }
+}
+
+/* --- préparation ------------------------------------------------ */
+function renderTCount(){
+  $("tcVal").textContent=TS.count;
+  $("tcMinus").disabled = TS.count<=2;
+  $("tcPlus").disabled  = TS.count>=16;
+  var size=2; while(size<TS.count) size*=2;
+  var byes=size-TS.count;
+  $("tcNote").textContent = "Tableau à "+size+" · "+
+    (byes===0 ? "aucune exemption" : byes+(byes>1?" équipes exemptées":" équipe exemptée")+" du 1er tour");
+}
+function renderTRows(){
+  var host=$("trows");
+  host.innerHTML="";
+  host.style.display="flex";
+  host.style.flexDirection="column";
+  host.style.gap="0";
+
+  for(var k=0;k<TS.count;k++){
+    (function(k){
+      var t=TS.teams[k];
+      var row=el("div","trow");
+      row.appendChild(el("span","seed",String(k+1).padStart(2,"0")));
+
+      var pick=el("button","pick");
+      pick.type="button";
+      pick.style.setProperty("--c",color(t.color).hex);
+      pick.setAttribute("aria-label","Couleur de l'équipe "+(k+1));
+      pick.setAttribute("aria-expanded", TS.open===k ? "true":"false");
+      pick.appendChild(el("i"));
+      pick.addEventListener("click",function(){
+        TS.open = TS.open===k ? -1 : k;
+        renderTRows();
+      });
+      row.appendChild(pick);
+
+      var name=el("input","field-input");
+      name.type="text";
+      name.value=t.name;
+      name.maxLength=22;
+      name.placeholder="Équipe "+(k+1);
+      name.setAttribute("aria-label","Nom de l'équipe "+(k+1));
+      name.addEventListener("input",function(){ t.name=name.value; save(); });
+      row.appendChild(name);
+      host.appendChild(row);
+
+      var sw=el("div","trow-sw swatches");
+      sw.hidden = TS.open!==k;
+      COLORS.forEach(function(col){
+        var b=el("button","sw");
+        b.type="button";
+        b.style.setProperty("--c",col.hex);
+        b.setAttribute("aria-pressed", col.id===t.color ? "true":"false");
+        b.setAttribute("aria-label","Couleur "+col.name);
+        b.addEventListener("click",function(){
+          t.color=col.id; TS.open=-1;
+          renderTRows(); save();
+        });
+        sw.appendChild(b);
+      });
+      host.appendChild(sw);
+    })(k);
+  }
+}
+function renderTRules(){
+  var a=$("ttarget").children, i;
+  for(i=0;i<a.length;i++) a[i].classList.toggle("on", +a[i].dataset.target===TS.target);
+  var b=$("tbust").children;
+  for(i=0;i<b.length;i++) b[i].classList.toggle("on", (b[i].dataset.bust==="1")===TS.bust);
+  $("tbustBack").textContent=backTo(TS.target);
+  var mm=$("tmode").children;
+  for(i=0;i<mm.length;i++) mm[i].classList.toggle("on", mm[i].dataset.mode===TS.mode);
+}
+function renderTSetup(){ renderTCount(); renderTRows(); renderTRules(); }
+
+$("tcMinus").addEventListener("click",function(){
+  if(TS.count<=2) return;
+  TS.count--; if(TS.open>=TS.count) TS.open=-1;
+  renderTCount(); renderTRows(); save();
+});
+$("tcPlus").addEventListener("click",function(){
+  if(TS.count>=16) return;
+  TS.count++;
+  renderTCount(); renderTRows(); save();
+});
+$("tmode").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-mode]"); if(!b) return;
+  TS.mode=b.dataset.mode; renderTRules(); save();
+});
+$("ttarget").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-target]"); if(!b) return;
+  TS.target=+b.dataset.target; renderTRules(); save();
+});
+$("tbust").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-bust]"); if(!b) return;
+  TS.bust=b.dataset.bust==="1"; renderTRules(); save();
+});
+$("tstart").addEventListener("click",function(){
+  buildTournament();
+  openBracket();
+  save();
+});
+
+/* --- le tableau -------------------------------------------------- */
+var SVGNS="http://www.w3.org/2000/svg";
+
+function bkSide(k, cls, score){
+  var s=el("div","bk-side "+(cls||""));
+  var dot=el("i");
+  if(k!=null) dot.style.setProperty("--c",tHex(k));
+  s.appendChild(dot);
+  s.appendChild(el("span",null, k==null ? "À suivre" : tName(k)));
+  if(score!=null) s.appendChild(el("b",null,String(score)));
+  if(k!=null) s.classList.add("named"); else s.classList.add("tbd");
+  return s;
+}
+
+function renderBracket(){
+  var host=$("bkScroll");
+  host.innerHTML="";
+
+  var MW=152, MH=58, GAP=14, COL=40, HEAD=26;
+  var rounds=T.rounds, size=T.size;
+  var bodyH=(size/2)*(MH+GAP);
+  var totalW=rounds*MW+(rounds-1)*COL;
+  var next=nextMatch();
+
+  var canvas=el("div","bk-canvas");
+  canvas.style.width=totalW+"px";
+  canvas.style.height=(bodyH+HEAD)+"px";
+
+  var svg=document.createElementNS(SVGNS,"svg");
+  svg.setAttribute("class","bk-links");
+  svg.setAttribute("width",totalW);
+  svg.setAttribute("height",bodyH+HEAD);
+  canvas.appendChild(svg);
+
+  for(var r=0;r<rounds;r++){
+    var count=size>>(r+1);
+    var span=bodyH/count;
+    var x=r*(MW+COL);
+
+    var title=el("div","bk-col",roundName(r));
+    title.style.left=x+"px";
+    title.style.width=MW+"px";
+    canvas.appendChild(title);
+
+    for(var i=0;i<count;i++){
+      var y=HEAD+span*i+span/2-MH/2;
+      var m=matchAt(r,i);
+
+      var card=el("button","bk-match");
+      card.type="button";
+      card.style.left=x+"px";
+      card.style.top=y+"px";
+      card.style.width=MW+"px";
+      card.style.height=MH+"px";
+
+      var playable = !m.done && m.a!=null && m.b!=null;
+      var sa,sb;
+      if(m.done && !m.bye){
+        sa=bkSide(m.a, m.winner===0?"won":"lost", m.score[0]);
+        sb=bkSide(m.b, m.winner===1?"won":"lost", m.score[1]);
+      }else if(m.bye){
+        sa=bkSide(m.winner===0?m.a:m.b,"won",null);
+        sb=el("div","bk-side tbd");
+        sb.appendChild(el("i"));
+        sb.appendChild(el("span",null,"Exempté"));
+      }else{
+        sa=bkSide(m.a,null,null);
+        sb=bkSide(m.b,null,null);
+      }
+      card.appendChild(sa);
+      card.appendChild(el("div","bk-rule"));
+      card.appendChild(sb);
+
+      if(playable){
+        card.classList.add("playable");
+        (function(id){ card.addEventListener("click",function(){ playMatch(id); }); })(T.matches.indexOf(m));
+      }else{
+        card.disabled=true;
+      }
+      if(T.champion>=0 ? (r===rounds-1) : (T.matches.indexOf(m)===next)) card.id="bkNext";
+      canvas.appendChild(card);
+
+      if(r<rounds-1){
+        var pspan=bodyH/(count/2);
+        var py=HEAD+pspan*Math.floor(i/2)+pspan/2;
+        var cy=y+MH/2;
+        var x1=x+MW, x2=x1+COL, mid=x1+COL/2;
+        var p=document.createElementNS(SVGNS,"path");
+        p.setAttribute("d","M"+x1+" "+cy+" H"+mid+" V"+py+" H"+x2);
+        svg.appendChild(p);
+      }
+    }
+  }
+  host.appendChild(canvas);
+
+  var played=0;
+  for(var k=0;k<T.matches.length;k++) if(T.matches[k].done && !T.matches[k].bye) played++;
+  $("bkTitle").textContent = T.teams.length+" équipes · "+played+" match"+(played>1?"s":"");
+
+  renderBkBar(next);
+}
+
+function renderBkBar(next){
+  var bar=$("bkBar");
+  bar.innerHTML="";
+  bar.classList.remove("bk-champ");
+
+  if(T.champion>=0){
+    bar.classList.add("bk-champ");
+    bar.style.setProperty("--team",tHex(T.champion));
+    var box=el("div","bk-next");
+    box.appendChild(el("p","eyebrow","Vainqueur du tournoi"));
+    box.appendChild(el("p","bk-vs",tName(T.champion)));
+    bar.appendChild(box);
+    var nb=el("button","bk-play","Nouveau");
+    nb.type="button";
+    nb.addEventListener("click",function(){ show("tsetup"); renderTSetup(); });
+    bar.appendChild(nb);
+    return;
+  }
+
+  if(next<0){
+    bar.appendChild(el("p","note","Tableau en attente."));
+    return;
+  }
+  var m=T.matches[next];
+  var box2=el("div","bk-next");
+  box2.appendChild(el("p","eyebrow","Prochain match · "+roundName(m.r)));
+  var vs=el("p","bk-vs");
+  vs.appendChild(document.createTextNode(tName(m.a)));
+  vs.appendChild(el("em",null,"vs"));
+  vs.appendChild(document.createTextNode(tName(m.b)));
+  box2.appendChild(vs);
+  bar.appendChild(box2);
+
+  var play=el("button","bk-play","Jouer");
+  play.type="button";
+  play.addEventListener("click",function(){ playMatch(next); });
+  bar.appendChild(play);
+}
+
+function openBracket(){
+  renderBracket();
+  show("bracket");
+  var n=$("bkNext");
+  if(n && n.scrollIntoView) n.scrollIntoView({block:"center",inline:"center"});
+}
+
+/* --- un match du tournoi ---------------------------------------- */
+function playMatch(mid){
+  var m=T.matches[mid];
+  if(!m || m.done || m.a==null || m.b==null) return;
+
+  var hexA=tHex(m.a), hexB=tHex(m.b);
+  if(hexA===hexB){
+    for(var c=0;c<COLORS.length;c++){
+      if(COLORS[c].hex!==hexA){ hexB=COLORS[c].hex; break; }
+    }
+  }
+  G={
+    mode:T.mode, target:T.target, bust:T.bust,
+    teams:[{label:tName(m.a),mates:"",hex:hexA},{label:tName(m.b),mates:"",hex:hexB}],
+    rounds:[], entry:[{h:0,b:0},{h:0,b:0}],
+    scores:[0,0], first:0, over:false, winner:-1,
+    tour:{mid:mid, recorded:false}
+  };
+  show("game");
+  renderGame(true);
+  save();
+  keepAwake();
+}
+
+function applyMatchResult(){
+  if(!G || !G.tour || G.tour.recorded || !T) return;
+  var m=T.matches[G.tour.mid];
+  G.tour.recorded=true;
+  if(!m || m.done) return;
+  m.score=[G.scores[0],G.scores[1]];
+  m.winner=G.winner;
+  m.done=true;
+  propagate(m);
+  if(m.r===T.rounds-1) T.champion = G.winner===0 ? m.a : m.b;
+}
+
 /* ------------------------------------------------------------------
    Navigation, persistance, écran allumé
 ------------------------------------------------------------------ */
+$("openTour").addEventListener("click",function(){
+  if(T && T.champion<0){ openBracket(); }
+  else { show("tsetup"); renderTSetup(); }
+});
+$("tsBack").addEventListener("click",function(){ show("setup"); });
+$("bkHome").addEventListener("click",function(){ show("setup"); });
+$("bkNew").addEventListener("click",function(){ show("tsetup"); renderTSetup(); });
+
+function refreshTourBtn(){
+  var live = !!(T && T.champion<0);
+  $("tourPip").hidden = !live;
+  $("tourBtnLabel").textContent = live ? "Tournoi en cours" : "Tournoi";
+}
+
 function show(name){
-  ["setup","game","over"].forEach(function(n){
+  ["setup","tsetup","bracket","game","over"].forEach(function(n){
     $("s-"+n).classList.toggle("on", n===name);
   });
   if(name!=="game") closeSheet();
+  if(name==="setup") refreshTourBtn();
 }
 
 function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify({s:S,g:G})); }catch(e){}
+  try{ localStorage.setItem(KEY, JSON.stringify({s:S,g:G,t:T,ts:TS})); }catch(e){}
 }
 function load(){
   var raw;
@@ -1024,6 +1638,15 @@ function load(){
     S=d.s;
     if(!S.teams || S.teams.length!==2) S.teams=[{name:"",mates:["",""],color:"rouge"},{name:"",mates:["",""],color:"bleu"}];
   }
+  if(d && d.ts && d.ts.teams && d.ts.teams.length===16){
+    TS=d.ts; TS.open=-1;
+    renderTSetup();
+  }
+  if(d && d.t && d.t.matches && d.t.teams){
+    T=d.t;
+  }
+  refreshTourBtn();
+
   if(d && d.g && d.g.teams){
     G=d.g;
     if(!G.entry) G.entry=[{h:0,b:0},{h:0,b:0}];
@@ -1047,7 +1670,9 @@ $("start").addEventListener("click",newGame);
 
 renderCards();
 renderRules();
+renderTSetup();
 load();
+refreshTourBtn();
 
 /* installation sur l'écran d'accueil et fonctionnement hors ligne */
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
