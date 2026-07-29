@@ -88,9 +88,11 @@ manche — en double, 2 sacs par joueur. Seule la différence entre les deux éq
 lance en premier à la manche suivante ; la toute première est tirée au sort. La partie s'arrête
 dès qu'une équipe atteint le score visé.
 
-Ce résumé est affiché dans l'application, sous le volet *Règles de la partie*, avec le seul réglage
-disponible : le **score à atteindre**, au choix 11, 15 ou 21 (21 par défaut). Le tournoi reprend le
-même volet, appliqué à tous ses matchs.
+Dans l'application, ces deux natures sont séparées. Le **score à atteindre** — 11, 15 ou 21, 21 par
+défaut — est un réglage comme un autre : il reste visible sur l'accueil, à un appui. Le rappel des
+règles, lui, est une fiche qui s'ouvre par-dessus l'écran depuis la ligne *Règles du jeu*, et se
+referme d'un toucher. Le tournoi propose les deux au même endroit, son score s'appliquant à tous
+ses matchs.
 
 ## Technique
 

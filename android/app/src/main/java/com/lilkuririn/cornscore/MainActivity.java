@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         "  if(s && s.classList.contains('on')){ document.getElementById('closeSheet').click(); return '1'; }" +
         "  var b=document.getElementById('bkSheetWrap');" +
         "  if(b && b.classList.contains('on')){ document.getElementById('bkSheetClose').click(); return '1'; }" +
+        "  var g=document.getElementById('rulesWrap');" +
+        "  if(g && g.classList.contains('on')){ document.getElementById('rulesClose').click(); return '1'; }" +
         "  function on(id){ var e=document.getElementById(id); return e && e.classList.contains('on'); }" +
         "  if(on('s-hall')){ document.getElementById('hallBack').click(); return '1'; }" +
         "  if(on('s-tsetup')){ document.getElementById('tsBack').click(); return '1'; }" +

@@ -173,27 +173,11 @@ h1,h2,h3,p{margin:0}
 .sw[aria-pressed="true"]::after{border-color:var(--c)}
 .sw:active{transform:scale(.9)}
 
-.rules{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.rules summary{
-  padding:14px;font-size:14px;font-weight:600;cursor:pointer;list-style:none;
-  display:flex;align-items:center;justify-content:space-between;
+.panel-block{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px;
 }
-.rules summary::-webkit-details-marker{display:none}
-.rules summary::after{content:"+";font-family:var(--fm);color:var(--muted);font-size:17px}
-.rules[open] summary::after{content:"–"}
-.rules-body{
-  padding:0 14px 14px;display:flex;flex-direction:column;gap:14px;
-  /* le volet défile sur lui-même plutôt que de pousser le pied de page */
-  max-height:min(300px,38dvh);
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  scrollbar-width:thin;
-  scrollbar-color:var(--line-2) transparent;
-}
-.rules-body::-webkit-scrollbar{width:4px}
-.rules-body::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:2px}
-.rules-body::-webkit-scrollbar-track{background:transparent}
-.opt{display:flex;flex-direction:column;gap:7px}
+.opt{display:flex;flex-direction:column;gap:9px}
 .opt-row{display:flex;gap:6px}
 .chip{
   flex:1;padding:9px 6px;border-radius:9px;background:var(--panel-2);
@@ -204,21 +188,21 @@ h1,h2,h3,p{margin:0}
 .note{font-size:12.5px;line-height:1.5;color:var(--muted)}
 
 /* résumé des règles */
-#rulesSummary,#trulesSummary{gap:13px}
-.pts{display:flex;flex-direction:column;gap:8px}
-.pt-row{display:flex;align-items:center;gap:11px}
+#rulesBody{display:flex;flex-direction:column;gap:20px;padding-top:16px}
+.pts{display:flex;flex-direction:column;gap:10px}
+.pt-row{display:flex;align-items:center;gap:13px}
 .pt-row b{
-  flex:0 0 auto;width:30px;height:30px;border-radius:9px;
+  flex:0 0 auto;width:34px;height:34px;border-radius:10px;
   display:grid;place-items:center;
   background:var(--panel-2);border:1px solid var(--line-2);
-  font-family:var(--fm);font-size:13.5px;font-weight:700;
+  font-family:var(--fm);font-size:15px;font-weight:700;
   font-variant-numeric:tabular-nums;
 }
-.pt-row span{font-size:14px;font-weight:500}
-.rulist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
-.rulist li{position:relative;padding-left:16px;font-size:12.8px;line-height:1.55;color:var(--muted)}
+.pt-row span{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.rulist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:13px}
+.rulist li{position:relative;padding-left:17px;font-size:13.5px;line-height:1.6;color:var(--muted)}
 .rulist li::before{
-  content:"";position:absolute;left:0;top:7px;
+  content:"";position:absolute;left:0;top:8px;
   width:5px;height:5px;border-radius:50%;background:var(--line-2);
 }
 .rulist b{color:var(--ink);font-weight:600}
@@ -696,20 +680,26 @@ h1,h2,h3,p{margin:0}
 
       <div id="cards"></div>
 
-      <details class="rules">
-        <summary>Règles de la partie</summary>
-        <div class="rules-body">
-          <div class="opt">
-            <p class="eyebrow">Score à atteindre</p>
-            <div class="opt-row" id="target">
-              <button type="button" class="chip" data-target="11">11</button>
-              <button type="button" class="chip" data-target="15">15</button>
-              <button type="button" class="chip on" data-target="21">21</button>
-            </div>
+      <div class="panel-block">
+        <div class="opt">
+          <p class="eyebrow">Score à atteindre</p>
+          <div class="opt-row" id="target">
+            <button type="button" class="chip" data-target="11">11</button>
+            <button type="button" class="chip" data-target="15">15</button>
+            <button type="button" class="chip on" data-target="21">21</button>
           </div>
-          <div class="opt" id="rulesSummary"></div>
         </div>
-      </details>
+      </div>
+
+      <button type="button" class="hall-link" id="openRules">
+        <span>
+          <span class="eyebrow">Règles du jeu</span>
+          <b>Comment marquer des points</b>
+        </span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
 
       <button type="button" class="hall-link" id="openHall" hidden>
         <span>
@@ -744,6 +734,22 @@ h1,h2,h3,p{margin:0}
     </footer>
   </section>
 
+  <!-- ============ RÈGLES DU JEU (par-dessus l'écran courant) ============ -->
+  <div class="sheet-wrap" id="rulesWrap">
+    <div class="scrim" id="rulesScrim"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Règles du jeu">
+      <div class="sheet-head">
+        <h3>Règles du jeu</h3>
+        <button type="button" class="icon-btn" id="rulesClose" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="sheet-body" id="rulesBody"></div>
+    </div>
+  </div>
+
   <!-- ============ TOURNOI · PRÉPARATION ============ -->
   <section class="screen" id="s-tsetup">
     <header class="brand">
@@ -776,21 +782,26 @@ h1,h2,h3,p{margin:0}
 
       <div id="trows"></div>
 
-      <details class="rules">
-        <summary>Règles des matchs</summary>
-        <div class="rules-body">
-          <div class="opt">
-            <p class="eyebrow">Score à atteindre</p>
-            <div class="opt-row" id="ttarget">
-              <button type="button" class="chip" data-target="11">11</button>
-              <button type="button" class="chip" data-target="15">15</button>
-              <button type="button" class="chip on" data-target="21">21</button>
-            </div>
+      <div class="panel-block">
+        <div class="opt">
+          <p class="eyebrow">Score à atteindre — tous les matchs</p>
+          <div class="opt-row" id="ttarget">
+            <button type="button" class="chip" data-target="11">11</button>
+            <button type="button" class="chip" data-target="15">15</button>
+            <button type="button" class="chip on" data-target="21">21</button>
           </div>
-          <div class="opt" id="trulesSummary"></div>
-          <p class="note">Ces règles s'appliquent à tous les matchs du tournoi. Quand le nombre d'équipes n'est pas une puissance de deux, les premières du tableau sont exemptées du premier tour.</p>
         </div>
-      </details>
+      </div>
+
+      <button type="button" class="hall-link" id="openRulesT">
+        <span>
+          <span class="eyebrow">Règles du jeu</span>
+          <b>Comment marquer des points</b>
+        </span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
 
     <footer class="cta-bar">
@@ -933,13 +944,15 @@ function color(id){
   for(var i=0;i<COLORS.length;i++){ if(COLORS[i].id===id) return COLORS[i]; }
   return COLORS[0];
 }
-/* Résumé des règles, partagé par l'accueil et la préparation du tournoi. */
+/* Fiche des règles, ouverte par-dessus l'écran courant depuis l'accueil
+   comme depuis la préparation d'un tournoi. */
 function fillRules(id){
   var host=$(id);
   if(!host) return;
   host.innerHTML="";
-  host.appendChild(el("p","eyebrow","Comptage"));
 
+  var comptage=el("div","block");
+  comptage.appendChild(el("p","eyebrow","Comptage"));
   var pts=el("div","pts");
   [["3","Sac dans le trou"],["1","Sac sur la planche"]].forEach(function(p){
     var row=el("div","pt-row");
@@ -947,8 +960,11 @@ function fillRules(id){
     row.appendChild(el("span",null,p[1]));
     pts.appendChild(row);
   });
-  host.appendChild(pts);
+  comptage.appendChild(pts);
+  host.appendChild(comptage);
 
+  var deroule=el("div","block");
+  deroule.appendChild(el("p","eyebrow","Déroulé d'une manche"));
   var list=el("ul","rulist");
   [
     ["Chaque équipe lance ","4 sacs"," par manche — en double, 2 sacs par joueur."],
@@ -962,7 +978,8 @@ function fillRules(id){
     li.appendChild(document.createTextNode(r[2]));
     list.appendChild(li);
   });
-  host.appendChild(list);
+  deroule.appendChild(list);
+  host.appendChild(deroule);
 }
 
 /* état de préparation */
@@ -1601,6 +1618,8 @@ function closeSheet(){
   $("sheetWrap").classList.remove("on");
   var bk=$("bkSheetWrap");
   if(bk) bk.classList.remove("on");
+  var ru=$("rulesWrap");
+  if(ru) ru.classList.remove("on");
 }
 $("openSheet").addEventListener("click",openSheet);
 $("closeSheet").addEventListener("click",closeSheet);
@@ -1853,6 +1872,13 @@ function refreshHallLink(){
   link.hidden = !H.length;
   $("hallCount").textContent = H.length===1 ? "1 partie enregistrée" : H.length+" parties enregistrées";
 }
+
+function openRules(){ $("rulesWrap").classList.add("on"); }
+function closeRules(){ $("rulesWrap").classList.remove("on"); }
+$("openRules").addEventListener("click",openRules);
+$("openRulesT").addEventListener("click",openRules);
+$("rulesClose").addEventListener("click",closeRules);
+$("rulesScrim").addEventListener("click",closeRules);
 
 $("openHall").addEventListener("click",function(){ renderHall(); show("hall"); });
 $("hallBack").addEventListener("click",function(){ show("setup"); });
@@ -2365,8 +2391,7 @@ $("start").addEventListener("click",newGame);
 
 renderCards();
 renderRules();
-fillRules("rulesSummary");
-fillRules("trulesSummary");
+fillRules("rulesBody");
 renderTSetup();
 load();
 refreshTourBtn();
