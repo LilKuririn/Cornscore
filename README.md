@@ -82,17 +82,15 @@ et « Marc » comptent pour la même personne. En double, c'est le nom de l'équ
 
 ## Règles appliquées
 
-Un sac dans le trou vaut 3 points, un sac sur la planche 1 point. À chaque manche, seule la
-différence entre les deux équipes est marquée. Chaque équipe lance 4 sacs par manche — en double,
-2 sacs par joueur.
+Un sac dans le trou vaut 3 points, un sac sur la planche 1 point. Chaque équipe lance 4 sacs par
+manche — en double, 2 sacs par joueur. Seule la différence entre les deux équipes est marquée :
+5 points contre 3 rapportent 2 points, l'autre équipe n'en marque aucun. L'équipe qui a marqué
+lance en premier à la manche suivante ; la toute première est tirée au sort. La partie s'arrête
+dès qu'une équipe atteint le score visé.
 
-Deux réglages, dans le volet *Règles de la partie* — repris à l'identique dans le tournoi, où ils
-s'appliquent à tous les matchs :
-
-| Réglage | Valeurs | Défaut |
-| --- | --- | --- |
-| Score à atteindre | 11 / 15 / 21 | 21 |
-| Dépassement | la partie est gagnée / retour à 15 | la partie est gagnée |
+Ce résumé est affiché dans l'application, sous le volet *Règles de la partie*, avec le seul réglage
+disponible : le **score à atteindre**, au choix 11, 15 ou 21 (21 par défaut). Le tournoi reprend le
+même volet, appliqué à tous ses matchs.
 
 ## Technique
 

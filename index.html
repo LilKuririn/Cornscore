@@ -186,6 +186,26 @@ h1,h2,h3,p{margin:0}
 .chip.on{color:var(--ink);border-color:var(--line-2)}
 .note{font-size:12.5px;line-height:1.5;color:var(--muted)}
 
+/* résumé des règles */
+#rulesSummary,#trulesSummary{gap:13px}
+.pts{display:flex;flex-direction:column;gap:8px}
+.pt-row{display:flex;align-items:center;gap:11px}
+.pt-row b{
+  flex:0 0 auto;width:30px;height:30px;border-radius:9px;
+  display:grid;place-items:center;
+  background:var(--panel-2);border:1px solid var(--line-2);
+  font-family:var(--fm);font-size:13.5px;font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.pt-row span{font-size:14px;font-weight:500}
+.rulist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.rulist li{position:relative;padding-left:16px;font-size:12.8px;line-height:1.55;color:var(--muted)}
+.rulist li::before{
+  content:"";position:absolute;left:0;top:7px;
+  width:5px;height:5px;border-radius:50%;background:var(--line-2);
+}
+.rulist b{color:var(--ink);font-weight:600}
+
 .cta-bar{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
 .cta{
   width:100%;padding:16px;border-radius:13px;
@@ -669,14 +689,7 @@ h1,h2,h3,p{margin:0}
               <button type="button" class="chip on" data-target="21">21</button>
             </div>
           </div>
-          <div class="opt">
-            <p class="eyebrow">En cas de dépassement</p>
-            <div class="opt-row" id="bust">
-              <button type="button" class="chip on" data-bust="0">La partie est gagnée</button>
-              <button type="button" class="chip" data-bust="1">Retour à <b id="bustBack">15</b></button>
-            </div>
-          </div>
-          <p class="note">Un sac dans le trou vaut 3 points, un sac sur la planche 1 point. À chaque manche, seule la différence entre les deux équipes est marquée — l'équipe qui a marqué lance en premier à la manche suivante.</p>
+          <div class="opt" id="rulesSummary"></div>
         </div>
       </details>
 
@@ -756,13 +769,7 @@ h1,h2,h3,p{margin:0}
               <button type="button" class="chip on" data-target="21">21</button>
             </div>
           </div>
-          <div class="opt">
-            <p class="eyebrow">En cas de dépassement</p>
-            <div class="opt-row" id="tbust">
-              <button type="button" class="chip on" data-bust="0">La partie est gagnée</button>
-              <button type="button" class="chip" data-bust="1">Retour à <b id="tbustBack">15</b></button>
-            </div>
-          </div>
+          <div class="opt" id="trulesSummary"></div>
           <p class="note">Ces règles s'appliquent à tous les matchs du tournoi. Quand le nombre d'équipes n'est pas une puissance de deux, les premières du tableau sont exemptées du premier tour.</p>
         </div>
       </details>
@@ -908,11 +915,41 @@ function color(id){
   for(var i=0;i<COLORS.length;i++){ if(COLORS[i].id===id) return COLORS[i]; }
   return COLORS[0];
 }
-function backTo(target){ return Math.max(0, Math.round(target*5/7)); }  /* 21 -> 15 */
+/* Résumé des règles, partagé par l'accueil et la préparation du tournoi. */
+function fillRules(id){
+  var host=$(id);
+  if(!host) return;
+  host.innerHTML="";
+  host.appendChild(el("p","eyebrow","Comptage"));
+
+  var pts=el("div","pts");
+  [["3","Sac dans le trou"],["1","Sac sur la planche"]].forEach(function(p){
+    var row=el("div","pt-row");
+    row.appendChild(el("b",null,p[0]));
+    row.appendChild(el("span",null,p[1]));
+    pts.appendChild(row);
+  });
+  host.appendChild(pts);
+
+  var list=el("ul","rulist");
+  [
+    ["Chaque équipe lance ","4 sacs"," par manche — en double, 2 sacs par joueur."],
+    ["Seule la ","différence"," est marquée : 5 points contre 3 rapportent 2 points, l'autre équipe n'en marque aucun."],
+    ["L'équipe qui a marqué ","lance en premier"," à la manche suivante. La toute première est tirée au sort."],
+    ["La partie s'arrête dès qu'une équipe ","atteint le score visé","."]
+  ].forEach(function(r){
+    var li=document.createElement("li");
+    li.appendChild(document.createTextNode(r[0]));
+    li.appendChild(el("b",null,r[1]));
+    li.appendChild(document.createTextNode(r[2]));
+    list.appendChild(li);
+  });
+  host.appendChild(list);
+}
 
 /* état de préparation */
 var S = {
-  mode:"simple", target:21, bust:false,
+  mode:"simple", target:21,
   teams:[
     {name:"", mates:["",""], color:"rouge"},
     {name:"", mates:["",""], color:"bleu"}
@@ -1025,9 +1062,6 @@ function renderCards(){
 function renderRules(){
   var t=$("target").children, i;
   for(i=0;i<t.length;i++) t[i].classList.toggle("on", +t[i].dataset.target===S.target);
-  var b=$("bust").children;
-  for(i=0;i<b.length;i++) b[i].classList.toggle("on", (b[i].dataset.bust==="1")===S.bust);
-  $("bustBack").textContent = backTo(S.target);
 }
 
 $("mode").addEventListener("click",function(e){
@@ -1045,19 +1079,13 @@ $("target").addEventListener("click",function(e){
   S.target=+b.dataset.target;
   renderRules(); save();
 });
-$("bust").addEventListener("click",function(e){
-  var b=e.target.closest("button[data-bust]");
-  if(!b) return;
-  S.bust = b.dataset.bust==="1";
-  renderRules(); save();
-});
 
 /* ------------------------------------------------------------------
    Cycle de vie de la partie
 ------------------------------------------------------------------ */
 function newGame(){
   G={
-    mode:S.mode, target:S.target, bust:S.bust,
+    mode:S.mode, target:S.target,
     teams:[
       {label:teamLabel(0), mates:matesLabel(0), hex:color(S.teams[0].color).hex},
       {label:teamLabel(1), mates:matesLabel(1), hex:color(S.teams[1].color).hex}
@@ -1074,19 +1102,16 @@ function newGame(){
 
 /* rejoue l'historique — l'annulation d'une manche redevient exacte */
 function recompute(){
-  var s=[0,0], over=false, winner=-1, back=backTo(G.target);
+  var s=[0,0], over=false, winner=-1;
   var first = (G.tossFirst===0 || G.tossFirst===1) ? G.tossFirst : 0;
   for(var r=0;r<G.rounds.length;r++){
     var rd=G.rounds[r];
-    for(var i=0;i<2;i++){
-      s[i]+=rd.gain[i];
-      if(G.bust && s[i]>G.target) s[i]=back;
-    }
+    s[0]+=rd.gain[0];
+    s[1]+=rd.gain[1];
     if(rd.gain[0]>rd.gain[1]) first=0;
     else if(rd.gain[1]>rd.gain[0]) first=1;
     if(!over){
-      var w = G.bust ? (s[0]===G.target?0:(s[1]===G.target?1:-1))
-                     : (s[0]>=G.target?0:(s[1]>=G.target?1:-1));
+      var w = s[0]>=G.target ? 0 : (s[1]>=G.target ? 1 : -1);
       if(w>=0){ over=true; winner=w; }
     }
   }
@@ -1405,12 +1430,10 @@ function renderSheet(){
   table.appendChild(thead);
 
   var tbody=el("tbody");
-  var run=[0,0], back=backTo(G.target);
+  var run=[0,0];
   G.rounds.forEach(function(rd,idx){
-    for(var i=0;i<2;i++){
-      run[i]+=rd.gain[i];
-      if(G.bust && run[i]>G.target) run[i]=back;
-    }
+    run[0]+=rd.gain[0];
+    run[1]+=rd.gain[1];
     var row=el("tr");
     row.appendChild(el("td",null,String(idx+1).padStart(2,"0")));
     for(var j=0;j<2;j++){
@@ -1835,7 +1858,7 @@ $("hallClear").addEventListener("click",function(){
 /* ==================================================================
    TOURNOI — élimination directe
 ================================================================== */
-var TS = { count:4, mode:"simple", target:21, bust:false, open:-1, teams:[] };
+var TS = { count:4, mode:"simple", target:21, open:-1, teams:[] };
 for(var _i=0;_i<16;_i++) TS.teams.push({name:"", color:COLORS[_i%COLORS.length].id});
 
 var T = null;   /* tournoi en cours */
@@ -1901,7 +1924,7 @@ function buildTournament(){
       return {name:(t.name||"").trim() || ("Équipe "+(k+1)), color:t.color};
     }),
     size:size, rounds:rounds, matches:matches,
-    mode:TS.mode, target:TS.target, bust:TS.bust, champion:-1
+    mode:TS.mode, target:TS.target, champion:-1
   };
 
   /* placement du 1er tour, les rangs au-delà de n étant des exemptions */
@@ -1985,9 +2008,6 @@ function renderTRows(){
 function renderTRules(){
   var a=$("ttarget").children, i;
   for(i=0;i<a.length;i++) a[i].classList.toggle("on", +a[i].dataset.target===TS.target);
-  var b=$("tbust").children;
-  for(i=0;i<b.length;i++) b[i].classList.toggle("on", (b[i].dataset.bust==="1")===TS.bust);
-  $("tbustBack").textContent=backTo(TS.target);
   var mm=$("tmode").children;
   for(i=0;i<mm.length;i++) mm[i].classList.toggle("on", mm[i].dataset.mode===TS.mode);
 }
@@ -2010,10 +2030,6 @@ $("tmode").addEventListener("click",function(e){
 $("ttarget").addEventListener("click",function(e){
   var b=e.target.closest("button[data-target]"); if(!b) return;
   TS.target=+b.dataset.target; renderTRules(); save();
-});
-$("tbust").addEventListener("click",function(e){
-  var b=e.target.closest("button[data-bust]"); if(!b) return;
-  TS.bust=b.dataset.bust==="1"; renderTRules(); save();
 });
 $("tstart").addEventListener("click",function(){
   buildTournament();
@@ -2181,7 +2197,7 @@ function playMatch(mid){
     }
   }
   G={
-    mode:T.mode, target:T.target, bust:T.bust,
+    mode:T.mode, target:T.target,
     teams:[{label:tName(m.a),mates:"",hex:hexA},{label:tName(m.b),mates:"",hex:hexB}],
     rounds:[], entry:[{h:0,b:0},{h:0,b:0}],
     scores:[0,0], first:0, over:false, winner:-1,
@@ -2331,6 +2347,8 @@ $("start").addEventListener("click",newGame);
 
 renderCards();
 renderRules();
+fillRules("rulesSummary");
+fillRules("trulesSummary");
 renderTSetup();
 load();
 refreshTourBtn();
