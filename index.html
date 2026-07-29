@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0D1012">
+<title>Cornhole — Compteur de points</title>
+</head>
+<body>
+
+<style>
+/* ---------------------------------------------------------------
+   Cornhole — compteur de points
+   Tokens : le chrome reste neutre, la couleur vient des équipes.
+--------------------------------------------------------------- */
+:root{
+  --bg:#0D1012;
+  --panel:#14181B;
+  --panel-2:#1B2124;
+  --line:rgba(255,255,255,.09);
+  --line-2:rgba(255,255,255,.16);
+  --ink:#EAEEF0;
+  --muted:#8D999E;
+  --tone:#FFFFFF;          /* sens du mélange des couleurs d'équipe */
+  --danger:#E5645A;
+  --shadow:0 24px 60px rgba(0,0,0,.55);
+  --ff:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --fm:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --r:14px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root{
+    --bg:#EFF2F2; --panel:#FFFFFF; --panel-2:#E7EBEC;
+    --line:rgba(13,20,22,.10); --line-2:rgba(13,20,22,.20);
+    --ink:#0E1618; --muted:#5D6A6E; --tone:#070C0D; --danger:#C2372C;
+    --shadow:0 24px 60px rgba(13,20,22,.14);
+    color-scheme:light;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1012; --panel:#14181B; --panel-2:#1B2124;
+  --line:rgba(255,255,255,.09); --line-2:rgba(255,255,255,.16);
+  --ink:#EAEEF0; --muted:#8D999E; --tone:#FFFFFF; --danger:#E5645A;
+  --shadow:0 24px 60px rgba(0,0,0,.55);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#EFF2F2; --panel:#FFFFFF; --panel-2:#E7EBEC;
+  --line:rgba(13,20,22,.10); --line-2:rgba(13,20,22,.20);
+  --ink:#0E1618; --muted:#5D6A6E; --tone:#070C0D;
+  --shadow:0 24px 60px rgba(13,20,22,.14);
+  color-scheme:light;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--ff);
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
+}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+h1,h2,h3,p{margin:0}
+:focus-visible{outline:2px solid color-mix(in oklab,var(--ink) 70%,transparent);outline-offset:2px;border-radius:6px}
+
+/* --- coquille ------------------------------------------------ */
+.shell{
+  position:relative;
+  display:flex;flex-direction:column;
+  width:100%;max-width:460px;margin:0 auto;
+  min-height:100dvh;
+  background:var(--bg);
+  overflow:hidden;
+}
+@media (min-width:760px) and (min-height:700px){
+  body{background:
+    radial-gradient(120% 90% at 50% -10%,color-mix(in oklab,var(--panel) 70%,var(--bg)),var(--bg) 60%);}
+  .shell{
+    height:min(92dvh,880px);min-height:0;
+    margin:4dvh auto;border:1px solid var(--line);
+    border-radius:30px;box-shadow:var(--shadow);
+  }
+}
+
+.screen{display:none;flex:1;min-height:0;flex-direction:column}
+.screen.on{display:flex}
+
+/* --- éléments typographiques partagés ------------------------ */
+.eyebrow{
+  font-family:var(--fm);font-size:10px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.num{font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-weight:800}
+
+/* =============================================================
+   1. ÉCRAN DE PRÉPARATION
+   ============================================================= */
+.brand{padding:clamp(22px,6vw,34px) 20px 14px}
+.brand h1{
+  font-size:clamp(34px,10vw,44px);font-weight:800;
+  letter-spacing:-.045em;line-height:.95;margin-top:8px;
+}
+.brand h1 span{color:var(--muted)}
+
+.setup-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
+
+.seg{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:4px;
+}
+.seg button{
+  padding:11px 8px;border-radius:10px;font-weight:600;font-size:15px;
+  color:var(--muted);transition:background .18s ease,color .18s ease;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.seg button span{font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.seg button.on{background:var(--panel-2);color:var(--ink)}
+
+.card{
+  --team:#E14434;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px;display:flex;flex-direction:column;gap:12px;
+  border-left:3px solid color-mix(in oklab,var(--team) 80%,var(--panel));
+}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.card-head .cname{
+  font-family:var(--fm);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:color-mix(in oklab,var(--team) 62%,var(--tone));
+}
+.field-input{
+  width:100%;padding:12px 13px;border-radius:11px;
+  background:var(--panel-2);border:1px solid transparent;
+  font-size:16px;font-weight:600;letter-spacing:-.01em;
+  transition:border-color .18s ease;
+}
+.field-input::placeholder{color:var(--muted);font-weight:500}
+.field-input:focus{border-color:color-mix(in oklab,var(--team) 55%,transparent);outline:none}
+.mates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mates .field-input{font-size:14px;padding:10px 12px;font-weight:500}
+
+.swatches{display:grid;grid-template-columns:repeat(9,1fr);gap:7px;padding:3px 0}
+.sw{
+  width:100%;aspect-ratio:1;border-radius:50%;position:relative;
+  background:var(--c);border:1px solid rgba(0,0,0,.18);
+  transition:transform .16s ease;
+}
+.sw::after{
+  content:"";position:absolute;inset:-5px;border-radius:50%;
+  border:1.5px solid transparent;transition:border-color .16s ease;
+}
+.sw[aria-pressed="true"]::after{border-color:var(--c)}
+.sw:active{transform:scale(.9)}
+
+.rules{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.rules summary{
+  padding:14px;font-size:14px;font-weight:600;cursor:pointer;list-style:none;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.rules summary::-webkit-details-marker{display:none}
+.rules summary::after{content:"+";font-family:var(--fm);color:var(--muted);font-size:17px}
+.rules[open] summary::after{content:"–"}
+.rules-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:14px}
+.opt{display:flex;flex-direction:column;gap:7px}
+.opt-row{display:flex;gap:6px}
+.chip{
+  flex:1;padding:9px 6px;border-radius:9px;background:var(--panel-2);
+  font-size:14px;font-weight:600;color:var(--muted);text-align:center;
+  border:1px solid transparent;transition:color .16s ease,border-color .16s ease;
+}
+.chip.on{color:var(--ink);border-color:var(--line-2)}
+.note{font-size:12.5px;line-height:1.5;color:var(--muted)}
+
+.cta-bar{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}
+.cta{
+  width:100%;padding:16px;border-radius:13px;
+  background:var(--ink);color:var(--bg);
+  font-size:16px;font-weight:700;letter-spacing:-.01em;
+  transition:transform .12s ease,opacity .2s ease;
+}
+.cta:active{transform:scale(.985)}
+.cta.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line-2)}
+
+/* =============================================================
+   2. ÉCRAN DE PARTIE
+   ============================================================= */
+.top{
+  display:flex;align-items:center;gap:12px;
+  padding:calc(10px + env(safe-area-inset-top)) 8px 10px 16px;
+  border-bottom:1px solid var(--line);
+}
+.top .eyebrow{flex:0 0 auto}
+.top .sep{flex:1;height:1px;background:var(--line)}
+.icon-btn{
+  width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+  color:var(--muted);transition:background .16s ease,color .16s ease;
+}
+.icon-btn:active{background:var(--panel);color:var(--ink)}
+
+.fields{flex:1;min-height:0;display:flex;flex-direction:column}
+
+.tfield{
+  --team:#E14434;
+  --t-bg:color-mix(in oklab,var(--team) 9%,var(--panel));
+  --t-ink:color-mix(in oklab,var(--team) 60%,var(--tone));
+  --t-name:color-mix(in oklab,var(--team) 72%,var(--tone));
+  flex:1;min-height:0;position:relative;
+  padding:14px 16px 12px;
+  display:flex;flex-direction:column;
+  background:var(--t-bg);
+  transition:background .3s ease;
+}
+.tfield + .tfield{border-top:1px solid var(--line)}
+.tfield.lead{background:color-mix(in oklab,var(--team) 14%,var(--panel))}
+
+.dot{width:9px;height:9px;border-radius:50%;background:var(--team);flex:0 0 auto}
+.t-name{
+  display:flex;align-items:center;gap:8px;
+  font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--t-name);
+}
+.t-name span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.honor{
+  display:inline-block;
+  font-family:var(--fm);font-size:9px;letter-spacing:.13em;text-transform:uppercase;
+  color:color-mix(in oklab,var(--team) 55%,var(--tone));
+  border:1px solid color-mix(in oklab,var(--team) 40%,transparent);
+  padding:3px 7px;border-radius:20px;
+}
+.t-mates{font-family:var(--fm);font-size:10.5px;letter-spacing:.06em;color:var(--muted);margin-top:7px}
+.t-mates:empty{display:none}
+.t-honor{margin-top:11px}
+.t-honor[hidden]{display:none}
+
+.t-score{
+  flex:1;min-height:0;display:flex;align-items:center;gap:12px;
+  position:relative;
+}
+.t-id{flex:1;min-width:0}
+.t-num{
+  flex:0 0 auto;
+  font-size:clamp(64px,23vw,116px);line-height:.78;color:var(--t-ink);
+}
+.t-gain{
+  position:absolute;right:2px;top:2px;
+  font-family:var(--fm);font-size:15px;font-weight:600;
+  color:color-mix(in oklab,var(--team) 70%,var(--tone));
+  opacity:0;pointer-events:none;
+}
+.t-gain.play{animation:gain 1.15s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes gain{
+  0%{opacity:0;transform:translateY(14px)}
+  22%{opacity:1;transform:translateY(0)}
+  70%{opacity:1;transform:translateY(-6px)}
+  100%{opacity:0;transform:translateY(-22px)}
+}
+.tfield.bloom::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(80% 120% at 88% 62%,color-mix(in oklab,var(--team) 34%,transparent),transparent 70%);
+  animation:bloom .9s ease-out forwards;
+}
+@keyframes bloom{from{opacity:1}to{opacity:0}}
+
+/* réglette de progression vers l'objectif */
+.ticks{display:flex;gap:3px;align-items:flex-end;height:12px;margin-top:10px}
+.ticks i{flex:1;height:4px;border-radius:2px;background:var(--line-2);transition:background .25s ease,height .25s ease}
+.ticks i.f{background:color-mix(in oklab,var(--team) 78%,var(--tone));height:9px}
+.ticks i.last{height:12px}
+
+/* --- console de saisie --------------------------------------- */
+.console{
+  border-top:1px solid var(--line);background:var(--panel);
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:9px;
+}
+.console-head{display:grid;grid-template-columns:1fr 92px 92px;align-items:center;gap:8px}
+.console-head .eyebrow{text-align:center}
+.console-head .eyebrow:first-child{text-align:left}
+.console-head b{color:color-mix(in oklab,var(--ink) 70%,var(--muted));font-weight:500}
+
+.crow{display:grid;grid-template-columns:1fr 92px 92px;align-items:center;gap:8px}
+.crow .who{display:flex;align-items:center;gap:7px;min-width:0}
+.crow .who span{
+  font-size:13.5px;font-weight:600;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.step{
+  --team:#E14434;
+  display:grid;grid-template-columns:30px 1fr 30px;align-items:center;
+  background:var(--panel-2);border-radius:10px;height:44px;
+}
+.step button{
+  height:100%;display:grid;place-items:center;color:var(--muted);
+  font-family:var(--fm);font-size:17px;line-height:1;border-radius:10px;
+  transition:color .14s ease;
+}
+.step button:disabled{opacity:.28;cursor:default}
+.step button:not(:disabled):active{color:var(--ink)}
+.step .v{
+  text-align:center;font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--muted);transition:color .18s ease;
+}
+.step .v.hot{color:color-mix(in oklab,var(--team) 62%,var(--tone))}
+
+.settle{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;margin-top:2px}
+.outcome{
+  font-family:var(--fm);font-size:11.5px;letter-spacing:.05em;
+  color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.outcome b{color:var(--ink);font-weight:600}
+.validate{
+  padding:14px 22px;border-radius:12px;background:var(--ink);color:var(--bg);
+  font-size:15px;font-weight:700;transition:transform .12s ease;
+}
+.validate:active{transform:scale(.97)}
+
+/* =============================================================
+   3. FEUILLE DE MATCH (panneau)
+   ============================================================= */
+.sheet-wrap{position:absolute;inset:0;z-index:20;display:none}
+.sheet-wrap.on{display:block}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.5);animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;max-height:88%;
+  background:var(--panel);border-top:1px solid var(--line-2);
+  border-radius:20px 20px 0 0;display:flex;flex-direction:column;
+  animation:rise .26s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes rise{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sheet-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 16px 10px;border-bottom:1px solid var(--line);
+}
+.sheet-head h3{font-size:16px;font-weight:700;letter-spacing:-.02em}
+.sheet-body{overflow-y:auto;padding:6px 16px 16px}
+.log{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.log th{
+  font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:right;padding:10px 0 8px;
+}
+.log th:first-child{text-align:left}
+.log td{
+  padding:9px 0;border-top:1px solid var(--line);font-size:14px;
+  display:flex;align-items:baseline;justify-content:flex-end;gap:12px;
+}
+.log td:first-child{justify-content:flex-start;font-family:var(--fm);font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.log .pt{font-weight:700;min-width:26px;text-align:right}
+.log .zero{color:var(--muted);font-weight:400}
+.log .run{color:var(--muted);font-size:12.5px;min-width:20px;text-align:right}
+.empty{padding:26px 0;text-align:center;color:var(--muted);font-size:13.5px}
+.sheet-acts{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.act{
+  width:100%;padding:14px;border-radius:12px;background:var(--panel-2);
+  font-size:15px;font-weight:600;text-align:center;transition:opacity .18s ease;
+}
+.act:disabled{opacity:.35;cursor:default}
+.act.danger{color:var(--danger)}
+
+/* =============================================================
+   4. ÉCRAN DE FIN
+   ============================================================= */
+.over{
+  --team:#E14434;
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:24px 20px;gap:22px;
+  background:radial-gradient(90% 60% at 50% 34%,color-mix(in oklab,var(--team) 16%,var(--bg)),var(--bg) 72%);
+}
+.over-head{display:flex;flex-direction:column;gap:9px;align-items:flex-start}
+.over-head h2{
+  font-size:clamp(32px,9.5vw,42px);font-weight:800;letter-spacing:-.045em;line-height:1;
+  color:color-mix(in oklab,var(--team) 62%,var(--tone));text-wrap:balance;
+}
+.final{display:flex;align-items:baseline;gap:12px;font-variant-numeric:tabular-nums}
+.final .a{font-size:52px;font-weight:800;letter-spacing:-.05em;color:color-mix(in oklab,var(--team) 60%,var(--tone))}
+.final .s{font-size:26px;color:var(--muted);font-weight:400}
+.final .b{font-size:36px;font-weight:700;letter-spacing:-.04em;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 10px;display:flex;flex-direction:column;gap:5px}
+.stat b{font-size:21px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.over-acts{display:flex;flex-direction:column;gap:9px;margin-top:auto;padding-top:12px}
+.reveal{animation:reveal .5s cubic-bezier(.2,.8,.3,1) backwards}
+@keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+}
+</style>
+
+<div class="shell">
+
+  <!-- ============ PRÉPARATION ============ -->
+  <section class="screen on" id="s-setup">
+    <header class="brand">
+      <p class="eyebrow">Compteur de points</p>
+      <h1>Cornhole<span>.</span></h1>
+    </header>
+
+    <div class="setup-body">
+      <div class="seg" id="mode">
+        <button type="button" data-mode="simple" class="on">Simple <span>1 v 1</span></button>
+        <button type="button" data-mode="double">Double <span>2 v 2</span></button>
+      </div>
+
+      <div id="cards"></div>
+
+      <details class="rules">
+        <summary>Règles de la partie</summary>
+        <div class="rules-body">
+          <div class="opt">
+            <p class="eyebrow">Score à atteindre</p>
+            <div class="opt-row" id="target">
+              <button type="button" class="chip" data-target="11">11</button>
+              <button type="button" class="chip" data-target="15">15</button>
+              <button type="button" class="chip on" data-target="21">21</button>
+            </div>
+          </div>
+          <div class="opt">
+            <p class="eyebrow">En cas de dépassement</p>
+            <div class="opt-row" id="bust">
+              <button type="button" class="chip on" data-bust="0">La partie est gagnée</button>
+              <button type="button" class="chip" data-bust="1">Retour à <b id="bustBack">15</b></button>
+            </div>
+          </div>
+          <p class="note">Un sac dans le trou vaut 3 points, un sac sur la planche 1 point. À chaque manche, seule la différence entre les deux équipes est marquée — l'équipe qui a marqué lance en premier à la manche suivante.</p>
+        </div>
+      </details>
+    </div>
+
+    <footer class="cta-bar">
+      <button type="button" class="cta" id="start">Commencer la partie</button>
+    </footer>
+  </section>
+
+  <!-- ============ PARTIE ============ -->
+  <section class="screen" id="s-game">
+    <header class="top">
+      <p class="eyebrow" id="roundLabel">Manche 1</p>
+      <div class="sep"></div>
+      <p class="eyebrow" id="targetLabel">Objectif 21</p>
+      <button type="button" class="icon-btn" id="openSheet" aria-label="Feuille de match">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M2.5 4h13M2.5 9h13M2.5 14h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="fields" id="fields"></div>
+
+    <section class="console">
+      <div class="console-head">
+        <p class="eyebrow" id="consoleTitle">4 sacs par équipe</p>
+        <p class="eyebrow">Trou <b>3 pts</b></p>
+        <p class="eyebrow">Planche <b>1 pt</b></p>
+      </div>
+      <div id="rows"></div>
+      <div class="settle">
+        <p class="outcome" id="outcome">Aucun sac compté</p>
+        <button type="button" class="validate" id="validate">Valider</button>
+      </div>
+    </section>
+
+    <!-- feuille de match -->
+    <div class="sheet-wrap" id="sheetWrap">
+      <div class="scrim" id="scrim"></div>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Feuille de match">
+        <div class="sheet-head">
+          <h3>Feuille de match</h3>
+          <button type="button" class="icon-btn" id="closeSheet" aria-label="Fermer">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sheet-body" id="sheetBody"></div>
+        <div class="sheet-acts">
+          <button type="button" class="act" id="undo">Annuler la dernière manche</button>
+          <button type="button" class="act danger" id="quit">Terminer la partie</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FIN ============ -->
+  <section class="screen" id="s-over">
+    <div class="over" id="over"></div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ------------------------------------------------------------------
+   Données
+------------------------------------------------------------------ */
+var COLORS = [
+  {id:"rouge",    name:"Rouge",    hex:"#E14434"},
+  {id:"ambre",    name:"Ambre",    hex:"#E2892C"},
+  {id:"or",       name:"Or",       hex:"#D9BE38"},
+  {id:"vert",     name:"Vert",     hex:"#3FA96A"},
+  {id:"sarcelle", name:"Sarcelle", hex:"#22A69D"},
+  {id:"bleu",     name:"Bleu",     hex:"#3B76E8"},
+  {id:"violet",   name:"Violet",   hex:"#8B5CF0"},
+  {id:"rose",     name:"Rose",     hex:"#DE4597"},
+  {id:"ardoise",  name:"Ardoise",  hex:"#8A949B"}
+];
+var KEY = "cornhole.v1";
+var BAGS = 4;              /* sacs lancés par équipe et par manche */
+
+function color(id){
+  for(var i=0;i<COLORS.length;i++){ if(COLORS[i].id===id) return COLORS[i]; }
+  return COLORS[0];
+}
+function backTo(target){ return Math.max(0, Math.round(target*5/7)); }  /* 21 -> 15 */
+
+/* état de préparation */
+var S = {
+  mode:"simple", target:21, bust:false,
+  teams:[
+    {name:"", mates:["",""], color:"rouge"},
+    {name:"", mates:["",""], color:"bleu"}
+  ]
+};
+
+/* état de partie */
+var G = null;
+
+/* ------------------------------------------------------------------
+   Utilitaires
+------------------------------------------------------------------ */
+function $(id){ return document.getElementById(id); }
+function el(tag,cls,txt){
+  var n=document.createElement(tag);
+  if(cls) n.className=cls;
+  if(txt!=null) n.textContent=txt;
+  return n;
+}
+function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+
+function defaultName(i){
+  return S.mode==="double" ? (i===0?"Équipe A":"Équipe B") : (i===0?"Joueur A":"Joueur B");
+}
+function teamLabel(i){
+  var t=S.teams[i];
+  var n=(t.name||"").trim();
+  if(n) return n;
+  if(S.mode==="double"){
+    var a=(t.mates[0]||"").trim(), b=(t.mates[1]||"").trim();
+    if(a&&b) return a+" & "+b;
+    if(a||b) return a||b;
+  }
+  return defaultName(i);
+}
+function matesLabel(i){
+  if(S.mode!=="double") return "";
+  var t=S.teams[i];
+  var a=(t.mates[0]||"").trim(), b=(t.mates[1]||"").trim();
+  if(a&&b) return a+" · "+b;
+  return a||b||"";
+}
+
+/* ------------------------------------------------------------------
+   Écran de préparation
+------------------------------------------------------------------ */
+function renderCards(){
+  var wrap=$("cards");
+  wrap.innerHTML="";
+  wrap.style.display="flex";
+  wrap.style.flexDirection="column";
+  wrap.style.gap="12px";
+
+  S.teams.forEach(function(t,i){
+    var c=color(t.color);
+    var card=el("div","card");
+    card.style.setProperty("--team",c.hex);
+
+    var head=el("div","card-head");
+    head.appendChild(el("p","eyebrow", S.mode==="double" ? (i===0?"Équipe A":"Équipe B") : (i===0?"Joueur A":"Joueur B")));
+    head.appendChild(el("p","cname",c.name));
+    card.appendChild(head);
+
+    var sw=el("div","swatches");
+    COLORS.forEach(function(col){
+      var b=el("button","sw");
+      b.type="button";
+      b.style.setProperty("--c",col.hex);
+      b.setAttribute("aria-pressed", col.id===t.color ? "true":"false");
+      b.setAttribute("aria-label","Couleur "+col.name);
+      b.addEventListener("click",function(){
+        var other=S.teams[1-i];
+        if(other.color===col.id) other.color=t.color;   /* échange plutôt que blocage */
+        t.color=col.id;
+        renderCards();
+        save();
+      });
+      sw.appendChild(b);
+    });
+    card.appendChild(sw);
+
+    var name=el("input","field-input");
+    name.type="text";
+    name.value=t.name;
+    name.maxLength=22;
+    name.placeholder=defaultName(i);
+    name.setAttribute("aria-label",(S.mode==="double"?"Nom de l'équipe ":"Nom du joueur ")+(i===0?"A":"B"));
+    name.addEventListener("input",function(){ t.name=name.value; save(); });
+    card.appendChild(name);
+
+    if(S.mode==="double"){
+      var mates=el("div","mates");
+      [0,1].forEach(function(k){
+        var m=el("input","field-input");
+        m.type="text";
+        m.value=t.mates[k];
+        m.maxLength=16;
+        m.placeholder="Joueur "+(k+1);
+        m.setAttribute("aria-label","Joueur "+(k+1)+" de l'équipe "+(i===0?"A":"B"));
+        m.addEventListener("input",function(){ t.mates[k]=m.value; save(); });
+        mates.appendChild(m);
+      });
+      card.appendChild(mates);
+    }
+
+    wrap.appendChild(card);
+  });
+}
+
+function renderRules(){
+  var t=$("target").children, i;
+  for(i=0;i<t.length;i++) t[i].classList.toggle("on", +t[i].dataset.target===S.target);
+  var b=$("bust").children;
+  for(i=0;i<b.length;i++) b[i].classList.toggle("on", (b[i].dataset.bust==="1")===S.bust);
+  $("bustBack").textContent = backTo(S.target);
+}
+
+$("mode").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-mode]");
+  if(!b) return;
+  S.mode=b.dataset.mode;
+  var kids=$("mode").children;
+  for(var i=0;i<kids.length;i++) kids[i].classList.toggle("on", kids[i]===b);
+  renderCards();
+  save();
+});
+$("target").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-target]");
+  if(!b) return;
+  S.target=+b.dataset.target;
+  renderRules(); save();
+});
+$("bust").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-bust]");
+  if(!b) return;
+  S.bust = b.dataset.bust==="1";
+  renderRules(); save();
+});
+
+/* ------------------------------------------------------------------
+   Cycle de vie de la partie
+------------------------------------------------------------------ */
+function newGame(){
+  G={
+    mode:S.mode, target:S.target, bust:S.bust,
+    teams:[
+      {label:teamLabel(0), mates:matesLabel(0), hex:color(S.teams[0].color).hex},
+      {label:teamLabel(1), mates:matesLabel(1), hex:color(S.teams[1].color).hex}
+    ],
+    rounds:[],
+    entry:[{h:0,b:0},{h:0,b:0}],
+    scores:[0,0], first:0, over:false, winner:-1
+  };
+  show("game");
+  renderGame(true);
+  save();
+  keepAwake();
+}
+
+/* rejoue l'historique — l'annulation d'une manche redevient exacte */
+function recompute(){
+  var s=[0,0], first=0, over=false, winner=-1, back=backTo(G.target);
+  for(var r=0;r<G.rounds.length;r++){
+    var rd=G.rounds[r];
+    for(var i=0;i<2;i++){
+      s[i]+=rd.gain[i];
+      if(G.bust && s[i]>G.target) s[i]=back;
+    }
+    if(rd.gain[0]>rd.gain[1]) first=0;
+    else if(rd.gain[1]>rd.gain[0]) first=1;
+    if(!over){
+      var w = G.bust ? (s[0]===G.target?0:(s[1]===G.target?1:-1))
+                     : (s[0]>=G.target?0:(s[1]>=G.target?1:-1));
+      if(w>=0){ over=true; winner=w; }
+    }
+  }
+  G.scores=s; G.first=first; G.over=over; G.winner=winner;
+}
+
+function roundPoints(i){ return G.entry[i].h*3 + G.entry[i].b; }
+function pending(){
+  var d=roundPoints(0)-roundPoints(1);
+  return d>0 ? [d,0] : [0,-d];
+}
+
+function validateRound(){
+  if(!G || G.over) return;
+  var gain=pending();
+  G.rounds.push({
+    h:[G.entry[0].h,G.entry[1].h],
+    b:[G.entry[0].b,G.entry[1].b],
+    gain:gain
+  });
+  var before=[G.scores[0],G.scores[1]];
+  recompute();
+  G.entry=[{h:0,b:0},{h:0,b:0}];
+  buzz(gain[0]||gain[1] ? 18 : 8);
+
+  if(G.over){ renderGame(); setTimeout(renderOver, 620); }
+  else renderGame(false, [G.scores[0]-before[0], G.scores[1]-before[1]]);
+  save();
+}
+
+function undoRound(){
+  if(!G.rounds.length) return;
+  G.rounds.pop();
+  recompute();
+  G.entry=[{h:0,b:0},{h:0,b:0}];
+  buzz(10);
+  renderGame();
+  renderSheet();
+  save();
+}
+
+/* ------------------------------------------------------------------
+   Rendu de la partie
+------------------------------------------------------------------ */
+function buildFields(){
+  var wrap=$("fields");
+  wrap.innerHTML="";
+  G.teams.forEach(function(t,i){
+    var f=el("div","tfield");
+    f.style.setProperty("--team",t.hex);
+    f.dataset.i=String(i);
+
+    var sc=el("div","t-score");
+    var id=el("div","t-id");
+    var name=el("h2","t-name");
+    name.appendChild(el("span","dot"));
+    name.appendChild(el("span",null,t.label));
+    id.appendChild(name);
+    id.appendChild(el("p","t-mates",t.mates));
+    var honor=el("div","t-honor");
+    honor.appendChild(el("span","honor","Lance en premier"));
+    id.appendChild(honor);
+    sc.appendChild(id);
+    sc.appendChild(el("div","t-num num","0"));
+    sc.appendChild(el("div","t-gain",""));
+    f.appendChild(sc);
+
+    var ticks=el("div","ticks");
+    ticks.setAttribute("aria-hidden","true");
+    for(var k=0;k<G.target;k++) ticks.appendChild(document.createElement("i"));
+    f.appendChild(ticks);
+
+    wrap.appendChild(f);
+  });
+}
+
+function buildRows(){
+  var wrap=$("rows");
+  wrap.innerHTML="";
+  wrap.style.display="flex";
+  wrap.style.flexDirection="column";
+  wrap.style.gap="8px";
+
+  G.teams.forEach(function(t,i){
+    var row=el("div","crow");
+    var who=el("div","who");
+    var dot=el("span","dot");
+    dot.style.background=t.hex;
+    who.appendChild(dot);
+    who.appendChild(el("span",null,t.label));
+    row.appendChild(who);
+
+    ["h","b"].forEach(function(kind){
+      var st=el("div","step");
+      st.style.setProperty("--team",t.hex);
+      var minus=el("button",null,"−");
+      minus.type="button";
+      minus.setAttribute("aria-label","Retirer un sac "+(kind==="h"?"dans le trou":"sur la planche")+" — "+t.label);
+      var val=el("div","v","0");
+      var plus=el("button",null,"+");
+      plus.type="button";
+      plus.setAttribute("aria-label","Ajouter un sac "+(kind==="h"?"dans le trou":"sur la planche")+" — "+t.label);
+      minus.addEventListener("click",function(){ bump(i,kind,-1); });
+      plus.addEventListener("click",function(){ bump(i,kind,1); });
+      st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
+      st.dataset.team=String(i); st.dataset.kind=kind;
+      row.appendChild(st);
+    });
+
+    wrap.appendChild(row);
+  });
+}
+
+function bump(i,kind,d){
+  var e=G.entry[i];
+  var next=e[kind]+d;
+  if(next<0) return;
+  if(e.h+e.b+d>BAGS) return;
+  e[kind]=next;
+  buzz(6);
+  renderConsole();
+  save();
+}
+
+function renderConsole(){
+  var steps=document.querySelectorAll(".console .step");
+  for(var k=0;k<steps.length;k++){
+    var st=steps[k];
+    var i=+st.dataset.team, kind=st.dataset.kind;
+    var e=G.entry[i], v=e[kind];
+    var val=st.querySelector(".v");
+    val.textContent=v;
+    val.classList.toggle("hot", v>0);
+    st.children[0].disabled = v===0;
+    st.children[2].disabled = (e.h+e.b)>=BAGS;
+  }
+
+  var g=pending();
+  var out=$("outcome");
+  out.innerHTML="";
+  if(!g[0] && !g[1]){
+    var any=G.entry[0].h+G.entry[0].b+G.entry[1].h+G.entry[1].b;
+    out.textContent = any ? "Manche nulle — 0 point" : "Aucun sac compté";
+  }else{
+    var w=g[0]?0:1;
+    var b=el("b",null,G.teams[w].label);
+    out.appendChild(b);
+    out.appendChild(document.createTextNode(" marque "+(g[w])+(g[w]>1?" points":" point")));
+  }
+}
+
+function renderGame(rebuild, gains){
+  if(rebuild){ buildFields(); buildRows(); }
+
+  $("roundLabel").textContent = "Manche "+(G.rounds.length+1);
+  $("targetLabel").textContent = "Objectif "+G.target;
+
+  var fields=$("fields").children;
+  for(var i=0;i<2;i++){
+    var f=fields[i];
+    var num=f.querySelector(".t-num");
+    var score=G.scores[i];
+    num.textContent=score;
+    f.classList.toggle("lead", score>G.scores[1-i]);
+    f.querySelector(".t-honor").hidden = !(G.first===i && !G.over);
+
+    var ticks=f.querySelectorAll(".ticks i");
+    var filled=Math.min(score,G.target);
+    for(var k=0;k<ticks.length;k++){
+      ticks[k].classList.toggle("f", k<filled);
+      ticks[k].classList.toggle("last", k===filled-1);
+    }
+
+    if(gains && gains[i]>0){
+      var gEl=f.querySelector(".t-gain");
+      gEl.textContent="+"+gains[i];
+      gEl.classList.remove("play");
+      void gEl.offsetWidth;
+      gEl.classList.add("play");
+      f.classList.remove("bloom");
+      void f.offsetWidth;
+      f.classList.add("bloom");
+    }
+  }
+  renderConsole();
+  $("undo").disabled = !G.rounds.length;
+}
+
+/* ------------------------------------------------------------------
+   Feuille de match
+------------------------------------------------------------------ */
+function renderSheet(){
+  var body=$("sheetBody");
+  body.innerHTML="";
+  if(!G.rounds.length){
+    body.appendChild(el("p","empty","Aucune manche jouée pour l'instant."));
+    $("undo").disabled=true;
+    return;
+  }
+  var table=el("table","log");
+  var thead=el("thead");
+  var tr=el("tr");
+  tr.appendChild(el("th",null,"Manche"));
+  tr.appendChild(el("th",null,G.teams[0].label));
+  tr.appendChild(el("th",null,G.teams[1].label));
+  thead.appendChild(tr);
+  table.appendChild(thead);
+
+  var tbody=el("tbody");
+  var run=[0,0], back=backTo(G.target);
+  G.rounds.forEach(function(rd,idx){
+    for(var i=0;i<2;i++){
+      run[i]+=rd.gain[i];
+      if(G.bust && run[i]>G.target) run[i]=back;
+    }
+    var row=el("tr");
+    row.appendChild(el("td",null,String(idx+1).padStart(2,"0")));
+    for(var j=0;j<2;j++){
+      var td=el("td");
+      var pt=el("span", rd.gain[j] ? "pt":"pt zero", rd.gain[j] ? "+"+rd.gain[j] : "—");
+      if(rd.gain[j]) pt.style.color="color-mix(in oklab,"+G.teams[j].hex+" 62%, var(--tone))";
+      td.appendChild(pt);
+      td.appendChild(el("span","run",String(run[j])));
+      row.appendChild(td);
+    }
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  body.appendChild(table);
+  $("undo").disabled=false;
+}
+
+function openSheet(){ renderSheet(); $("sheetWrap").classList.add("on"); }
+function closeSheet(){ $("sheetWrap").classList.remove("on"); }
+$("openSheet").addEventListener("click",openSheet);
+$("closeSheet").addEventListener("click",closeSheet);
+$("scrim").addEventListener("click",closeSheet);
+$("undo").addEventListener("click",function(){ undoRound(); });
+$("quit").addEventListener("click",function(){
+  closeSheet();
+  G=null; save();
+  show("setup");
+});
+$("validate").addEventListener("click",validateRound);
+
+/* ------------------------------------------------------------------
+   Écran de fin
+------------------------------------------------------------------ */
+function renderOver(){
+  var w=G.winner, l=1-w;
+  var box=$("over");
+  box.innerHTML="";
+  box.style.setProperty("--team",G.teams[w].hex);
+
+  var head=el("div","over-head reveal");
+  head.appendChild(el("p","eyebrow","Partie terminée en "+G.rounds.length+" manches"));
+  head.appendChild(el("h2",null,G.teams[w].label+" l'emporte"));
+  var fin=el("div","final");
+  fin.appendChild(el("span","a",String(G.scores[w])));
+  fin.appendChild(el("span","s","–"));
+  fin.appendChild(el("span","b",String(G.scores[l])));
+  head.appendChild(fin);
+  box.appendChild(head);
+
+  var holes=[0,0], best=[0,0];
+  G.rounds.forEach(function(r){
+    for(var i=0;i<2;i++){ holes[i]+=r.h[i]; if(r.gain[i]>best[i]) best[i]=r.gain[i]; }
+  });
+  var stats=el("div","stats reveal");
+  stats.style.animationDelay="80ms";
+  [
+    ["Manches", String(G.rounds.length)],
+    ["Sacs dans le trou", holes[w]+" / "+holes[l]],
+    ["Meilleure manche", "+"+best[w]]
+  ].forEach(function(s){
+    var c=el("div","stat");
+    c.appendChild(el("p","eyebrow",s[0]));
+    c.appendChild(el("b",null,s[1]));
+    stats.appendChild(c);
+  });
+  box.appendChild(stats);
+
+  var acts=el("div","over-acts reveal");
+  acts.style.animationDelay="160ms";
+  var again=el("button","cta","Revanche");
+  again.type="button";
+  again.addEventListener("click",function(){ newGame(); });
+  var back=el("button","cta ghost","Nouvelle configuration");
+  back.type="button";
+  back.addEventListener("click",function(){ G=null; save(); show("setup"); });
+  acts.appendChild(again); acts.appendChild(back);
+  box.appendChild(acts);
+
+  show("over");
+  buzz([14,60,26]);
+}
+
+/* ------------------------------------------------------------------
+   Navigation, persistance, écran allumé
+------------------------------------------------------------------ */
+function show(name){
+  ["setup","game","over"].forEach(function(n){
+    $("s-"+n).classList.toggle("on", n===name);
+  });
+  if(name!=="game") closeSheet();
+}
+
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify({s:S,g:G})); }catch(e){}
+}
+function load(){
+  var raw;
+  try{ raw=localStorage.getItem(KEY); }catch(e){ return; }
+  if(!raw) return;
+  var d;
+  try{ d=JSON.parse(raw); }catch(e){ return; }
+  if(d && d.s){
+    S=d.s;
+    if(!S.teams || S.teams.length!==2) S.teams=[{name:"",mates:["",""],color:"rouge"},{name:"",mates:["",""],color:"bleu"}];
+  }
+  if(d && d.g && d.g.teams){
+    G=d.g;
+    if(!G.entry) G.entry=[{h:0,b:0},{h:0,b:0}];
+    recompute();
+    if(G.over){ renderOver(); }
+    else { show("game"); renderGame(true); keepAwake(); }
+  }
+}
+
+var lock=null;
+function keepAwake(){
+  if(!("wakeLock" in navigator)) return;
+  navigator.wakeLock.request("screen").then(function(l){ lock=l; }).catch(function(){});
+}
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible" && G && !G.over && !lock) keepAwake();
+  if(document.visibilityState==="hidden") lock=null;
+});
+
+$("start").addEventListener("click",newGame);
+
+renderCards();
+renderRules();
+load();
+})();
+</script>
+
+</body>
+</html>
