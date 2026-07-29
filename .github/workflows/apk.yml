@@ -55,9 +55,22 @@ jobs:
       - name: Construire
         working-directory: android
         run: |
+          set -o pipefail
           gradle assembleDebug --no-daemon --stacktrace \
             -Pvc=${{ github.run_number }} \
-            -Pvn=1.0.${{ github.run_number }}
+            -Pvn=1.0.${{ github.run_number }} 2>&1 | tee ../build.log
+
+      - name: Journal en cas d'échec
+        if: failure()
+        run: |
+          mkdir -p .ci
+          tail -c 60000 build.log > .ci/last-build.log 2>/dev/null || echo "pas de journal" > .ci/last-build.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash || true
+          git add -f .ci/last-build.log
+          git commit -m "Journal du build APK [skip ci]" || true
+          git push || true
 
       - name: Renommer
         run: cp android/app/build/outputs/apk/debug/app-debug.apk cornscore.apk

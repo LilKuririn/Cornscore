@@ -7,15 +7,19 @@ plugins {
 def webRoot = rootProject.projectDir.parentFile
 def webOut  = layout.buildDirectory.dir("webassets").get().asFile
 
+/* Les fichiers sont listés un par un : déclarer la racine du dépôt comme
+   arborescence d'entrée la ferait chevaucher le dossier de build. */
+def webFiles = files(
+    "${webRoot}/index.html",
+    "${webRoot}/manifest.webmanifest",
+    "${webRoot}/icon-192.png",
+    "${webRoot}/icon-512.png",
+    "${webRoot}/icon-maskable-512.png",
+    "${webRoot}/apple-touch-icon.png"
+)
+
 def copyWeb = tasks.register('copyWeb', Copy) {
-    from(webRoot) {
-        include 'index.html'
-        include 'manifest.webmanifest'
-        include 'icon-192.png'
-        include 'icon-512.png'
-        include 'icon-maskable-512.png'
-        include 'apple-touch-icon.png'
-    }
+    from webFiles
     into webOut
 }
 
