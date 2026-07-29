@@ -5,8 +5,13 @@ on ouvre `index.html` et on joue.
 
 ## Utilisation
 
-Ouvrir [`index.html`](index.html) dans un navigateur — ou l'héberger et l'ajouter à l'écran
-d'accueil du téléphone pour l'avoir en plein écran.
+**En ligne :** <https://lilkuririn.github.io/Cornscore/>
+
+Sur téléphone, ouvrir ce lien puis *Ajouter à l'écran d'accueil* : l'app s'installe avec sa propre
+icône, se lance en plein écran sans barre de navigateur et **fonctionne hors ligne**, y compris
+sans réseau. Une mise à jour du site est reprise au premier lancement connecté suivant.
+
+En local, il suffit d'ouvrir [`index.html`](index.html) dans un navigateur.
 
 ## Fonctionnalités
 
@@ -35,6 +40,16 @@ Deux réglages, dans le volet *Règles de la partie* :
 
 ## Technique
 
-HTML, CSS et JavaScript natifs dans un fichier unique. Le thème est défini par des variables CSS
-et les couleurs d'équipe sont dérivées du fond avec `color-mix()`, ce qui rend l'interface lisible
-en clair comme en sombre. L'état de la partie est conservé dans `localStorage`.
+HTML, CSS et JavaScript natifs, sans dépendance ni étape de compilation. Le thème est défini par
+des variables CSS et les couleurs d'équipe sont dérivées du fond avec `color-mix()`, ce qui rend
+l'interface lisible en clair comme en sombre. L'état de la partie est conservé dans `localStorage`.
+
+| Fichier | Rôle |
+| --- | --- |
+| `index.html` | Toute l'application |
+| `manifest.webmanifest` | Installation sur l'écran d'accueil |
+| `sw.js` | Service worker — réseau d'abord pour la page, cache pour le reste |
+| `icon-*.png` | Icônes 192 / 512 / masquable, et `apple-touch-icon.png` |
+
+Le site est publié par GitHub Pages depuis la branche `main`, à la racine. Après modification de
+`index.html`, un `git push` suffit à déployer.
