@@ -28,6 +28,11 @@ def copyWeb = tasks.register('copyWeb', Copy) {
    de s'installer par-dessus le précédent. */
 def keystore = file("${rootProject.projectDir}/debug.keystore")
 
+/* Calculé hors de la closure : « versionCode (x).toString() » serait lu par
+   Groovy comme un appel dont on transforme le résultat, et non l'inverse. */
+def buildCode = ((project.findProperty("vc") ?: "1") as String).toInteger()
+def buildName = (project.findProperty("vn") ?: "1.0") as String
+
 android {
     namespace 'com.lilkuririn.cornscore'
     compileSdk 34
@@ -36,8 +41,8 @@ android {
         applicationId "com.lilkuririn.cornscore"
         minSdk 24
         targetSdk 34
-        versionCode (project.findProperty("vc") ?: "1").toString().toInteger()
-        versionName (project.findProperty("vn") ?: "1.0").toString()
+        versionCode buildCode
+        versionName buildName
     }
 
     signingConfigs {

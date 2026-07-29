@@ -13,6 +13,28 @@ sans réseau. Une mise à jour du site est reprise au premier lancement connect�
 
 En local, il suffit d'ouvrir [`index.html`](index.html) dans un navigateur.
 
+## Application Android
+
+Un APK installable est reconstruit à chaque modification de l'application :
+
+**[Télécharger `cornscore.apk`](https://github.com/LilKuririn/Cornscore/releases/download/apk/cornscore.apk)**
+
+Sur le téléphone, ouvrir le fichier téléchargé et autoriser l'installation depuis cette source.
+Android affichera un avertissement : l'application n'est pas signée par une clé du Play Store,
+c'est normal pour une installation directe.
+
+L'APK n'est pas une copie de l'application : `android/` est une coquille native minimale — une
+WebView qui sert `index.html` depuis ses assets — et la compilation va chercher les fichiers web
+à la racine du dépôt. Il n'y a donc qu'une seule version du code.
+
+Deux détails côté Android : les assets sont servis par une origine `https` interne plutôt qu'en
+`file://`, sans quoi `localStorage` n'est pas fiable ; et le bouton retour du téléphone ferme la
+feuille de match ou remonte d'un écran avant de proposer de quitter.
+
+Le build tourne dans GitHub Actions (`.github/workflows/apk.yml`), aucune chaîne d'outils Android
+n'est nécessaire en local. La clé de signature est créée au premier passage et conservée dans le
+dépôt, pour que chaque nouvelle version s'installe par-dessus la précédente.
+
 ## Fonctionnalités
 
 - **Simple (1v1) ou double (2v2)** — nom d'équipe, noms des joueurs, couleur au choix parmi neuf.
