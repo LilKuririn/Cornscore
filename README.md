@@ -20,9 +20,13 @@ En local, il suffit d'ouvrir [`index.html`](index.html) dans un navigateur.
   automatique des matchs. Entièrement optionnel : l'accueil reste la partie simple ou double.
 - **Saisie par manche** — un compteur *trou* (3 points) et un compteur *planche* (1 point) par
   équipe, plafonnés à 4 sacs. L'annulation est calculée en direct avant validation.
-- **Suivi de l'honneur** — l'équipe qui a marqué lance en premier à la manche suivante.
-- **Feuille de match** — historique manche par manche avec score courant, et annulation de la
-  dernière manche (l'historique est rejoué, l'annulation reste donc exacte).
+- **Suivi de l'honneur** — l'équipe qui a marqué lance en premier à la manche suivante, et un
+  tirage au sort attribue la première manche.
+- **Feuille de match** — historique manche par manche avec score courant. Chaque manche peut être
+  corrigée ou supprimée après coup : l'historique est rejoué et le score recalculé sur toute la
+  partie.
+- **Palmarès** — les parties terminées sont archivées : confrontations directes, classement par
+  victoires, dernières rencontres.
 - **Fin de partie** — vainqueur, score final, sacs dans le trou, meilleure manche, revanche.
 - **Confort** — partie sauvegardée en local, écran maintenu allumé, retour haptique, thèmes
   clair et sombre.
@@ -41,6 +45,14 @@ L'arbre est consultable en permanence : les vainqueurs apparaissent dans leur co
 final, le prochain match est mis en avant et rappelé dans la barre du bas. À la fin d'un match, on
 enchaîne directement sur le suivant ou on revient au tableau. Le tournoi et la partie en cours sont
 sauvegardés séparément : on peut jouer un 1v1 improvisé sans perdre le tournoi commencé.
+
+## Palmarès
+
+Chaque partie terminée est archivée localement (200 au maximum, tournoi compris). Un lien apparaît
+en bas de l'accueil dès la première partie enregistrée.
+
+Le regroupement se fait sur le nom saisi, insensible à la casse : deux parties jouées par « marc »
+et « Marc » comptent pour la même personne. En double, c'est le nom de l'équipe qui fait foi.
 
 ## Règles appliquées
 
