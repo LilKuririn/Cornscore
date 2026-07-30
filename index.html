@@ -675,6 +675,7 @@ a.hall-link{text-decoration:none;color:inherit}
 .duel-n{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
 .duel-n span{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .duel-n.r{justify-content:flex-end}
+.duel-mid{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto}
 .duel-s{
   font-family:var(--fm);font-size:15px;font-weight:700;
   font-variant-numeric:tabular-nums;flex:0 0 auto;letter-spacing:.02em;
@@ -693,6 +694,16 @@ a.hall-link{text-decoration:none;color:inherit}
 .rank .who{display:flex;align-items:center;gap:8px;min-width:0}
 .rank .who span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 .rank .pct{color:var(--muted);font-size:12.5px}
+
+/* joueur seul ou équipe de deux */
+.mtag{
+  flex:0 0 auto;
+  font-family:var(--fm);font-size:8.5px;font-weight:500;
+  letter-spacing:.1em;color:var(--muted);
+  border:1px solid var(--line-2);border-radius:5px;
+  padding:2px 4px;line-height:1;
+  position:relative;top:-.5px;
+}
 
 .rec{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
 .rec .d{font-family:var(--fm);font-size:10px;letter-spacing:.05em;color:var(--muted);flex:0 0 58px}
@@ -1111,6 +1122,7 @@ fr:{
   "hall.recent":"Dernières parties",
   "hall.team":"Équipe", "hall.w":"V", "hall.l":"D", "hall.rate":"Ratio",
   "hall.beat":"{w} bat {l}",
+  "hall.tag.solo":"1v1", "hall.tag.duo":"2v2",
   "hall.clear":"Effacer le palmarès",
   "hall.clear.confirm":"Confirmer l'effacement",
   "rules.title":"Règles du jeu",
@@ -1237,6 +1249,7 @@ en:{
   "hall.recent":"Recent games",
   "hall.team":"Team", "hall.w":"W", "hall.l":"L", "hall.rate":"Win rate",
   "hall.beat":"{w} beat {l}",
+  "hall.tag.solo":"1v1", "hall.tag.duo":"2v2",
   "hall.clear":"Clear the records",
   "hall.clear.confirm":"Confirm clearing",
   "rules.title":"How to play",
@@ -1515,8 +1528,17 @@ function renderRules(){
 
 $("mode").addEventListener("click",function(e){
   var b=e.target.closest("button[data-mode]");
-  if(!b) return;
+  if(!b || b.dataset.mode===S.mode) return;   /* rien à faire si c'est déjà le mode courant */
+
   S.mode=b.dataset.mode;
+  /* Passer de simple à double, ou l'inverse, change la nature de ce qu'on
+     nomme : un joueur devient une équipe. Les noms précédents n'ont plus
+     de sens, on repart de zéro. Les couleurs, elles, restent. */
+  S.teams.forEach(function(team){
+    team.name="";
+    team.mates=["",""];
+  });
+
   var kids=$("mode").children;
   for(var i=0;i<kids.length;i++) kids[i].classList.toggle("on", kids[i]===b);
   renderCards();
@@ -2153,6 +2175,31 @@ function archiveGame(){
 
 function nameKey(s){ return (s||"").trim().toLocaleLowerCase("fr"); }
 
+/* Un nom peut désigner un joueur seul ou une équipe de deux : on relève le
+   format dans lequel il a joué pour pouvoir les distinguer d'un coup d'œil.
+   Un nom apparu dans les deux ne reçoit aucune marque, elle mentirait. */
+function modeTags(){
+  var m={};
+  H.forEach(function(g){
+    for(var i=0;i<2;i++){
+      var k=nameKey(g.n[i]);
+      if(!k) continue;
+      if(!m[k]) m[k]={solo:false,duo:false};
+      if(g.mode==="double") m[k].duo=true; else m[k].solo=true;
+    }
+  });
+  return m;
+}
+function tagFor(tags,name){
+  var i=tags[nameKey(name)];
+  if(!i || (i.solo && i.duo)) return null;
+  return t(i.duo ? "hall.tag.duo" : "hall.tag.solo");
+}
+function tagEl(tags,name){
+  var s=tagFor(tags,name);
+  return s ? el("span","mtag",s) : null;
+}
+
 function standings(){
   var map={}, order=[];
   H.forEach(function(g){
@@ -2180,10 +2227,11 @@ function duels(){
     var flip = kb<ka;
     var id = flip ? kb+"|"+ka : ka+"|"+kb;
     var f = flip ? 1 : 0;
-    if(!map[id]){ map[id]={n:["",""], c:["",""], w:[0,0]}; order.push(id); }
+    if(!map[id]){ map[id]={n:["",""], c:["",""], w:[0,0], solo:false, duo:false}; order.push(id); }
     var m=map[id];
     m.n=[g.n[f],g.n[1-f]];
     m.c=[g.c[f],g.c[1-f]];
+    if(g.mode==="double") m.duo=true; else m.solo=true;
     if(g.w===f) m.w[0]++; else m.w[1]++;
   });
   var list=order.map(function(k){ return map[k]; });
@@ -2208,6 +2256,8 @@ function renderHall(){
     return;
   }
 
+  var tags=modeTags();
+
   /* confrontations */
   var d=duels();
   if(d.length){
@@ -2218,10 +2268,18 @@ function renderHall(){
 
       var left=el("div","duel-n");
       var dl=el("span","dot"); dl.style.background=x.c[0];
-      left.appendChild(dl); left.appendChild(el("span",null,x.n[0]));
+      left.appendChild(dl);
+      left.appendChild(el("span",null,x.n[0]));
       top.appendChild(left);
 
-      top.appendChild(el("p","duel-s",x.w[0]+" – "+x.w[1]));
+      /* le format sous le score : la colonne du milieu a de la place,
+         les noms n'en avaient pas à céder */
+      var mid=el("div","duel-mid");
+      mid.appendChild(el("p","duel-s",x.w[0]+" – "+x.w[1]));
+      if(x.solo !== x.duo){
+        mid.appendChild(el("span","mtag",t(x.duo ? "hall.tag.duo" : "hall.tag.solo")));
+      }
+      top.appendChild(mid);
 
       var right=el("div","duel-n r");
       right.appendChild(el("span",null,x.n[1]));
@@ -2261,6 +2319,8 @@ function renderHall(){
     var dot=el("span","dot"); dot.style.background=m.hex;
     who.appendChild(dot);
     who.appendChild(el("span",null,m.label));
+    var mt=tagEl(tags,m.label);
+    if(mt) who.appendChild(mt);
     td.appendChild(who);
     tr.appendChild(td);
     tr.appendChild(el("td",null,String(m.v)));
@@ -3033,11 +3093,16 @@ LANG=detectLang();
 document.documentElement.lang=LANG;
 applyStaticText();
 
+/* L'état est restauré avant tout affichage : dans l'autre ordre, l'accueil
+   se dessinait avec les valeurs par défaut, puis load() remplaçait l'état
+   sans redessiner — une partie en double reprise après fermeture montrait
+   la bascule sur Simple et deux champs au lieu de six. */
+load();
+
 renderCards();
 renderRules();
 fillRules("rulesBody");
 renderTSetup();
-load();
 refreshTourBtn();
 refreshHallLink();
 
