@@ -15,6 +15,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -141,9 +142,9 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(web);
 
-        /* Android 15 impose le bord à bord aux applications visant l'API 35.
-           Le thème demande à en être exempté, ce qui suffit aujourd'hui ;
-           cette marge prend le relais le jour où l'exemption disparaîtra.
+        /* Le bord à bord est imposé, et l'exemption du thème n'est plus
+           honorée à partir de l'API 36 : cette marge est désormais la seule
+           chose qui empêche la page de passer sous les barres système.
            Elle s'applique à la racine du contenu — et non à la WebView avant
            son rattachement, où l'écouteur n'était jamais appelé — puis on
            réclame explicitement une distribution des marges. */
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         });
         ViewCompat.requestApplyInsets(root);
 
+        installBackHandler();
         web.loadUrl(ORIGIN + "/assets/index.html");
     }
 
@@ -175,16 +177,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        web.evaluateJavascript(BACK_JS, value -> {
-            if (value != null && value.contains("1")) return;
-            long now = System.currentTimeMillis();
-            if (now - lastBack < 2000L) {
-                finish();
-            } else {
-                lastBack = now;
-                Toast.makeText(this, R.string.quit_hint, Toast.LENGTH_SHORT).show();
+    /* Le retour passe par le répartiteur d'AndroidX plutôt que par
+       onBackPressed(), que le système n'appelle plus pour une application
+       visant l'API 36 — le geste y est régi par le retour prédictif. */
+    private void installBackHandler() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                web.evaluateJavascript(BACK_JS, new ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String value) {
+                        if (value != null && value.contains("1")) return;
+                        long now = System.currentTimeMillis();
+                        if (now - lastBack < 2000L) {
+                            finish();
+                        } else {
+                            lastBack = now;
+                            Toast.makeText(MainActivity.this, R.string.quit_hint, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
     }

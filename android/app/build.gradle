@@ -40,12 +40,12 @@ def uploadStore = System.getenv("RELEASE_KEYSTORE")
 
 android {
     namespace 'com.scoretosslabs.cornscore'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.scoretosslabs.cornscore"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode buildCode
         versionName buildName
     }

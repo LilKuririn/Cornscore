@@ -45,12 +45,12 @@ jobs:
       - name: Plateforme Android
         run: |
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-            "platforms;android-35" "build-tools;35.0.0" > /dev/null || true
+            "platforms;android-36" "build-tools;36.0.0" > /dev/null || true
 
       - name: Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.14.5'
 
       - name: Construire l'APK installable
         working-directory: android
