@@ -45,22 +45,24 @@ Trois choses restent à faire de ton côté, elles ne peuvent pas l'être depuis
 - Clé d'envoi générée, ses quatre secrets déposés dans le dépôt. La CI produit le bundle.
 - Application créée dans la console sous `com.scoretosslabs.cornscore`, gratuite, catégorie Sport,
   anglais par défaut.
-- Première release publiée en test interne (1.0.20), accessible aux testeurs.
+- Test fermé lancé, build 1.0.24 distribué aux testeurs.
+- Niveau d'API cible relevé à 36, avant l'échéance Play du 31 août 2026.
+- Page de soutien Ko-fi ouverte et reliée à l'écran *À propos*.
 
 ### Reste à faire
 
-**1. Le lien de soutien.** Ouvre un compte Ko-fi, Buy Me a Coffee, Liberapay ou GitHub Sponsors,
-puis colle son adresse dans `SUPPORT_URL`, en tête du script de [`index.html`](index.html). Tant
-qu'elle est vide, la ligne n'apparaît pas dans l'écran *À propos*. **Ne rien offrir en échange
-d'un don** : une contrepartie numérique en ferait un achat, que Google impose de passer par sa
-propre facturation.
-
-**2. Les captures d'écran** de la fiche, à prendre sur le téléphone — voir
+**1. Les captures d'écran** de la fiche, à prendre sur le téléphone — voir
 [`store/fiche-play.md`](store/fiche-play.md).
 
-**3. Le test fermé.** C'est lui qui ouvre l'accès à la production : une douzaine de testeurs
-pendant quatorze jours continus. Le test interne n'y compte pas. Le build déjà envoyé se promeut
-vers cette piste sans reconstruction, par *Promouvoir la release*.
+**2. Achever le test fermé.** Douze testeurs inscrits pendant quatorze jours continus, sans jamais
+repasser en dessous. C'est lui, et non le test interne, qui ouvre l'accès à la production.
+
+**3. Publier en production** avant le 31 août 2026, échéance du niveau d'API.
+
+Le lien de soutien vit dans `SUPPORT_URL`, en tête du script de [`index.html`](index.html) : le
+vider fait disparaître la ligne plutôt que d'afficher un lien mort. **Ne rien offrir en échange
+d'un don** — une contrepartie numérique en ferait un achat, que Google impose de passer par sa
+propre facturation.
 
 ### Pour mémoire : comment la clé d'envoi a été créée
 
