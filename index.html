@@ -137,6 +137,8 @@ h1,h2,h3,p{margin:0}
 }
 .seg button .sub{font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
 .seg button.on{background:var(--panel-2);color:var(--ink)}
+.seg3{grid-template-columns:1fr 1fr 1fr}
+.seg3 button{font-size:14px}
 
 .card{
   --team:#E14434;
@@ -818,7 +820,7 @@ a.hall-link{text-decoration:none;color:inherit}
   <!-- ============ À PROPOS ============ -->
   <div class="sheet-wrap" id="aboutWrap">
     <div class="scrim" id="aboutScrim"></div>
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="À propos">
+    <div class="sheet" role="dialog" aria-modal="true" data-i18n-aria="about.title">
       <div class="sheet-head">
         <h3 data-i18n="about.title">À propos</h3>
         <button type="button" class="icon-btn" id="aboutClose" data-i18n-aria="nav.close">
@@ -834,7 +836,7 @@ a.hall-link{text-decoration:none;color:inherit}
   <!-- ============ RÈGLES DU JEU (par-dessus l'écran courant) ============ -->
   <div class="sheet-wrap" id="rulesWrap">
     <div class="scrim" id="rulesScrim"></div>
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="Règles du jeu">
+    <div class="sheet" role="dialog" aria-modal="true" data-i18n-aria="rules.title">
       <div class="sheet-head">
         <h3 data-i18n="rules.title">Règles du jeu</h3>
         <button type="button" class="icon-btn" id="rulesClose" data-i18n-aria="nav.close">
@@ -926,7 +928,7 @@ a.hall-link{text-decoration:none;color:inherit}
     <!-- options du tournoi -->
     <div class="sheet-wrap" id="bkSheetWrap">
       <div class="scrim" id="bkScrim"></div>
-      <div class="sheet" role="dialog" aria-modal="true" aria-label="Options du tournoi">
+      <div class="sheet" role="dialog" aria-modal="true" data-i18n-aria="tour.menu">
         <div class="sheet-head">
           <h3 data-i18n="tour.title">Tournoi</h3>
           <button type="button" class="icon-btn" id="bkSheetClose" data-i18n-aria="nav.close">
@@ -975,7 +977,7 @@ a.hall-link{text-decoration:none;color:inherit}
     <!-- tirage au sort -->
     <div class="toss-wrap" id="tossWrap" hidden>
       <div class="toss-scrim"></div>
-      <div class="toss-box" role="dialog" aria-modal="true" aria-label="Tirage au sort">
+      <div class="toss-box" role="dialog" aria-modal="true" data-i18n-aria="toss.draw">
         <p class="eyebrow" data-i18n="toss.who">Qui lance en premier</p>
         <div class="reel" id="reel">
           <div class="reel-strip" id="reelStrip"></div>
@@ -989,7 +991,7 @@ a.hall-link{text-decoration:none;color:inherit}
     <!-- feuille de match -->
     <div class="sheet-wrap" id="sheetWrap">
       <div class="scrim" id="scrim"></div>
-      <div class="sheet" role="dialog" aria-modal="true" aria-label="Feuille de match">
+      <div class="sheet" role="dialog" aria-modal="true" data-i18n-aria="sheet.title">
         <div class="sheet-head">
           <h3 data-i18n="sheet.title">Feuille de match</h3>
           <button type="button" class="icon-btn" id="closeSheet" data-i18n-aria="nav.close">
@@ -1149,7 +1151,7 @@ fr:{
   "rules.4a":"La partie s'arrête dès qu'une équipe ", "rules.4b":"atteint le score visé", "rules.4c":".",
   "about.title":"À propos",
   "about.version":"Version {v}",
-  "about.lang":"Langue",
+  "about.lang":"Langue", "about.lang.auto":"Téléphone",
   "about.support":"Soutenir", "about.support.label":"Offrir un café au développeur",
   "about.privacy":"Confidentialité", "about.privacy.label":"Ce que l'application fait de vos données",
   "about.source":"Code source", "about.source.label":"Le projet sur GitHub",
@@ -1276,7 +1278,7 @@ en:{
   "rules.4a":"The game ends as soon as a team ", "rules.4b":"reaches the target score", "rules.4c":".",
   "about.title":"About",
   "about.version":"Version {v}",
-  "about.lang":"Language",
+  "about.lang":"Language", "about.lang.auto":"Phone",
   "about.support":"Support", "about.support.label":"Buy the developer a coffee",
   "about.privacy":"Privacy", "about.privacy.label":"What the app does with your data",
   "about.source":"Source code", "about.source.label":"The project on GitHub",
@@ -1328,9 +1330,13 @@ function applyStaticText(){
   document.title = "Cornscore — "+t("app.tagline");
 }
 
+/* l vaut "fr", "en", ou null pour revenir au suivi du téléphone. */
 function setLang(l){
-  LANG = (l==="en") ? "en" : "fr";
-  try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){}
+  try{
+    if(l===null) localStorage.removeItem(LANG_KEY);
+    else localStorage.setItem(LANG_KEY, l==="en" ? "en" : "fr");
+  }catch(e){}
+  LANG = (l===null) ? detectLang() : (l==="en" ? "en" : "fr");
   document.documentElement.lang=LANG;
   applyStaticText();
   renderCards(); renderRules(); renderTSetup();
@@ -1343,12 +1349,24 @@ function setLang(l){
   if($("aboutWrap").classList.contains("on")) fillAbout();
 }
 
+/* Un choix explicite l'emporte toujours. Sinon on suit le téléphone, en
+   parcourant toute sa liste de langues et non la seule première : un
+   appareil réglé en allemand puis français doit donner du français.
+   Repli en anglais, la langue la plus probable hors de nos deux cas. */
 function detectLang(){
   var saved=null;
   try{ saved=localStorage.getItem(LANG_KEY); }catch(e){}
   if(saved==="fr"||saved==="en") return saved;
-  var nav=(navigator.language||navigator.userLanguage||"fr").toLowerCase();
-  return nav.indexOf("fr")===0 ? "fr" : "en";
+
+  var list=(navigator.languages && navigator.languages.length)
+             ? navigator.languages
+             : [navigator.language || navigator.userLanguage || ""];
+  for(var i=0;i<list.length;i++){
+    var l=String(list[i]).toLowerCase();
+    if(l.indexOf("fr")===0) return "fr";
+    if(l.indexOf("en")===0) return "en";
+  }
+  return "en";
 }
 
 function color(id){
@@ -1431,12 +1449,18 @@ function langPicker(){
   var box=el("div","block");
   box.style.paddingTop="18px";
   box.appendChild(el("p","eyebrow",t("about.lang")));
-  var seg=el("div","seg");
-  [["fr","Français"],["en","English"]].forEach(function(l){
+  /* Trois choix, dont le retour au suivi du téléphone : sans lui, une
+     langue choisie une fois ne se déchoisissait plus. */
+  var choisi=null;
+  try{ choisi=localStorage.getItem(LANG_KEY); }catch(e){}
+  if(choisi!=="fr" && choisi!=="en") choisi=null;
+
+  var seg=el("div","seg seg3");
+  [[null,t("about.lang.auto")],["fr","Français"],["en","English"]].forEach(function(l){
     var b=el("button",null,l[1]);
     b.type="button";
-    if(LANG===l[0]) b.classList.add("on");
-    b.addEventListener("click",function(){ if(LANG!==l[0]) setLang(l[0]); });
+    if(choisi===l[0]) b.classList.add("on");
+    b.addEventListener("click",function(){ setLang(l[0]); });
     seg.appendChild(b);
   });
   box.appendChild(seg);
@@ -1690,11 +1714,11 @@ function buildRows(){
       st.style.setProperty("--team",team.hex);
       var minus=el("button",null,"−");
       minus.type="button";
-      minus.setAttribute("aria-label","Retirer un sac "+(kind==="h"?"dans le trou":"sur la planche")+" — "+t.label);
+      minus.setAttribute("aria-label",t(kind==="h"?"game.rm.hole":"game.rm.board")+" — "+team.label);
       var val=el("div","v","0");
       var plus=el("button",null,"+");
       plus.type="button";
-      plus.setAttribute("aria-label","Ajouter un sac "+(kind==="h"?"dans le trou":"sur la planche")+" — "+t.label);
+      plus.setAttribute("aria-label",t(kind==="h"?"game.add.hole":"game.add.board")+" — "+team.label);
       minus.addEventListener("click",function(){ bump(i,kind,-1); });
       plus.addEventListener("click",function(){ bump(i,kind,1); });
       st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
@@ -1995,13 +2019,13 @@ function renderEditor(body){
       var minus=el("button",null,"−");
       minus.type="button";
       minus.disabled = e[kind]===0;
-      minus.setAttribute("aria-label","Retirer un sac "+(kind==="h"?"dans le trou":"sur la planche")+" — "+t.label);
+      minus.setAttribute("aria-label",t(kind==="h"?"game.rm.hole":"game.rm.board")+" — "+team.label);
       var val=el("div","v",String(e[kind]));
       if(e[kind]>0) val.classList.add("hot");
       var plus=el("button",null,"+");
       plus.type="button";
       plus.disabled = (e.h+e.b)>=BAGS;
-      plus.setAttribute("aria-label","Ajouter un sac "+(kind==="h"?"dans le trou":"sur la planche")+" — "+t.label);
+      plus.setAttribute("aria-label",t(kind==="h"?"game.add.hole":"game.add.board")+" — "+team.label);
       minus.addEventListener("click",function(){ editBump(i,kind,-1); });
       plus.addEventListener("click",function(){ editBump(i,kind,1); });
       st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
