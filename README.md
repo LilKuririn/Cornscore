@@ -39,14 +39,32 @@ dépôt, pour que chaque nouvelle version s'installe par-dessus la précédente.
 
 Trois choses restent à faire de ton côté, elles ne peuvent pas l'être depuis le dépôt.
 
+### Fait
+
+- Compte développeur créé, identité vérifiée.
+- Clé d'envoi générée, ses quatre secrets déposés dans le dépôt. La CI produit le bundle.
+- Application créée dans la console sous `com.scoretosslabs.cornscore`, gratuite, catégorie Sport,
+  anglais par défaut.
+- Première release publiée en test interne (1.0.20), accessible aux testeurs.
+
+### Reste à faire
+
 **1. Le lien de soutien.** Ouvre un compte Ko-fi, Buy Me a Coffee, Liberapay ou GitHub Sponsors,
 puis colle son adresse dans `SUPPORT_URL`, en tête du script de [`index.html`](index.html). Tant
 qu'elle est vide, la ligne n'apparaît pas dans l'écran *À propos*. **Ne rien offrir en échange
 d'un don** : une contrepartie numérique en ferait un achat, que Google impose de passer par sa
 propre facturation.
 
-**2. La clé d'envoi.** Le bundle destiné à Play doit être signé par une clé qui, contrairement à
-celle de l'APK, n'a rien à faire dans le dépôt. `keytool` vient avec un JDK, à installer une fois :
+**2. Les captures d'écran** de la fiche, à prendre sur le téléphone — voir
+[`store/fiche-play.md`](store/fiche-play.md).
+
+**3. Le test fermé.** C'est lui qui ouvre l'accès à la production : une douzaine de testeurs
+pendant quatorze jours continus. Le test interne n'y compte pas. Le build déjà envoyé se promeut
+vers cette piste sans reconstruction, par *Promouvoir la release*.
+
+### Pour mémoire : comment la clé d'envoi a été créée
+
+`keytool` vient avec un JDK :
 
 ```powershell
 winget install Microsoft.OpenJDK.21
@@ -66,7 +84,7 @@ du magasin. Puis, pour obtenir la valeur du secret directement dans le presse-pa
 [Convert]::ToBase64String([IO.File]::ReadAllBytes("upload.jks")) | Set-Clipboard
 ```
 
-Dans *Settings → Secrets and variables → Actions*, quatre secrets :
+Les quatre secrets, dans *Settings → Secrets and variables → Actions* :
 
 | Nom | Valeur |
 | --- | --- |
@@ -85,9 +103,8 @@ L'APK d'installation directe porte le suffixe `.direct` : signé par une autre c
 pas s'installer par-dessus la version du magasin, et coexiste donc avec elle sous le nom
 « Cornscore direct ».
 
-**3. Le compte développeur.** 25 $ une fois, vérification d'identité, puis un test fermé auprès
-d'une douzaine de testeurs pendant environ deux semaines avant l'accès à la production. La
-politique de confidentialité est déjà en ligne : <https://lilkuririn.github.io/Cornscore/privacy.html>
+La politique de confidentialité, exigée par la console, est en ligne :
+<https://lilkuririn.github.io/Cornscore/privacy.html>
 
 ## Fonctionnalités
 
