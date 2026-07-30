@@ -630,13 +630,17 @@ h1,h2,h3,p{margin:0}
 .hall-link:active{border-color:var(--line-2)}
 a.hall-link{text-decoration:none;color:inherit}
 
-.about-link{
-  align-self:center;padding:9px 14px;border-radius:9px;
-  font-family:var(--fm);font-size:10px;font-weight:500;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
-  transition:color .16s ease;
+/* Les deux destinations de consultation, groupées en une carte : elles se
+   présentent comme une liste, et deux blocs séparés coûtaient plus haut. */
+.link-group{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);overflow:hidden;
 }
-.about-link:active{color:var(--ink)}
+.link-group .hall-link{
+  background:none;border:0;border-radius:0;padding:13px 14px;
+}
+.link-group .hall-link + .hall-link{border-top:1px solid var(--line)}
+.link-group .hall-link:active{background:var(--panel-2)}
 
 .about-id{display:flex;flex-direction:column;gap:6px;padding-top:16px}
 .about-id h4{margin:0;font-size:26px;font-weight:800;letter-spacing:-.035em}
@@ -763,17 +767,27 @@ a.hall-link{text-decoration:none;color:inherit}
         </div>
       </div>
 
-      <button type="button" class="hall-link" id="openRules">
-        <span>
-          <span class="eyebrow" data-i18n="setup.rules.eyebrow">Règles du jeu</span>
-          <b data-i18n="setup.rules.label">Comment marquer des points</b>
-        </span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="link-group">
+        <button type="button" class="hall-link" id="openRules">
+          <span>
+            <span class="eyebrow" data-i18n="setup.rules.eyebrow">Règles du jeu</span>
+            <b data-i18n="setup.rules.label">Comment marquer des points</b>
+          </span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
 
-      <button type="button" class="about-link" id="openAbout" data-i18n="setup.about">Cornscore · À propos</button>
+        <button type="button" class="hall-link" id="openAbout">
+          <span>
+            <span class="eyebrow" data-i18n="setup.about.eyebrow">À propos</span>
+            <b data-i18n="setup.about.label">Réglages, sauvegarde et langue</b>
+          </span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <footer class="cta-bar">
@@ -1039,7 +1053,7 @@ fr:{
   "setup.start":"Commencer la partie",
   "setup.rules.eyebrow":"Règles du jeu",
   "setup.rules.label":"Comment marquer des points",
-  "setup.about":"Cornscore · À propos",
+  "setup.about.eyebrow":"À propos", "setup.about.label":"Réglages, sauvegarde et langue",
   "team.a":"Équipe A", "team.b":"Équipe B",
   "player.a":"Joueur A", "player.b":"Joueur B",
   "team.name.aria":"Nom de l'équipe", "player.name.aria":"Nom du joueur",
@@ -1166,7 +1180,7 @@ en:{
   "setup.start":"Start the game",
   "setup.rules.eyebrow":"How to play",
   "setup.rules.label":"How points are scored",
-  "setup.about":"Cornscore · About",
+  "setup.about.eyebrow":"About", "setup.about.label":"Settings, backup and language",
   "team.a":"Team A", "team.b":"Team B",
   "player.a":"Player A", "player.b":"Player B",
   "team.name.aria":"Team name", "player.name.aria":"Player name",
