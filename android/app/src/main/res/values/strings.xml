@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cornscore</string>
+    <!-- app_name est défini par variante dans build.gradle : la version
+         d'installation directe se distingue de celle du magasin. -->
     <string name="quit_hint">Press again to leave</string>
     <string name="no_browser">No browser available</string>
     <string name="share_via">Share</string>

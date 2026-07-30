@@ -79,6 +79,12 @@ Dans *Settings → Secrets and variables → Actions*, quatre secrets :
 générer cette clé à ta place : le dépôt étant public, tout ce qui transite par les journaux ou les
 artefacts d'Actions est lisible par n'importe qui.
 
+L'identifiant de l'application est `com.scoretosslabs.cornscore`. Il doit correspondre au nom du
+package saisi dans la console Play, et **ne peut plus changer** une fois l'application créée.
+L'APK d'installation directe porte le suffixe `.direct` : signé par une autre clé, il ne pourrait
+pas s'installer par-dessus la version du magasin, et coexiste donc avec elle sous le nom
+« Cornscore direct ».
+
 **3. Le compte développeur.** 25 $ une fois, vérification d'identité, puis un test fermé auprès
 d'une douzaine de testeurs pendant environ deux semaines avant l'accès à la production. La
 politique de confidentialité est déjà en ligne : <https://lilkuririn.github.io/Cornscore/privacy.html>

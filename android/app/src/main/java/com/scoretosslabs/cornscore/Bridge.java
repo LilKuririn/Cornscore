@@ -1,4 +1,4 @@
-package com.lilkuririn.cornscore;
+package com.scoretosslabs.cornscore;
 
 import android.app.Activity;
 import android.content.ContentValues;

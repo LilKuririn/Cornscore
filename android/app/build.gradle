@@ -39,11 +39,11 @@ def buildName = (project.findProperty("vn") ?: "1.0") as String
 def uploadStore = System.getenv("RELEASE_KEYSTORE")
 
 android {
-    namespace 'com.lilkuririn.cornscore'
+    namespace 'com.scoretosslabs.cornscore'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.lilkuririn.cornscore"
+        applicationId "com.scoretosslabs.cornscore"
         minSdk 24
         targetSdk 35
         versionCode buildCode
@@ -70,10 +70,17 @@ android {
     }
 
     buildTypes {
+        /* L'APK d'installation directe porte un identifiant distinct : signé
+           par une autre clé que la version du magasin, il ne pourrait pas
+           s'installer par-dessus. Avec ce suffixe les deux coexistent, et on
+           n'a jamais à désinstaller pour passer de l'une à l'autre. */
         debug {
+            applicationIdSuffix ".direct"
+            resValue "string", "app_name", "Cornscore direct"
             signingConfig signingConfigs.debug
         }
         release {
+            resValue "string", "app_name", "Cornscore"
             minifyEnabled false
             if (uploadStore) signingConfig signingConfigs.release
         }
