@@ -61,6 +61,9 @@ garden, on a campsite, wherever the boards are.
 
 Play to 11, 15 or 21. Four bags per team per frame; in doubles, two bags each.
 
+The game also goes by bags, baggo, sack toss or bean bag toss. If you throw corn-filled bags at a
+wooden board with a hole in it, this is your scoreboard.
+
 Free, and free of everything else.
 ```
 
@@ -125,6 +128,9 @@ intégralement hors ligne — dans un jardin, en camping, partout où sont les p
 
 Score à atteindre au choix : 11, 15 ou 21. Quatre sacs par équipe et par manche ; en double, deux
 sacs par joueur.
+
+Le jeu est aussi appelé jeu de poches, lancer de sacs, ou bags et baggo en anglais. Si vous lancez
+des sacs de maïs sur une planche percée d'un trou, voici votre tableau de marque.
 
 Gratuite, et débarrassée du reste.
 ```
