@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0D1012" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#EFF2F2" media="(prefers-color-scheme: light)">
-<meta name="description" content="Compteur de points pour le jeu de cornhole, en simple ou en double.">
+<meta name="description" content="Compteur de points pour les jeux d'extérieur : cornhole en simple, en double et en tournoi.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cornscore">
-<title>Cornscore — Compteur de points</title>
+<meta name="apple-mobile-web-app-title" content="ScoreToss">
+<title>ScoreToss — Compteur de points</title>
 </head>
 <body>
 
@@ -774,7 +774,7 @@ a.hall-link{text-decoration:none;color:inherit}
   <section class="screen on" id="s-games">
     <header class="brand">
       <p class="eyebrow" data-i18n="games.eyebrow">Choisir un jeu</p>
-      <h1>Cornscore<span>.</span></h1>
+      <h1>ScoreToss<span>.</span></h1>
     </header>
 
     <div class="games">
@@ -1144,7 +1144,7 @@ fr:{
   "games.cornhole.sub":"Simple, double et tournois",
   "games.soon":"En chantier", "games.soon.sub":"Mölkky, pétanque, palet…",
   "games.change":"Changer de jeu",
-  "app.desc":"Compteur de points pour le jeu de cornhole. Parties en simple ou en double, tournois à élimination directe et palmarès entre joueurs.",
+  "app.desc":"Compteur de points pour les jeux d'extérieur. Cornhole en simple ou en double, tournois à élimination directe et palmarès entre joueurs.",
   "nav.home":"Accueil", "nav.close":"Fermer",
   "mode.single":"Simple", "mode.single.sub":"1 v 1",
   "mode.double":"Double", "mode.double.sub":"2 v 2",
@@ -1262,7 +1262,7 @@ fr:{
   "data.bad":"Fichier illisible",
   "data.confirm":"Remplacer les données actuelles ?",
   "share.result":"Partager le résultat",
-  "share.game":"{a} {sa} – {sb} {b} · {n} manches · Cornscore",
+  "share.game":"{a} {sa} – {sb} {b} · {n} manches · ScoreToss",
   "share.bracket":"Partager le tableau",
   "share.copied":"Copié dans le presse-papiers",
   "color.rouge":"Rouge","color.ambre":"Ambre","color.or":"Or","color.vert":"Vert",
@@ -1275,7 +1275,7 @@ en:{
   "games.cornhole.sub":"Singles, doubles and tournaments",
   "games.soon":"In the works", "games.soon.sub":"Mölkky, pétanque, palet…",
   "games.change":"Change game",
-  "app.desc":"A score keeper for cornhole. Singles and doubles games, single-elimination tournaments, and a record of who beats whom.",
+  "app.desc":"A score keeper for outdoor games. Cornhole singles and doubles, single-elimination tournaments, and a record of who beats whom.",
   "nav.home":"Home", "nav.close":"Close",
   "mode.single":"Singles", "mode.single.sub":"1 v 1",
   "mode.double":"Doubles", "mode.double.sub":"2 v 2",
@@ -1393,7 +1393,7 @@ en:{
   "data.bad":"Unreadable file",
   "data.confirm":"Replace the current data?",
   "share.result":"Share the result",
-  "share.game":"{a} {sa} – {sb} {b} · {n} frames · Cornscore",
+  "share.game":"{a} {sa} – {sb} {b} · {n} frames · ScoreToss",
   "share.bracket":"Share the bracket",
   "share.copied":"Copied to the clipboard",
   "color.rouge":"Red","color.ambre":"Amber","color.or":"Gold","color.vert":"Green",
@@ -1406,7 +1406,7 @@ es:{
   "games.cornhole.sub":"Individual, parejas y torneos",
   "games.soon":"En preparación", "games.soon.sub":"Mölkky, petanca, palet…",
   "games.change":"Cambiar de juego",
-  "app.desc":"Marcador para el juego de cornhole. Partidas individuales o por parejas, torneos de eliminación directa e historial de enfrentamientos.",
+  "app.desc":"Marcador para juegos de exterior. Cornhole individual o por parejas, torneos de eliminación directa e historial de enfrentamientos.",
   "nav.home":"Inicio", "nav.close":"Cerrar",
   "mode.single":"Individual", "mode.single.sub":"1 v 1",
   "mode.double":"Parejas", "mode.double.sub":"2 v 2",
@@ -1524,7 +1524,7 @@ es:{
   "data.bad":"Archivo ilegible",
   "data.confirm":"¿Reemplazar los datos actuales?",
   "share.result":"Compartir el resultado",
-  "share.game":"{a} {sa} – {sb} {b} · {n} rondas · Cornscore",
+  "share.game":"{a} {sa} – {sb} {b} · {n} rondas · ScoreToss",
   "share.bracket":"Compartir el cuadro",
   "share.copied":"Copiado al portapapeles",
   "color.rouge":"Rojo","color.ambre":"Ámbar","color.or":"Oro","color.vert":"Verde",
@@ -1560,7 +1560,7 @@ function applyStaticText(){
     n[i].setAttribute("aria-label",s);
     n[i].title=s;
   }
-  document.title = "Cornscore — "+t("app.tagline");
+  document.title = "ScoreToss — "+t("app.tagline");
 }
 
 /* l vaut "fr", "en", ou null pour revenir au suivi du téléphone. */
@@ -2676,7 +2676,7 @@ function fillAbout(){
   body.innerHTML="";
 
   var id=el("div","about-id");
-  id.appendChild(el("h4",null,"Cornscore"));
+  id.appendChild(el("h4",null,"ScoreToss"));
   id.appendChild(el("p",null,t("app.desc")));
   id.appendChild(el("p","about-ver",tf("about.version",{v:APP_VERSION})));
   body.appendChild(id);

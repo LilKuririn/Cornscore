@@ -1,7 +1,7 @@
-# Cornscore
+# ScoreToss
 
-Compteur de points pour le jeu de **cornhole**. Une page, aucune dépendance, aucun serveur :
-on ouvre `index.html` et on joue.
+Compteur de points pour les **jeux d'extérieur**, à commencer par le cornhole. Une page, aucune
+dépendance, aucun serveur : on ouvre `index.html` et on joue.
 
 ## Utilisation
 
@@ -103,7 +103,7 @@ L'identifiant de l'application est `com.scoretosslabs.cornscore`. Il doit corres
 package saisi dans la console Play, et **ne peut plus changer** une fois l'application créée.
 L'APK d'installation directe porte le suffixe `.direct` : signé par une autre clé, il ne pourrait
 pas s'installer par-dessus la version du magasin, et coexiste donc avec elle sous le nom
-« Cornscore direct ».
+« ScoreToss direct ».
 
 La politique de confidentialité, exigée par la console, est en ligne :
 <https://lilkuririn.github.io/Cornscore/privacy.html>
@@ -122,8 +122,9 @@ La politique de confidentialité, exigée par la console, est en ligne :
   partie.
 - **Palmarès** — les parties terminées sont archivées : confrontations directes, classement par
   victoires, dernières rencontres.
-- **Français et anglais** — la langue suit celle du téléphone au premier lancement, et se change
-  depuis la fiche *À propos*.
+- **Français, anglais et espagnol** — la langue suit celle du téléphone au premier lancement, et
+  se change depuis la fiche *À propos*.
+- **Choix du jeu** — l'accueil liste les jeux ; le cornhole est le premier, d'autres suivront.
 - **Sauvegarde et partage** — export et restauration des données en JSON, partage du score final
   ou de l'arbre du tournoi en texte.
 - **Fin de partie** — vainqueur, score final, sacs dans le trou, meilleure manche, revanche.

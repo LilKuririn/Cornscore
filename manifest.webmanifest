@@ -1,7 +1,7 @@
 {
-  "name": "Cornscore — Compteur de points",
-  "short_name": "Cornscore",
-  "description": "Compteur de points pour le jeu de cornhole, en simple ou en double.",
+  "name": "ScoreToss — Compteur de points",
+  "short_name": "ScoreToss",
+  "description": "Compteur de points pour les jeux d'extérieur : cornhole en simple, en double et en tournoi.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",

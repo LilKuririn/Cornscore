@@ -10,7 +10,7 @@ uniquement entre les deux.
 ### en-US *(langue par défaut, obligatoire)*
 
 ```
-First internal build of Cornscore.
+First internal build of ScoreToss.
 
 Keep score at cornhole: singles or doubles, four bags per team per frame, with the cancellation
 worked out for you. Includes single-elimination tournaments up to 16 teams and a record of who
@@ -23,7 +23,7 @@ final, switching language, and that everything survives closing the app.
 ### fr-FR *(seulement si tu ajoutes la langue à la fiche)*
 
 ```
-Première version interne de Cornscore.
+Première version interne de ScoreToss.
 
 Compteur de points pour le cornhole : simple ou double, quatre sacs par équipe et par manche,
 annulation calculée pour vous. Comprend les tournois à élimination directe jusqu'à 16 équipes et

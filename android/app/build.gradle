@@ -76,11 +76,11 @@ android {
            n'a jamais à désinstaller pour passer de l'une à l'autre. */
         debug {
             applicationIdSuffix ".direct"
-            resValue "string", "app_name", "Cornscore direct"
+            resValue "string", "app_name", "ScoreToss direct"
             signingConfig signingConfigs.debug
         }
         release {
-            resValue "string", "app_name", "Cornscore"
+            resValue "string", "app_name", "ScoreToss"
             minifyEnabled false
             if (uploadStore) signingConfig signingConfigs.release
         }

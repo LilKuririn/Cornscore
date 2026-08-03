@@ -9,7 +9,7 @@ Les limites de caractères sont celles de la console. Les compteurs indiqués so
 **App name** *(30 max — 26 utilisés)*
 
 ```
-Cornscore: Cornhole Scores
+ScoreToss: Cornhole Scores
 ```
 
 **Short description** *(80 max — 77 utilisés)*
@@ -27,7 +27,7 @@ Two big numbers, each in its team's colour, and a row of ticks showing how close
 target. Nothing else competes for attention while you play.
 
 SCORING A FRAME
-Tap the bags — in the hole for 3, on the board for 1 — and Cornscore works out the cancellation
+Tap the bags — in the hole for 3, on the board for 1 — and ScoreToss works out the cancellation
 for you. It shows what the frame is worth before you confirm it, so nobody has to do arithmetic
 between throws. The team that scored throws first in the next frame, and the app keeps track.
 
@@ -50,12 +50,12 @@ SMALL THINGS THAT HELP
 · The screen stays awake while you play
 · A short buzz confirms each tap
 · Light and dark, following your phone
-· English and French
+· English, French and Spanish
 · Export a backup before switching phones
 · Share the final score or the bracket
 
 NO ADS, NO ACCOUNT, NO INTERNET
-Cornscore collects nothing. There is no sign-up, no server and no tracking. Your games, tournaments
+ScoreToss collects nothing. There is no sign-up, no server and no tracking. Your games, tournaments
 and records are stored on your phone and never leave it. The app works entirely offline — in a
 garden, on a campsite, wherever the boards are.
 
@@ -74,7 +74,7 @@ Free, and free of everything else.
 **Nom de l'application** *(30 max — 29 utilisés)*
 
 ```
-Cornscore : score au cornhole
+ScoreToss : score au cornhole
 ```
 
 **Description courte** *(80 max — 79 utilisés)*
@@ -92,7 +92,7 @@ Deux grands chiffres, chacun dans la couleur de son équipe, et une réglette de
 distance au score visé. Rien d'autre ne vient réclamer l'attention pendant la partie.
 
 COMPTER UNE MANCHE
-On touche les sacs — 3 points dans le trou, 1 sur la planche — et Cornscore calcule l'annulation.
+On touche les sacs — 3 points dans le trou, 1 sur la planche — et ScoreToss calcule l'annulation.
 Le résultat de la manche s'affiche avant validation, personne n'a de soustraction à faire entre
 deux lancers. L'équipe qui a marqué lance en premier à la manche suivante, l'application suit.
 
@@ -117,12 +117,12 @@ LES PETITS RIENS
 · L'écran reste allumé pendant la partie
 · Une vibration brève confirme chaque appui
 · Thème clair et sombre, selon le téléphone
-· Français et anglais
+· Français, anglais et espagnol
 · Sauvegarde exportable avant de changer de téléphone
 · Partage du score final ou du tableau
 
 SANS PUBLICITÉ, SANS COMPTE, SANS INTERNET
-Cornscore ne collecte rien. Ni inscription, ni serveur, ni traceur. Vos parties, vos tournois et
+ScoreToss ne collecte rien. Ni inscription, ni serveur, ni traceur. Vos parties, vos tournois et
 votre palmarès restent sur votre téléphone et n'en sortent jamais. L'application fonctionne
 intégralement hors ligne — dans un jardin, en camping, partout où sont les planches.
 
@@ -170,6 +170,6 @@ Si la console refuse le format, envoie-les moi : je les recadre en 9:16 sur le f
 l'application.
 
 **Note sur le public cible.** Déclarer une tranche incluant les moins de 13 ans fait entrer
-l'application dans le programme « Familles », avec ses exigences supplémentaires. Comme Cornscore
+l'application dans le programme « Familles », avec ses exigences supplémentaires. Comme ScoreToss
 ne collecte rien et n'affiche aucune publicité, elle y satisferait sans mal, mais cela ajoute des
 contrôles au moment de la revue. À 13 ans et plus, le parcours est plus court.
