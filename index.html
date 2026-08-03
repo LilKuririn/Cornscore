@@ -139,6 +139,8 @@ h1,h2,h3,p{margin:0}
 .seg button.on{background:var(--panel-2);color:var(--ink)}
 .seg3{grid-template-columns:1fr 1fr 1fr}
 .seg3 button{font-size:14px}
+.seg4{grid-template-columns:1fr 1fr}
+.seg4 button{font-size:14px}
 
 .card{
   --team:#E14434;
@@ -1298,10 +1300,138 @@ en:{
   "color.rouge":"Red","color.ambre":"Amber","color.or":"Gold","color.vert":"Green",
   "color.sarcelle":"Teal","color.bleu":"Blue","color.violet":"Purple",
   "color.rose":"Pink","color.ardoise":"Slate"
+},
+es:{
+  "app.tagline":"Marcador",
+  "app.desc":"Marcador para el juego de cornhole. Partidas individuales o por parejas, torneos de eliminación directa e historial de enfrentamientos.",
+  "nav.home":"Inicio", "nav.close":"Cerrar",
+  "mode.single":"Individual", "mode.single.sub":"1 v 1",
+  "mode.double":"Parejas", "mode.double.sub":"2 v 2",
+  "setup.target":"Puntos para ganar",
+  "setup.start":"Empezar la partida",
+  "setup.rules.eyebrow":"Cómo se juega",
+  "setup.rules.label":"Cómo se anotan los puntos",
+  "setup.about.eyebrow":"Acerca de", "setup.about.label":"Ajustes, copia de seguridad e idioma",
+  "team.a":"Equipo A", "team.b":"Equipo B",
+  "player.a":"Jugador A", "player.b":"Jugador B",
+  "team.name.aria":"Nombre del equipo", "player.name.aria":"Nombre del jugador",
+  "team.player":"Jugador",
+  "team.color.aria":"Color del equipo", "color.aria":"Color",
+  "game.frame":"Ronda", "game.target":"Se juega a",
+  "game.bags":"{n} bolsas por equipo",
+  "game.hole":"Hoyo", "game.hole.pts":"3 pts",
+  "game.board":"Tabla", "game.board.pts":"1 pt",
+  "game.first":"Lanza primero",
+  "game.validate":"Confirmar",
+  "game.none":"Ninguna bolsa contada",
+  "game.tie":"Ronda empatada — sin puntos",
+  "game.scores":"{name} anota {n} punto", "game.scores_p":"{name} anota {n} puntos",
+  "game.add.hole":"Añadir una bolsa en el hoyo", "game.rm.hole":"Quitar una bolsa del hoyo",
+  "game.add.board":"Añadir una bolsa en la tabla", "game.rm.board":"Quitar una bolsa de la tabla",
+  "toss.draw":"Sorteo",
+  "toss.who":"Quién lanza primero",
+  "toss.running":"Sorteando",
+  "toss.result":"{name} lanza primero",
+  "sheet.title":"Hoja de puntuación",
+  "sheet.frame":"Ronda",
+  "sheet.empty":"Todavía no se ha jugado ninguna ronda.",
+  "sheet.hint":"Toca una ronda para corregir el recuento de bolsas. La puntuación se recalcula en toda la partida.",
+  "sheet.undo":"Deshacer la última ronda",
+  "sheet.quit":"Terminar la partida",
+  "sheet.quit.tour":"Abandonar el partido",
+  "sheet.fix.aria":"Corregir la ronda {n}",
+  "edit.title":"Corrección · ronda {n}",
+  "edit.cancel":"Cancelar",
+  "edit.save":"Guardar la corrección",
+  "edit.delete":"Eliminar esta ronda",
+  "over.done":"Partida terminada en {n} rondas",
+  "over.wins":"Gana {name}",
+  "over.frames":"Rondas",
+  "over.holes":"Bolsas en el hoyo",
+  "over.best":"Mejor ronda",
+  "over.rematch":"Revancha",
+  "over.newsetup":"Nueva configuración",
+  "over.next":"Siguiente partido",
+  "over.nextline":"A continuación: {a} contra {b}.",
+  "over.champion":"Ver el ganador del torneo",
+  "over.bracket":"Volver al cuadro",
+  "tour.title":"Torneo",
+  "tour.eyebrow":"Eliminación directa",
+  "tour.teams":"Equipos inscritos",
+  "tour.target":"Puntos para ganar — todos los partidos",
+  "tour.create":"Crear el cuadro",
+  "tour.add":"Añadir un equipo", "tour.remove":"Quitar un equipo",
+  "tour.bracketof":"Cuadro de {n}",
+  "tour.byes.none":"sin exentos",
+  "tour.byes":"{n} equipo exento de la primera ronda", "tour.byes_p":"{n} equipos exentos de la primera ronda",
+  "tour.teamn":"Equipo {n}",
+  "tour.team.aria":"Nombre del equipo {n}",
+  "tour.color.aria":"Color del equipo {n}",
+  "tour.menu":"Opciones del torneo",
+  "tour.state":"Estado del cuadro",
+  "tour.summary":"{t} equipos · {m} partido jugado · {s}", "tour.summary_p":"{t} equipos · {m} partidos jugados · {s}",
+  "tour.warn":"Abandonar borra el cuadro y sus resultados. Las partidas ya jugadas se conservan en el historial.",
+  "tour.restart":"Empezar un cuadro nuevo",
+  "tour.abandon":"Abandonar el torneo",
+  "tour.abandon.confirm":"Confirmar el abandono",
+  "tour.head":"{t} equipos · {m} partido", "tour.head_p":"{t} equipos · {m} partidos",
+  "tour.next":"Siguiente partido · {r}",
+  "tour.play":"Jugar",
+  "tour.winner":"Ganador del torneo",
+  "tour.new":"Nuevo",
+  "tour.waiting":"Cuadro en espera.",
+  "tour.tbd":"Por definir",
+  "tour.bye":"Exento",
+  "tour.done":"terminado", "tour.pending":"en espera",
+  "tour.live":"Torneo en curso", "tour.over":"Torneo terminado",
+  "round.final":"Final", "round.semi":"Semifinales",
+  "round.quarter":"Cuartos de final", "round.16":"Octavos", "round.n":"Ronda {n}",
+  "hall.title":"Historial", "hall.aria":"Historial",
+  "hall.count":"{n} partida guardada", "hall.count_p":"{n} partidas guardadas",
+  "hall.empty":"Todavía no hay ninguna partida guardada.",
+  "hall.duels":"Cara a cara",
+  "hall.standings":"Clasificación",
+  "hall.recent":"Últimas partidas",
+  "hall.team":"Equipo", "hall.w":"V", "hall.l":"D", "hall.rate":"Ratio",
+  "hall.beat":"{w} gana a {l}",
+  "hall.tag.solo":"1v1", "hall.tag.duo":"2v2",
+  "hall.clear":"Borrar el historial",
+  "hall.clear.confirm":"Confirmar el borrado",
+  "rules.title":"Cómo se juega",
+  "rules.count":"Puntuación",
+  "rules.hole":"Bolsa en el hoyo", "rules.board":"Bolsa en la tabla",
+  "rules.flow":"Cómo transcurre una ronda",
+  "rules.1a":"Cada equipo lanza ", "rules.1b":"4 bolsas", "rules.1c":" por ronda; en parejas, 2 bolsas cada uno.",
+  "rules.2a":"Solo cuenta la ", "rules.2b":"diferencia", "rules.2c":": 5 puntos contra 3 anotan 2, y el otro equipo no anota nada.",
+  "rules.3a":"Quien haya anotado ", "rules.3b":"lanza primero", "rules.3c":" en la ronda siguiente. La primera se decide por sorteo.",
+  "rules.4a":"La partida termina en cuanto un equipo ", "rules.4b":"alcanza los puntos fijados", "rules.4c":".",
+  "about.title":"Acerca de",
+  "about.version":"Versión {v}",
+  "about.lang":"Idioma", "about.lang.auto":"Teléfono",
+  "about.support":"Apoyar", "about.support.label":"Invita un café al desarrollador",
+  "about.privacy":"Privacidad", "about.privacy.label":"Qué hace la aplicación con tus datos",
+  "about.source":"Código fuente", "about.source.label":"El proyecto en GitHub",
+  "about.foot":"Ningún dato sale de tu teléfono. Las partidas, los torneos y el historial se guardan localmente, nunca se transmiten, y desaparecen si desinstalas la aplicación.",
+  "data.title":"Tus datos",
+  "data.export":"Exportar una copia de seguridad",
+  "data.import":"Restaurar una copia de seguridad",
+  "data.hint":"La copia contiene el historial, el torneo en curso y la partida en curso. Guárdala antes de cambiar de teléfono.",
+  "data.done":"Copia guardada",
+  "data.imported":"Copia restaurada",
+  "data.bad":"Archivo ilegible",
+  "data.confirm":"¿Reemplazar los datos actuales?",
+  "share.result":"Compartir el resultado",
+  "share.game":"{a} {sa} – {sb} {b} · {n} rondas · Cornscore",
+  "share.bracket":"Compartir el cuadro",
+  "share.copied":"Copiado al portapapeles",
+  "color.rouge":"Rojo","color.ambre":"Ámbar","color.or":"Oro","color.vert":"Verde",
+  "color.sarcelle":"Turquesa","color.bleu":"Azul","color.violet":"Morado",
+  "color.rose":"Rosa","color.ardoise":"Pizarra"
 }
 };
 
 var LANG = "fr";
+var DATE_LOCALE = {fr:"fr-FR", en:"en-GB", es:"es-ES"};
 function t(k){
   var d=TXT[LANG]||TXT.fr;
   return d[k]!==undefined ? d[k] : (TXT.fr[k]!==undefined ? TXT.fr[k] : k);
@@ -1334,9 +1464,9 @@ function applyStaticText(){
 function setLang(l){
   try{
     if(l===null) localStorage.removeItem(LANG_KEY);
-    else localStorage.setItem(LANG_KEY, l==="en" ? "en" : "fr");
+    else localStorage.setItem(LANG_KEY, l);
   }catch(e){}
-  LANG = (l===null) ? detectLang() : (l==="en" ? "en" : "fr");
+  LANG = (l===null) ? detectLang() : l;
   document.documentElement.lang=LANG;
   applyStaticText();
   renderCards(); renderRules(); renderTSetup();
@@ -1356,7 +1486,7 @@ function setLang(l){
 function detectLang(){
   var saved=null;
   try{ saved=localStorage.getItem(LANG_KEY); }catch(e){}
-  if(saved==="fr"||saved==="en") return saved;
+  if(saved==="fr"||saved==="en"||saved==="es") return saved;
 
   var list=(navigator.languages && navigator.languages.length)
              ? navigator.languages
@@ -1364,6 +1494,7 @@ function detectLang(){
   for(var i=0;i<list.length;i++){
     var l=String(list[i]).toLowerCase();
     if(l.indexOf("fr")===0) return "fr";
+    if(l.indexOf("es")===0) return "es";
     if(l.indexOf("en")===0) return "en";
   }
   return "en";
@@ -1453,10 +1584,10 @@ function langPicker(){
      langue choisie une fois ne se déchoisissait plus. */
   var choisi=null;
   try{ choisi=localStorage.getItem(LANG_KEY); }catch(e){}
-  if(choisi!=="fr" && choisi!=="en") choisi=null;
+  if(choisi!=="fr" && choisi!=="en" && choisi!=="es") choisi=null;
 
-  var seg=el("div","seg seg3");
-  [[null,t("about.lang.auto")],["fr","Français"],["en","English"]].forEach(function(l){
+  var seg=el("div","seg seg4");
+  [[null,t("about.lang.auto")],["fr","Français"],["en","English"],["es","Español"]].forEach(function(l){
     var b=el("button",null,l[1]);
     b.type="button";
     if(choisi===l[0]) b.classList.add("on");
@@ -2252,7 +2383,7 @@ function standings(){
   });
   var list=order.map(function(k){ return map[k]; });
   list.sort(function(a,b){
-    return (b.v-a.v) || ((b.v+b.d)-(a.v+a.d)) || a.label.localeCompare(b.label,"fr");
+    return (b.v-a.v) || ((b.v+b.d)-(a.v+a.d)) || a.label.localeCompare(b.label,LANG);
   });
   return list;
 }
@@ -2375,7 +2506,7 @@ function renderHall(){
   H.slice(0,8).forEach(function(g){
     var row=el("div","rec");
     var dt=new Date(g.d);
-    row.appendChild(el("p","d", dt.toLocaleDateString(LANG==="fr"?"fr-FR":"en-GB",{day:"numeric",month:"short"})));
+    row.appendChild(el("p","d", dt.toLocaleDateString(DATE_LOCALE[LANG]||"en-GB",{day:"numeric",month:"short"})));
     var m=el("p","m");
     var mp=tf("hall.beat",{w:"\u0000",l:"\u0001"}).split(/[\u0000\u0001]/);
     m.appendChild(document.createTextNode(mp[0]||""));
