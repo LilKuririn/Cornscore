@@ -2,5 +2,5 @@
 <resources>
     <!-- Fond clair, aligné sur le thème clair de la page web -->
     <color name="ground">#EFF2F2</color>
-    <color name="ic_launcher_background">#1B3A6B</color>
+    <color name="ic_launcher_background">#223A60</color>
 </resources>
