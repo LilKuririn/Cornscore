@@ -121,6 +121,50 @@ h1,h2,h3,p{margin:0}
 }
 .brand h1 span{color:var(--muted)}
 
+/* =============================================================
+   0. CHOIX DU JEU
+   ============================================================= */
+.games{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:0 16px 16px;display:flex;flex-direction:column;gap:12px;
+}
+.games > *{flex:0 0 auto}
+
+.tile{
+  display:flex;align-items:center;gap:15px;width:100%;text-align:left;
+  background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:17px 16px;
+  transition:border-color .18s ease,transform .12s ease;
+}
+.tile:active{transform:scale(.99);border-color:var(--line-2)}
+.tile-mark{
+  flex:0 0 auto;width:58px;height:58px;border-radius:15px;
+  display:grid;place-items:center;color:var(--ink);
+  background:color-mix(in oklab,var(--ink) 6%,var(--panel));
+}
+.tile-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.tile-name{font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.tile-sub{font-size:12.8px;line-height:1.45;color:var(--muted)}
+.tile .chev{color:var(--muted);flex:0 0 auto}
+
+/* le jeu à venir : même gabarit, mais rien à toucher */
+.tile.soon{background:none;border-style:dashed;cursor:default}
+.tile.soon .tile-mark{background:none;border:1px dashed var(--line-2);color:var(--muted)}
+.soon-chip{
+  font-family:var(--fm);font-size:9px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line-2);border-radius:20px;padding:3px 9px;
+}
+
+/* fil d'ariane vers le choix du jeu */
+.crumb{
+  display:flex;align-items:center;gap:6px;padding:2px 0;
+  font-family:var(--fm);font-size:10px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  transition:color .16s ease;
+}
+.crumb:active{color:var(--ink)}
+
 .setup-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
 /* les blocs gardent leur taille naturelle : c'est la colonne qui défile,
    pas les cartes qui s'écrasent. */
@@ -726,13 +770,60 @@ a.hall-link{text-decoration:none;color:inherit}
 
 <div class="shell">
 
+  <!-- ============ CHOIX DU JEU ============ -->
+  <section class="screen on" id="s-games">
+    <header class="brand">
+      <p class="eyebrow" data-i18n="games.eyebrow">Choisir un jeu</p>
+      <h1>Cornscore<span>.</span></h1>
+    </header>
+
+    <div class="games">
+      <button type="button" class="tile" id="playCornhole">
+        <span class="tile-mark">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+            <rect x="10" y="3.5" width="14" height="27" rx="3" stroke="currentColor" stroke-width="2"/>
+            <circle cx="17" cy="11" r="3.2" stroke="currentColor" stroke-width="2"/>
+            <rect x="12.6" y="18" width="8" height="8" rx="1.8" fill="#C5551F"
+                  transform="rotate(-17 16.6 22)"/>
+          </svg>
+        </span>
+        <span class="tile-txt">
+          <span class="tile-name">Cornhole</span>
+          <span class="tile-sub" data-i18n="games.cornhole.sub">Simple, double et tournois</span>
+        </span>
+        <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="tile soon" aria-disabled="true">
+        <span class="tile-mark">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+            <circle cx="11.5" cy="21" r="5" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="22.5" cy="21" r="5" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="17" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+        </span>
+        <span class="tile-txt">
+          <span class="soon-chip" data-i18n="games.soon">En chantier</span>
+          <span class="tile-sub" data-i18n="games.soon.sub">Mölkky, pétanque, palet…</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ PRÉPARATION ============ -->
-  <section class="screen on" id="s-setup">
+  <section class="screen" id="s-setup">
     <header class="brand">
       <div class="brand-row">
         <div>
-          <p class="eyebrow" data-i18n="app.tagline">Compteur de points</p>
-          <h1>Cornscore<span>.</span></h1>
+          <button type="button" class="crumb" id="backToGames">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span data-i18n="games.change">Changer de jeu</span>
+          </button>
+          <h1>Cornhole<span>.</span></h1>
         </div>
         <div class="nav">
           <button type="button" class="nav-btn" id="openHall" hidden data-i18n-aria="hall.aria">
@@ -1049,6 +1140,10 @@ var BAGS = 4;              /* sacs lancés par équipe et par manche */
 var TXT = {
 fr:{
   "app.tagline":"Compteur de points",
+  "games.eyebrow":"Choisir un jeu",
+  "games.cornhole.sub":"Simple, double et tournois",
+  "games.soon":"En chantier", "games.soon.sub":"Mölkky, pétanque, palet…",
+  "games.change":"Changer de jeu",
   "app.desc":"Compteur de points pour le jeu de cornhole. Parties en simple ou en double, tournois à élimination directe et palmarès entre joueurs.",
   "nav.home":"Accueil", "nav.close":"Fermer",
   "mode.single":"Simple", "mode.single.sub":"1 v 1",
@@ -1176,6 +1271,10 @@ fr:{
 },
 en:{
   "app.tagline":"Score keeper",
+  "games.eyebrow":"Pick a game",
+  "games.cornhole.sub":"Singles, doubles and tournaments",
+  "games.soon":"In the works", "games.soon.sub":"Mölkky, pétanque, palet…",
+  "games.change":"Change game",
   "app.desc":"A score keeper for cornhole. Singles and doubles games, single-elimination tournaments, and a record of who beats whom.",
   "nav.home":"Home", "nav.close":"Close",
   "mode.single":"Singles", "mode.single.sub":"1 v 1",
@@ -1303,6 +1402,10 @@ en:{
 },
 es:{
   "app.tagline":"Marcador",
+  "games.eyebrow":"Elige un juego",
+  "games.cornhole.sub":"Individual, parejas y torneos",
+  "games.soon":"En preparación", "games.soon.sub":"Mölkky, petanca, palet…",
+  "games.change":"Cambiar de juego",
   "app.desc":"Marcador para el juego de cornhole. Partidas individuales o por parejas, torneos de eliminación directa e historial de enfrentamientos.",
   "nav.home":"Inicio", "nav.close":"Cerrar",
   "mode.single":"Individual", "mode.single.sub":"1 v 1",
@@ -3128,6 +3231,9 @@ function applyMatchResult(){
 /* ------------------------------------------------------------------
    Navigation, persistance, écran allumé
 ------------------------------------------------------------------ */
+$("playCornhole").addEventListener("click",function(){ show("setup"); });
+$("backToGames").addEventListener("click",function(){ show("games"); });
+
 $("openTour").addEventListener("click",function(){
   if(T){ openBracket(); }
   else { show("tsetup"); renderTSetup(); }
@@ -3205,7 +3311,7 @@ function refreshTourBtn(){
 }
 
 function show(name){
-  ["setup","tsetup","bracket","hall","game","over"].forEach(function(n){
+  ["games","setup","tsetup","bracket","hall","game","over"].forEach(function(n){
     $("s-"+n).classList.toggle("on", n===name);
   });
   if(name!=="game") closeSheet();

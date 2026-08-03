@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         "  if(on('s-hall')){ document.getElementById('hallBack').click(); return '1'; }" +
         "  if(on('s-tsetup')){ document.getElementById('tsBack').click(); return '1'; }" +
         "  if(on('s-bracket')){ document.getElementById('bkHome').click(); return '1'; }" +
+        "  if(on('s-setup')){ document.getElementById('backToGames').click(); return '1'; }" +
         "  return '0';" +
         "})()";
 
