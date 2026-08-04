@@ -125,6 +125,9 @@ La politique de confidentialité, exigée par la console, est en ligne :
 - **Français, anglais et espagnol** — la langue suit celle du téléphone au premier lancement, et
   se change depuis la fiche *À propos*.
 - **Choix du jeu** — l'accueil liste les jeux ; le cornhole est le premier, d'autres suivront.
+- **Noms mémorisés** — les noms employés sont retenus et proposés sous le champ de saisie, dans la
+  partie comme dans le tournoi. Les choisir plutôt que les retaper évite les doublons qui
+  fausseraient le palmarès. Gestion et oubli depuis la fiche *À propos*.
 - **Sauvegarde et partage** — export et restauration des données en JSON, partage du score final
   ou de l'arbre du tournoi en texte.
 - **Fin de partie** — vainqueur, score final, sacs dans le trou, meilleure manche, revanche.
