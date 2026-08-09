@@ -42,8 +42,11 @@ corrigée ou supprimée après coup, aussi loin soit-elle : l'historique est rej
 recalculé sur toute la partie. Une erreur de décompte se répare en cinq secondes au lieu de finir
 en discussion.
 
-**Fin de partie.** Vainqueur, score final, sacs dans le trou, meilleure manche. Revanche en un
-appui, ou partage du résultat en texte.
+**Fin de partie.** Vainqueur, score final, puis la courbe des points cumulés des deux équipes,
+manche après manche, le score à atteindre marqué en pointillés. Dessous, le face-à-face colonne
+contre colonne — points, manches gagnées, sacs dans le trou, sacs sur la planche, meilleure
+manche : la meilleure valeur de chaque ligne prend la couleur de son équipe, l'autre s'efface.
+Revanche en un appui, ou partage du résultat en texte.
 
 ## Tournois
 
