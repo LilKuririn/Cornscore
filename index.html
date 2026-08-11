@@ -513,8 +513,9 @@ h1,h2,h3,p{margin:0}
 .prog-dots{animation:fade .35s ease .85s backwards;opacity:1}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 .prog-grid{stroke:var(--line-2);stroke-width:1}
+.prog-tick{stroke:var(--line);stroke-width:1}
 .prog-goal{stroke:var(--line-2);stroke-width:1;stroke-dasharray:2 4}
-.prog-x{font-family:var(--fm);font-size:8.5px;letter-spacing:.06em;fill:var(--muted)}
+.prog-x,.prog-y{font-family:var(--fm);font-size:8.5px;letter-spacing:.06em;fill:var(--muted)}
 
 .tale-row{
   display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
@@ -2506,7 +2507,7 @@ function overFacts(){
    dépasse la cible : la marge de la victoire se voit sans la lire. */
 function overChart(f,w,l){
   var N=G.rounds.length;
-  var W=320, H=118, PL=4, PR=4, PT=9, PB=15;
+  var W=320, H=118, PL=17, PR=4, PT=9, PB=15;
   var ymax=Math.max(G.target, f.run[0][N], f.run[1][N], 1);
   function px(i){ return PL + (i/N)*(W-PL-PR); }
   function py(v){ return PT + (1-v/ymax)*(H-PT-PB); }
@@ -2522,13 +2523,38 @@ function overChart(f,w,l){
 
   function rule(yv,cls){
     var ln=document.createElementNS(SVGNS,"line");
-    ln.setAttribute("x1",0); ln.setAttribute("x2",W);
+    ln.setAttribute("x1",PL); ln.setAttribute("x2",W);
     ln.setAttribute("y1",yv); ln.setAttribute("y2",yv);
     ln.setAttribute("class",cls);
     svg.appendChild(ln);
   }
+  function ylab(v,yv){
+    var tx=document.createElementNS(SVGNS,"text");
+    tx.setAttribute("class","prog-y");
+    tx.setAttribute("x",PL-5);
+    tx.setAttribute("y",yv.toFixed(1));
+    /* le décalage plutôt que dominant-baseline, que les vieilles
+       WebView d'Android alignent encore de travers */
+    tx.setAttribute("dy","0.32em");
+    tx.setAttribute("text-anchor","end");
+    tx.textContent=v;
+    svg.appendChild(tx);
+  }
+
+  /* Échelle des points : un pas rond qui donne trois ou quatre repères,
+     quel que soit le score atteint. Le score visé garde le sien — c'est
+     la ligne qui compte — et fait taire le repère qu'il touche. */
+  var gy=py(G.target), stp=100, cand=[1,2,5,10,20,25,50];
+  for(var c=0;c<cand.length;c++){ if(cand[c]>=ymax/4){ stp=cand[c]; break; } }
+  for(var v=stp;v<=ymax;v+=stp){
+    if(Math.abs(py(v)-gy)<7) continue;
+    rule(py(v),"prog-tick");
+    ylab(v,py(v));
+  }
   rule(py(0),"prog-grid");
-  rule(py(G.target),"prog-goal");
+  ylab(0,py(0));
+  rule(gy,"prog-goal");
+  ylab(G.target,gy);
 
   /* numéros de manche : assez pour se repérer, jamais au point de se
      chevaucher — la dernière est toujours nommée */
