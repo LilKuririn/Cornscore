@@ -205,36 +205,6 @@ h1,h2,h3,p{margin:0}
 }
 .field-input::placeholder{color:var(--muted);font-weight:500}
 .field-input:focus{border-color:color-mix(in oklab,var(--team) 55%,transparent);outline:none}
-/* noms mémorisés, proposés sous le champ actif */
-.sug{
-  display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch;
-}
-.sug::-webkit-scrollbar{display:none}
-.sug-chip{
-  flex:0 0 auto;max-width:150px;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap;
-  padding:8px 12px;border-radius:20px;
-  background:var(--panel-2);border:1px solid var(--line-2);
-  font-size:13.5px;font-weight:600;color:var(--ink);
-}
-.sug-chip.on{border-color:color-mix(in oklab,var(--ink) 45%,transparent)}
-.sug-chip:active{background:color-mix(in oklab,var(--ink) 12%,var(--panel-2))}
-
-.known{display:flex;flex-wrap:wrap;gap:7px;padding-top:4px}
-.known-chip{
-  display:flex;align-items:center;gap:7px;
-  padding:6px 8px 6px 11px;border-radius:20px;
-  background:var(--panel-2);border:1px solid var(--line);
-  font-size:13px;font-weight:600;
-}
-.known-chip b{font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.known-chip span{
-  width:17px;height:17px;border-radius:50%;display:grid;place-items:center;
-  background:var(--line-2);color:var(--bg);
-  font-size:11px;line-height:1;font-weight:700;
-}
-
 .mates{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mates .field-input{font-size:14px;padding:10px 12px;font-weight:500}
 
@@ -1330,9 +1300,6 @@ fr:{
   "about.privacy":"Confidentialité", "about.privacy.label":"Ce que l'application fait de vos données",
   "about.source":"Code source", "about.source.label":"Le projet sur GitHub",
   "about.foot":"Aucune donnée ne quitte votre téléphone. Les parties, les tournois et le palmarès sont enregistrés localement, ne sont jamais transmis, et disparaissent si vous désinstallez l'application.",
-  "names.title":"Noms mémorisés",
-  "names.hint":"Les noms employés sont retenus et proposés sous le champ de saisie. Les choisir plutôt que les retaper garde le palmarès cohérent.",
-  "names.forget":"Oublier {name}",
   "sheet.quit.confirm":"Confirmer l'arrêt",
   "data.title":"Vos données",
   "data.export":"Exporter une sauvegarde",
@@ -1472,9 +1439,6 @@ en:{
   "about.privacy":"Privacy", "about.privacy.label":"What the app does with your data",
   "about.source":"Source code", "about.source.label":"The project on GitHub",
   "about.foot":"No data leaves your phone. Games, tournaments and records are stored locally, are never transmitted, and disappear if you uninstall the app.",
-  "names.title":"Remembered names",
-  "names.hint":"Names you use are kept and offered under the field. Picking one instead of retyping keeps the records consistent.",
-  "names.forget":"Forget {name}",
   "sheet.quit.confirm":"Confirm ending",
   "data.title":"Your data",
   "data.export":"Export a backup",
@@ -1614,9 +1578,6 @@ es:{
   "about.privacy":"Privacidad", "about.privacy.label":"Qué hace la aplicación con tus datos",
   "about.source":"Código fuente", "about.source.label":"El proyecto en GitHub",
   "about.foot":"Ningún dato sale de tu teléfono. Las partidas, los torneos y el historial se guardan localmente, nunca se transmiten, y desaparecen si desinstalas la aplicación.",
-  "names.title":"Nombres guardados",
-  "names.hint":"Los nombres que usas se guardan y se ofrecen bajo el campo. Elegirlos en vez de volver a escribirlos mantiene el historial coherente.",
-  "names.forget":"Olvidar a {name}",
   "sheet.quit.confirm":"Confirmar el final",
   "data.title":"Tus datos",
   "data.export":"Exportar una copia de seguridad",
@@ -1871,10 +1832,6 @@ function renderCards(){
     name.placeholder=defaultName(i);
     name.setAttribute("aria-label",t(S.mode==="double"?"team.name.aria":"player.name.aria")+" "+(i===0?"A":"B"));
     name.addEventListener("input",function(){ team.name=name.value; save(); });
-    wireName(name, function(){
-      var o=S.teams[1-i];
-      return [o.name, o.mates[0], o.mates[1], team.mates[0], team.mates[1]];
-    });
     card.appendChild(name);
 
     if(S.mode==="double"){
@@ -1887,10 +1844,6 @@ function renderCards(){
         m.placeholder=t("team.player")+" "+(k+1);
         m.setAttribute("aria-label",t("team.player")+" "+(k+1)+" — "+t(i===0?"team.a":"team.b"));
         m.addEventListener("input",function(){ team.mates[k]=m.value; save(); });
-        wireName(m, function(){
-          var o=S.teams[1-i];
-          return [team.name, o.name, o.mates[0], o.mates[1], team.mates[1-k]];
-        });
         mates.appendChild(m);
       });
       card.appendChild(mates);
@@ -1938,13 +1891,6 @@ $("target").addEventListener("click",function(e){
    Cycle de vie de la partie
 ------------------------------------------------------------------ */
 function newGame(){
-  /* on retient ce qui a été saisi : noms d'équipe et de coéquipiers */
-  rememberAll([
-    S.teams[0].name, S.teams[1].name,
-    S.teams[0].mates[0], S.teams[0].mates[1],
-    S.teams[1].mates[0], S.teams[1].mates[1]
-  ]);
-
   G={
     mode:S.mode, target:S.target,
     teams:[
@@ -2733,90 +2679,6 @@ function renderOver(){
 }
 
 /* ==================================================================
-   NOMS MÉMORISÉS
-
-   Retaper les noms est l'action la plus répétée de l'application, et
-   c'est aussi ce qui abîme le palmarès : « Marc », « marc » et « Marc  »
-   y comptent pour trois. On mémorise donc les noms employés, et on les
-   propose sous le champ actif — les choisir plutôt que les ressaisir
-   supprime la corvée et la divergence d'un coup.
-================================================================== */
-var P = [];              /* [{n:"Marc", u:3, t:1699…}] */
-var P_MAX = 40;
-
-function rememberName(name){
-  var v=(name||"").trim();
-  if(!v) return;
-  var k=nameKey(v);
-  for(var i=0;i<P.length;i++){
-    if(nameKey(P[i].n)===k){
-      P[i].n=v; P[i].u++; P[i].t=Date.now();
-      return;
-    }
-  }
-  P.push({n:v, u:1, t:Date.now()});
-}
-function rememberAll(list){
-  for(var i=0;i<list.length;i++) rememberName(list[i]);
-  /* les plus employés d'abord, les récents ensuite */
-  P.sort(function(a,b){ return (b.u-a.u) || (b.t-a.t); });
-  if(P.length>P_MAX) P.length=P_MAX;
-  save();
-}
-function forgetName(name){
-  var k=nameKey(name);
-  P=P.filter(function(p){ return nameKey(p.n)!==k; });
-  save();
-}
-
-/* --- la barre de suggestions, sous le champ actif ----------------- */
-var sugBox=null;
-
-function hideSuggestions(){
-  if(sugBox && sugBox.parentNode) sugBox.parentNode.removeChild(sugBox);
-  sugBox=null;
-}
-
-/* `pris` : les noms déjà employés ailleurs dans la même saisie */
-function showSuggestions(input, pris){
-  hideSuggestions();
-  if(!P.length) return;
-  var interdits={};
-  (pris||[]).forEach(function(v){ var k=nameKey(v); if(k) interdits[k]=1; });
-  var cour=nameKey(input.value);
-
-  var libres=P.filter(function(p){
-    var k=nameKey(p.n);
-    return !interdits[k] || k===cour;
-  });
-  if(!libres.length) return;
-
-  sugBox=el("div","sug");
-  libres.slice(0,12).forEach(function(p){
-    var b=el("button","sug-chip",p.n);
-    b.type="button";
-    if(nameKey(p.n)===cour) b.classList.add("on");
-    /* mousedown plutôt que click : le blur du champ arriverait avant */
-    b.addEventListener("mousedown",function(ev){
-      ev.preventDefault();
-      input.value=p.n;
-      input.dispatchEvent(new Event("input"));
-      hideSuggestions();
-      input.blur();
-    });
-    sugBox.appendChild(b);
-  });
-  input.parentNode.insertBefore(sugBox, input.nextSibling);
-}
-
-/* Branche un champ de nom sur la réserve. `autres` rend la liste des
-   noms occupés au moment du focus. */
-function wireName(input, autres){
-  input.addEventListener("focus",function(){ showSuggestions(input, autres()); });
-  input.addEventListener("blur",function(){ setTimeout(hideSuggestions,120); });
-}
-
-/* ==================================================================
    PALMARÈS — parties archivées et confrontations
 ================================================================== */
 var H=[];
@@ -3081,26 +2943,6 @@ function fillAbout(){
   links.appendChild(aboutRow(t("about.source"),t("about.source.label"),SOURCE_URL));
   body.appendChild(links);
 
-  if(P.length){
-    var pl=el("div","block");
-    pl.style.paddingTop="18px";
-    pl.appendChild(el("p","eyebrow",t("names.title")));
-    var known=el("div","known");
-    P.forEach(function(p){
-      var c=el("div","known-chip");
-      c.appendChild(el("b",null,p.n));
-      var x=el("span",null,"×");
-      x.setAttribute("role","button");
-      x.setAttribute("aria-label",tf("names.forget",{name:p.n}));
-      x.addEventListener("click",function(){ forgetName(p.n); fillAbout(); });
-      c.appendChild(x);
-      known.appendChild(c);
-    });
-    pl.appendChild(known);
-    pl.appendChild(el("p","hint",t("names.hint")));
-    body.appendChild(pl);
-  }
-
   var data=el("div","block");
   data.style.paddingTop="18px";
   data.appendChild(el("p","eyebrow",t("data.title")));
@@ -3143,7 +2985,7 @@ function exportName(){
 }
 
 function exportData(){
-  var payload=JSON.stringify({v:1, at:Date.now(), s:S, ts:TS, t:T, g:G, h:H, p:P}, null, 1);
+  var payload=JSON.stringify({v:1, at:Date.now(), s:S, ts:TS, t:T, g:G, h:H}, null, 1);
   var name=exportName();
   var b=bridge();
   if(b && b.saveFile){
@@ -3172,7 +3014,6 @@ function applyImport(text){
   if(d.ts && d.ts.teams && d.ts.teams.length===16){ TS=d.ts; TS.open=-1; }
   T = (d.t && d.t.matches && d.t.teams) ? d.t : null;
   H = (d.h && d.h.length) ? d.h : [];
-  P = (d.p && d.p.length) ? d.p : [];
   G = (d.g && d.g.teams) ? d.g : null;
   if(G){ if(!G.entry) G.entry=[{h:0,b:0},{h:0,b:0}]; recompute(); }
 
@@ -3330,7 +3171,6 @@ function roundName(r){
 
 function buildTournament(){
   var n=TS.count;
-  rememberAll(TS.teams.slice(0,n).map(function(x){ return x.name; }));
   var size=2; while(size<n) size*=2;
   var rounds=Math.round(Math.log(size)/Math.log(2));
   var order=seedOrder(size);
@@ -3405,10 +3245,6 @@ function renderTRows(){
       name.placeholder=tf("tour.teamn",{n:k+1});
       name.setAttribute("aria-label",tf("tour.team.aria",{n:k+1}));
       name.addEventListener("input",function(){ team.name=name.value; save(); });
-      wireName(name, function(){
-        return TS.teams.slice(0,TS.count).filter(function(x,j){ return j!==k; })
-                       .map(function(x){ return x.name; });
-      });
       row.appendChild(name);
       host.appendChild(row);
 
@@ -3737,7 +3573,7 @@ function show(name){
 }
 
 function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify({s:S,g:G,t:T,ts:TS,h:H,p:P})); }catch(e){}
+  try{ localStorage.setItem(KEY, JSON.stringify({s:S,g:G,t:T,ts:TS,h:H})); }catch(e){}
 }
 function load(){
   var raw;
@@ -3757,7 +3593,6 @@ function load(){
     T=d.t;
   }
   if(d && d.h && d.h.length) H=d.h;
-  if(d && d.p && d.p.length) P=d.p;
   refreshTourBtn();
   refreshHallLink();
 

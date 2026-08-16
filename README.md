@@ -25,10 +25,8 @@ En local, ouvrir [`index.html`](index.html) dans un navigateur suffit.
 
 ## Compter une partie
 
-**Simple (1v1) ou double (2v2).** Nom d'équipe, noms des joueurs, couleur au choix parmi neuf. Les
-noms déjà employés sont proposés sous le champ de saisie : les choisir évite de les retaper, et
-garde le palmarès cohérent. Passer d'un mode à l'autre repart de noms vides, un joueur n'étant pas
-une équipe.
+**Simple (1v1) ou double (2v2).** Nom d'équipe, noms des joueurs, couleur au choix parmi neuf.
+Passer d'un mode à l'autre repart de noms vides, un joueur n'étant pas une équipe.
 
 **Saisie par manche.** Un compteur *trou* (3 points) et un compteur *planche* (1 point) par équipe,
 plafonnés à quatre sacs. L'annulation est calculée et affichée avant validation : personne n'a de
@@ -87,8 +85,8 @@ Le rappel des règles est une fiche qui s'ouvre par-dessus l'écran, et se refer
 ## Vos données restent chez vous
 
 Aucune donnée ne quitte le téléphone. Pas de compte, pas de serveur, pas de traceur, pas de
-publicité. Les parties, les tournois, le palmarès et les noms mémorisés sont enregistrés localement
-et disparaissent avec l'application.
+publicité. Les parties, les tournois et le palmarès sont enregistrés localement et disparaissent
+avec l'application.
 
 Une **sauvegarde** exportable en JSON permet de tout emporter avant de changer de téléphone, et de
 le restaurer ensuite.
