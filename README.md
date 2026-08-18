@@ -4,7 +4,7 @@
 
 # ScoreToss
 
-Compteur de points pour les jeux d'extérieur, à commencer par le **cornhole**.
+Compteur de points pour les jeux d'extérieur : **cornhole** et **palet breton**.
 
 Conçu pour être lu d'un coup d'œil depuis l'autre planche, et utilisé debout dans un jardin : deux
 grands chiffres, chacun dans la couleur de son équipe, et rien d'autre qui réclame l'attention
@@ -24,6 +24,10 @@ En local, ouvrir [`index.html`](index.html) dans un navigateur suffit.
 ---
 
 ## Compter une partie
+
+L'accueil liste les jeux ; le reste de l'application est commun aux deux. Manches successives,
+honneur au vainqueur de la précédente, correction après coup, tournois et palmarès fonctionnent
+à l'identique — seules la saisie d'une manche et les règles changent.
 
 **Simple (1v1) ou double (2v2).** Nom d'équipe, noms des joueurs, couleur au choix parmi neuf.
 Passer d'un mode à l'autre repart de noms vides, un joueur n'étant pas une équipe.
@@ -72,15 +76,36 @@ entre deux barbecues : **qui mène**.
 Une petite marque `1v1` ou `2v2` distingue les joueurs des équipes. Un nom apparu dans les deux
 formats n'en reçoit aucune : elle mentirait.
 
+Chaque jeu a son palmarès : une victoire au cornhole et une au palet ne se comparent pas.
+
 ## Les règles appliquées
+
+Le rappel des règles est une fiche qui s'ouvre par-dessus l'écran, et se referme d'un toucher. Elle
+suit le jeu en cours.
+
+### Cornhole
 
 Un sac dans le trou vaut **3 points**, un sac sur la planche **1 point**. Chaque équipe lance
 **4 sacs** par manche — en double, 2 sacs par joueur. Seule la **différence** entre les deux équipes
 est marquée : 5 points contre 3 rapportent 2 points, l'autre équipe n'en marque aucun. La partie
-s'arrête dès qu'une équipe atteint le score visé.
+s'arrête dès qu'une équipe atteint le score visé, **21** par défaut, 11 ou 15 au choix.
 
-Le **score à atteindre** — 11, 15 ou 21, 21 par défaut — est le seul réglage, visible sur l'accueil.
-Le rappel des règles est une fiche qui s'ouvre par-dessus l'écran, et se referme d'un toucher.
+### Palet breton
+
+Sur planche, au laiton. Le **maître** est posé sur la planche par l'équipe qui a marqué, qui lance
+ensuite en premier ; l'autre relance jusqu'à reprendre le point ou épuiser ses palets.
+
+Seule l'équipe dont le palet est le plus proche du maître marque, **1 point par palet mieux placé
+que le meilleur adverse**. Un palet tombé de la planche ne compte pas. Si le **maître** quitte la
+planche, la mène est **nulle** et se rejoue — l'honneur ne change pas de main. Partie en **12
+points**, 11 ou 15 au choix.
+
+Le nombre de **palets par joueur** se règle à 2, 3 ou 4, l'usage variant d'une fédération à l'autre.
+Par défaut 4 en simple et 2 en double, soit quatre palets par équipe dans les deux formats — c'est
+le maximum qu'une mène peut rapporter.
+
+La saisie s'en trouve simplifiée : une seule réglette par équipe, puisqu'une seule marque. Deux zéros
+valent mène nulle.
 
 ## Vos données restent chez vous
 
@@ -96,8 +121,9 @@ le restaurer ensuite.
 Français, anglais et espagnol. La langue suit celle du téléphone au premier lancement et se change
 depuis la fiche *À propos*, où une position « Téléphone » permet de revenir au suivi automatique.
 
-Le vocabulaire suit celui de la fédération : *frame* en anglais désigne la manche, *round* le tour
-de tournoi — deux mots que le français confond.
+Le vocabulaire suit celui de chaque fédération. Au cornhole, *frame* en anglais désigne la manche et
+*round* le tour de tournoi — deux mots que le français confond. Au palet, la manche est une **mène**,
+*end* en anglais, *mano* en espagnol : l'application change de mot avec le jeu.
 
 ## Comment c'est fait
 
@@ -132,6 +158,5 @@ site est publié par GitHub Pages depuis `main` : un `git push` suffit à déplo
 
 ## Ce qui viendra
 
-Le mölkky, la pétanque et le palet, sous forme de modules au-dessus du même moteur — l'accueil liste
-déjà les jeux et garde une place pour eux. Les tournois en poules, quand l'élimination directe
-montrera ses limites.
+Le mölkky, la pétanque et le palet vendéen, sur le même moteur — l'accueil garde une place pour eux.
+Les tournois en poules, quand l'élimination directe montrera ses limites.

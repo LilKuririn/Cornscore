@@ -226,6 +226,7 @@ h1,h2,h3,p{margin:0}
   border-radius:var(--r);padding:14px;
 }
 .opt{display:flex;flex-direction:column;gap:9px}
+.opt + .opt{margin-top:16px}
 .opt-row{display:flex;gap:6px}
 .chip{
   flex:1;padding:9px 6px;border-radius:9px;background:var(--panel-2);
@@ -362,6 +363,8 @@ h1,h2,h3,p{margin:0}
 .console-head b{color:color-mix(in oklab,var(--ink) 70%,var(--muted));font-weight:500}
 
 .crow{display:grid;grid-template-columns:1fr 92px 92px;align-items:center;gap:8px}
+/* au palet une seule reglette par equipe : elle occupe la place des deux */
+.crow.solo{grid-template-columns:1fr 120px}
 .crow .who{display:flex;align-items:center;gap:7px;min-width:0}
 .crow .who span{
   font-size:13.5px;font-weight:600;color:var(--ink);
@@ -699,6 +702,7 @@ h1,h2,h3,p{margin:0}
 .ed-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0 12px}
 .ed-back{font-size:13.5px;font-weight:600;color:var(--muted)}
 .ed-cols{display:grid;grid-template-columns:1fr 92px 92px;gap:8px;padding-bottom:9px}
+.ed-cols.solo{grid-template-columns:1fr 120px}
 .ed-cols p{text-align:center}
 .ed-cols p:first-child{text-align:left}
 .sheet-body .crow + .crow{margin-top:8px}
@@ -836,6 +840,24 @@ a.hall-link{text-decoration:none;color:inherit}
         </svg>
       </button>
 
+      <button type="button" class="tile" id="playPalet">
+        <span class="tile-mark">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+            <rect x="3.5" y="8" width="27" height="19" rx="3" stroke="currentColor" stroke-width="2"/>
+            <circle cx="17" cy="17.5" r="2.1" fill="#C5551F"/>
+            <circle cx="10.2" cy="21.4" r="3.3" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="23.4" cy="13.4" r="3.3" stroke="currentColor" stroke-width="1.7"/>
+          </svg>
+        </span>
+        <span class="tile-txt">
+          <span class="tile-name" data-i18n="palet.name">Palet breton</span>
+          <span class="tile-sub" data-i18n="games.palet.sub">Sur planche, simple et double</span>
+        </span>
+        <svg class="chev" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
       <div class="tile soon" aria-disabled="true">
         <span class="tile-mark">
           <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
@@ -863,7 +885,7 @@ a.hall-link{text-decoration:none;color:inherit}
             </svg>
             <span data-i18n="games.change">Changer de jeu</span>
           </button>
-          <h1>Cornhole<span>.</span></h1>
+          <h1 id="setupTitle">Cornhole<span>.</span></h1>
         </div>
         <div class="nav">
           <button type="button" class="nav-btn" id="openHall" hidden data-i18n-aria="hall.aria">
@@ -894,10 +916,14 @@ a.hall-link{text-decoration:none;color:inherit}
       <div class="panel-block">
         <div class="opt">
           <p class="eyebrow" data-i18n="setup.target">Score à atteindre</p>
-          <div class="opt-row" id="target">
-            <button type="button" class="chip" data-target="11">11</button>
-            <button type="button" class="chip" data-target="15">15</button>
-            <button type="button" class="chip on" data-target="21">21</button>
+          <div class="opt-row" id="target"></div>
+        </div>
+        <div class="opt" id="paletOpt" hidden>
+          <p class="eyebrow" data-i18n="setup.palets">Palets par joueur</p>
+          <div class="opt-row" id="palets">
+            <button type="button" class="chip" data-palets="2">2</button>
+            <button type="button" class="chip" data-palets="3">3</button>
+            <button type="button" class="chip on" data-palets="4">4</button>
           </div>
         </div>
       </div>
@@ -1097,8 +1123,9 @@ a.hall-link{text-decoration:none;color:inherit}
     <section class="console">
       <div class="console-head">
         <p class="eyebrow" id="consoleTitle">4 sacs par équipe</p>
-        <p class="eyebrow"><span data-i18n="game.hole">Trou</span> <b data-i18n="game.hole.pts">3 pts</b></p>
-        <p class="eyebrow"><span data-i18n="game.board">Planche</span> <b data-i18n="game.board.pts">1 pt</b></p>
+        <p class="eyebrow ch-corn"><span data-i18n="game.hole">Trou</span> <b data-i18n="game.hole.pts">3 pts</b></p>
+        <p class="eyebrow ch-corn"><span data-i18n="game.board">Planche</span> <b data-i18n="game.board.pts">1 pt</b></p>
+        <p class="eyebrow ch-palet" hidden><b data-i18n="game.perpalet">1 pt par palet</b></p>
       </div>
       <div id="rows"></div>
       <div class="settle">
@@ -1173,6 +1200,20 @@ var KEY = "cornhole.v1";
 var LANG_KEY = "cornhole.lang";
 var BAGS = 4;              /* sacs lancés par équipe et par manche */
 
+/* Ce que chaque jeu impose : les scores proposés, celui par défaut, et
+   pour le palet le nombre de palets par joueur — l'usage varie d'une
+   fédération à l'autre, on en fait un réglage plutôt qu'un dogme. */
+var GAMES = {
+  cornhole:{ targets:[11,15,21], target:21 },
+  palet:   { targets:[11,12,15], target:12 }
+};
+/* quatre palets par équipe dans les deux formats */
+function paletDefault(mode){ return mode==="double" ? 2 : 4; }
+function paletMax(mode,per){ return per*(mode==="double" ? 2 : 1); }
+/* le jeu qui fait foi : celui en cours s'il y en a un, sinon la préparation */
+function curGame(){ return (G && !G.over) ? G.game : S.game; }
+function newEntry(g){ return g==="palet" ? [{p:0},{p:0}] : [{h:0,b:0},{h:0,b:0}]; }
+
 /* ==================================================================
    Langues — « manche » se dit frame au cornhole, à ne pas confondre
    avec les tours d'un tournoi (rounds).
@@ -1182,7 +1223,7 @@ fr:{
   "app.tagline":"Compteur de points",
   "games.eyebrow":"Choisir un jeu",
   "games.cornhole.sub":"Simple, double et tournois",
-  "games.soon":"En chantier", "games.soon.sub":"Mölkky, pétanque, palet…",
+  "games.soon":"En chantier", "games.soon.sub":"Mölkky, pétanque, palet vendéen…",
   "games.change":"Changer de jeu",
   "app.desc":"Compteur de points pour les jeux d'extérieur. Cornhole en simple ou en double, tournois à élimination directe et palmarès entre joueurs.",
   "nav.home":"Accueil", "nav.close":"Fermer",
@@ -1301,6 +1342,37 @@ fr:{
   "about.source":"Code source", "about.source.label":"Le projet sur GitHub",
   "about.foot":"Aucune donnée ne quitte votre téléphone. Les parties, les tournois et le palmarès sont enregistrés localement, ne sont jamais transmis, et disparaissent si vous désinstallez l'application.",
   "sheet.quit.confirm":"Confirmer l'arrêt",
+  "games.palet.sub":"Sur planche, simple et double",
+  "palet.name":"Palet breton",
+  "setup.palets":"Palets par joueur",
+  "game.palets":"{n} palets par équipe",
+  "game.perpalet":"1 pt par palet",
+  "game.void":"Mène nulle",
+  "game.add.pt":"Ajouter un point",
+  "game.rm.pt":"Retirer un point",
+  "prules.title":"Le palet breton",
+  "prules.count":"Comptage",
+  "prules.pt":"par palet mieux placé que le meilleur adverse",
+  "prules.flow":"Déroulé",
+  "prules.1a":"L'équipe qui a marqué pose le ","prules.1b":"maître","prules.1c":" sur la planche et lance en premier.",
+  "prules.2a":"L'équipe qui n'a pas le point relance ","prules.2b":"jusqu'à le reprendre","prules.2c":" ou épuiser ses palets.",
+  "prules.3a":"Seule l'équipe la plus proche marque : ","prules.3b":"1 point par palet","prules.3c":" mieux placé que le meilleur adverse.",
+  "prules.4a":"Un palet tombé de la planche ","prules.4b":"ne compte pas","prules.4c":".",
+  "prules.5a":"Si le maître quitte la planche, la mène est ","prules.5b":"nulle","prules.5c":" et se rejoue.",
+  "over.void":"Mènes nulles",
+  "over.avg":"Moyenne par mène",
+  "hall.game":"Jeu",
+  "pal.game.frame":"Mène",
+  "pal.sheet.frame":"Mène",
+  "pal.sheet.empty":"Aucune mène jouée pour l'instant.",
+  "pal.sheet.hint":"Touchez une mène pour corriger le compte des palets. Le score est recalculé sur toute la partie.",
+  "pal.sheet.undo":"Annuler la dernière mène",
+  "pal.sheet.fix.aria":"Corriger la mène {n}",
+  "pal.edit.title":"Correction · mène {n}",
+  "pal.over.frames":"Mènes",
+  "pal.over.done":"Partie terminée en {n} mènes",
+  "pal.over.best":"Meilleure mène",
+  "pal.over.won":"Mènes gagnées",
   "data.title":"Vos données",
   "data.export":"Exporter une sauvegarde",
   "data.import":"Restaurer une sauvegarde",
@@ -1321,7 +1393,7 @@ en:{
   "app.tagline":"Score keeper",
   "games.eyebrow":"Pick a game",
   "games.cornhole.sub":"Singles, doubles and tournaments",
-  "games.soon":"In the works", "games.soon.sub":"Mölkky, pétanque, palet…",
+  "games.soon":"In the works", "games.soon.sub":"Mölkky, pétanque, Vendée palet…",
   "games.change":"Change game",
   "app.desc":"A score keeper for outdoor games. Cornhole singles and doubles, single-elimination tournaments, and a record of who beats whom.",
   "nav.home":"Home", "nav.close":"Close",
@@ -1440,6 +1512,37 @@ en:{
   "about.source":"Source code", "about.source.label":"The project on GitHub",
   "about.foot":"No data leaves your phone. Games, tournaments and records are stored locally, are never transmitted, and disappear if you uninstall the app.",
   "sheet.quit.confirm":"Confirm ending",
+  "games.palet.sub":"On the board, singles and doubles",
+  "palet.name":"Breton palet",
+  "setup.palets":"Palets per player",
+  "game.palets":"{n} palets per team",
+  "game.perpalet":"1 pt per palet",
+  "game.void":"Void end",
+  "game.add.pt":"Add a point",
+  "game.rm.pt":"Remove a point",
+  "prules.title":"Breton palet",
+  "prules.count":"Scoring",
+  "prules.pt":"per palet closer than the opponent's best",
+  "prules.flow":"How it goes",
+  "prules.1a":"The team that scored sets the ","prules.1b":"master","prules.1c":" on the board and throws first.",
+  "prules.2a":"The team without the point keeps throwing ","prules.2b":"until it takes it back","prules.2c":" or runs out of palets.",
+  "prules.3a":"Only the closest team scores: ","prules.3b":"1 point per palet","prules.3c":" closer than the opponent's best.",
+  "prules.4a":"A palet that falls off the board ","prules.4b":"does not count","prules.4c":".",
+  "prules.5a":"If the master leaves the board, the end is ","prules.5b":"void","prules.5c":" and is replayed.",
+  "over.void":"Void ends",
+  "over.avg":"Average per end",
+  "hall.game":"Game",
+  "pal.game.frame":"End",
+  "pal.sheet.frame":"End",
+  "pal.sheet.empty":"No ends played yet.",
+  "pal.sheet.hint":"Tap an end to correct its palet count. The score is recalculated across the whole game.",
+  "pal.sheet.undo":"Undo the last end",
+  "pal.sheet.fix.aria":"Correct end {n}",
+  "pal.edit.title":"Correction · end {n}",
+  "pal.over.frames":"Ends",
+  "pal.over.done":"Game finished in {n} ends",
+  "pal.over.best":"Best end",
+  "pal.over.won":"Ends won",
   "data.title":"Your data",
   "data.export":"Export a backup",
   "data.import":"Restore a backup",
@@ -1460,7 +1563,7 @@ es:{
   "app.tagline":"Marcador",
   "games.eyebrow":"Elige un juego",
   "games.cornhole.sub":"Individual, parejas y torneos",
-  "games.soon":"En preparación", "games.soon.sub":"Mölkky, petanca, palet…",
+  "games.soon":"En preparación", "games.soon.sub":"Mölkky, petanca, palet vendeano…",
   "games.change":"Cambiar de juego",
   "app.desc":"Marcador para juegos de exterior. Cornhole individual o por parejas, torneos de eliminación directa e historial de enfrentamientos.",
   "nav.home":"Inicio", "nav.close":"Cerrar",
@@ -1579,6 +1682,37 @@ es:{
   "about.source":"Código fuente", "about.source.label":"El proyecto en GitHub",
   "about.foot":"Ningún dato sale de tu teléfono. Las partidas, los torneos y el historial se guardan localmente, nunca se transmiten, y desaparecen si desinstalas la aplicación.",
   "sheet.quit.confirm":"Confirmar el final",
+  "games.palet.sub":"Sobre tabla, individual y dobles",
+  "palet.name":"Palet bretón",
+  "setup.palets":"Paletes por jugador",
+  "game.palets":"{n} paletes por equipo",
+  "game.perpalet":"1 pt por palete",
+  "game.void":"Mano nula",
+  "game.add.pt":"Añadir un punto",
+  "game.rm.pt":"Quitar un punto",
+  "prules.title":"El palet bretón",
+  "prules.count":"Puntuación",
+  "prules.pt":"por palete mejor colocado que el mejor rival",
+  "prules.flow":"Desarrollo",
+  "prules.1a":"El equipo que puntuó coloca el ","prules.1b":"maestro","prules.1c":" sobre la tabla y lanza primero.",
+  "prules.2a":"El equipo sin el punto vuelve a lanzar ","prules.2b":"hasta recuperarlo","prules.2c":" o agotar sus paletes.",
+  "prules.3a":"Solo puntúa el equipo más cercano: ","prules.3b":"1 punto por palete","prules.3c":" mejor colocado que el mejor rival.",
+  "prules.4a":"Un palete caído de la tabla ","prules.4b":"no cuenta","prules.4c":".",
+  "prules.5a":"Si el maestro sale de la tabla, la mano es ","prules.5b":"nula","prules.5c":" y se repite.",
+  "over.void":"Manos nulas",
+  "over.avg":"Promedio por mano",
+  "hall.game":"Juego",
+  "pal.game.frame":"Mano",
+  "pal.sheet.frame":"Mano",
+  "pal.sheet.empty":"Todavía no se ha jugado ninguna mano.",
+  "pal.sheet.hint":"Toca una mano para corregir el recuento de paletes. La puntuación se recalcula en toda la partida.",
+  "pal.sheet.undo":"Deshacer la última mano",
+  "pal.sheet.fix.aria":"Corregir la mano {n}",
+  "pal.edit.title":"Corrección · mano {n}",
+  "pal.over.frames":"Manos",
+  "pal.over.done":"Partida terminada en {n} manos",
+  "pal.over.best":"Mejor mano",
+  "pal.over.won":"Manos ganadas",
   "data.title":"Tus datos",
   "data.export":"Exportar una copia de seguridad",
   "data.import":"Restaurar una copia de seguridad",
@@ -1606,6 +1740,16 @@ function t(k){
 /* Pluriel simple : suffixe _p au-delà de un, suffisant pour le français
    comme pour l'anglais sur les tournures employées ici. */
 function tn(k,n){ return t(n>1 ? k+"_p" : k).replace(/\{n\}/g,n); }
+/* Le palet dit « mène » là où le cornhole dit « manche ». Une clé
+   « pal.x » se substitue à « x » quand elle existe et qu'on y joue ;
+   partout ailleurs le libellé commun sert aux deux jeux. */
+function tgk(k){
+  var pk="pal."+k, d=TXT[LANG]||TXT.fr;
+  return (curGame()==="palet" && d[pk]!==undefined) ? pk : k;
+}
+function tg(k){ return t(tgk(k)); }
+function tgf(k,vals){ return tf(tgk(k),vals); }
+
 function tf(k,vals){
   var s=t(k);
   for(var p in vals) s=s.replace(new RegExp("\\{"+p+"\\}","g"), vals[p]);
@@ -1673,10 +1817,39 @@ function color(id){
 }
 /* Fiche des règles, ouverte par-dessus l'écran courant depuis l'accueil
    comme depuis la préparation d'un tournoi. */
+/* Le palet compte autrement : pas de bareme a deux valeurs, mais un point
+   par palet mieux place. La fiche suit donc une autre trame. */
+function fillPaletRules(host){
+  var comptage=el("div","block");
+  comptage.appendChild(el("p","eyebrow",t("prules.count")));
+  var pts=el("div","pts");
+  var row=el("div","pt-row");
+  row.appendChild(el("b",null,"1"));
+  row.appendChild(el("span",null,t("prules.pt")));
+  pts.appendChild(row);
+  comptage.appendChild(pts);
+  host.appendChild(comptage);
+
+  var deroule=el("div","block");
+  deroule.appendChild(el("p","eyebrow",t("prules.flow")));
+  var list=el("ul","rulist");
+  [1,2,3,4,5].forEach(function(k){
+    var li=document.createElement("li");
+    li.appendChild(document.createTextNode(t("prules."+k+"a")));
+    li.appendChild(el("b",null,t("prules."+k+"b")));
+    li.appendChild(document.createTextNode(t("prules."+k+"c")));
+    list.appendChild(li);
+  });
+  deroule.appendChild(list);
+  host.appendChild(deroule);
+}
+
 function fillRules(id){
   var host=$(id);
   if(!host) return;
   host.innerHTML="";
+
+  if(curGame()==="palet") return fillPaletRules(host);
 
   var comptage=el("div","block");
   comptage.appendChild(el("p","eyebrow",t("rules.count")));
@@ -1711,7 +1884,7 @@ function fillRules(id){
 
 /* état de préparation */
 var S = {
-  mode:"simple", target:21,
+  game:"cornhole", mode:"simple", target:21, palets:4,
   teams:[
     {name:"", mates:["",""], color:"rouge"},
     {name:"", mates:["",""], color:"bleu"}
@@ -1853,9 +2026,42 @@ function renderCards(){
   });
 }
 
+/* Les scores proposés changent d'un jeu à l'autre : on reconstruit la
+   rangée plutôt que d'en masquer des morceaux. */
+function fillChips(host, vals, cur, attr){
+  host.innerHTML="";
+  vals.forEach(function(v){
+    var b=el("button","chip",String(v));
+    b.type="button";
+    b.setAttribute("data-"+attr, String(v));
+    if(v===cur) b.classList.add("on");
+    host.appendChild(b);
+  });
+}
+
+/* Bascule l'écran de préparation sur un jeu : titre, scores proposés,
+   réglage des palets, cartes d'équipe et fiche de règles. */
+function applyGame(id){
+  S.game = id;
+  var d = GAMES[id] || GAMES.cornhole;
+  if(d.targets.indexOf(S.target)<0) S.target = d.target;
+  if(id==="palet" && !S.palets) S.palets = paletDefault(S.mode);
+  var h1=$("setupTitle");
+  if(h1 && h1.firstChild) h1.firstChild.nodeValue = (id==="palet") ? t("palet.name") : "Cornhole";
+  $("paletOpt").hidden = (id!=="palet");
+  renderRules();
+  renderCards();
+  fillRules("rulesBody");
+  save();
+}
+
 function renderRules(){
+  var h1=$("setupTitle");
+  if(h1 && h1.firstChild) h1.firstChild.nodeValue = (S.game==="palet") ? t("palet.name") : "Cornhole";
+  fillChips($("target"), (GAMES[S.game]||GAMES.cornhole).targets, S.target, "target");
+  fillChips($("palets"), [2,3,4], S.palets, "palets");
+  $("paletOpt").hidden = (S.game!=="palet");
   var c=$("target").children, i;
-  for(i=0;i<c.length;i++) c[i].classList.toggle("on", +c[i].dataset.target===S.target);
   /* le mode n'était synchronisé qu'au clic : au rechargement d'une partie
      en double, la bascule restait affichée sur Simple. */
   var m=$("mode").children;
@@ -1875,10 +2081,20 @@ $("mode").addEventListener("click",function(e){
     team.mates=["",""];
   });
 
+  /* quatre palets par équipe quel que soit le format */
+  if(S.game==="palet") S.palets = paletDefault(S.mode);
+
   var kids=$("mode").children;
   for(var i=0;i<kids.length;i++) kids[i].classList.toggle("on", kids[i]===b);
   renderCards();
+  renderRules();
   save();
+});
+$("palets").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-palets]");
+  if(!b) return;
+  S.palets=+b.dataset.palets;
+  renderRules(); save();
 });
 $("target").addEventListener("click",function(e){
   var b=e.target.closest("button[data-target]");
@@ -1892,13 +2108,14 @@ $("target").addEventListener("click",function(e){
 ------------------------------------------------------------------ */
 function newGame(){
   G={
-    mode:S.mode, target:S.target,
+    game:S.game, mode:S.mode, target:S.target,
+    max:paletMax(S.mode,S.palets),
     teams:[
       {label:teamLabel(0), mates:matesLabel(0), hex:color(S.teams[0].color).hex},
       {label:teamLabel(1), mates:matesLabel(1), hex:color(S.teams[1].color).hex}
     ],
     rounds:[],
-    entry:[{h:0,b:0},{h:0,b:0}],
+    entry:newEntry(S.game),
     scores:[0,0], first:0, over:false, winner:-1
   };
   show("game");
@@ -1926,7 +2143,11 @@ function recompute(){
 }
 
 function roundPoints(i){ return G.entry[i].h*3 + G.entry[i].b; }
+
+/* Au cornhole les deux équipes lancent et seule la différence est marquée.
+   Au palet une seule équipe marque, et le compte saisi est déjà son gain. */
 function pending(){
+  if(G.game==="palet") return [G.entry[0].p, G.entry[1].p];
   var d=roundPoints(0)-roundPoints(1);
   return d>0 ? [d,0] : [0,-d];
 }
@@ -1934,14 +2155,12 @@ function pending(){
 function validateRound(){
   if(!G || G.over) return;
   var gain=pending();
-  G.rounds.push({
-    h:[G.entry[0].h,G.entry[1].h],
-    b:[G.entry[0].b,G.entry[1].b],
-    gain:gain
-  });
+  G.rounds.push(G.game==="palet"
+    ? { p:[G.entry[0].p,G.entry[1].p], gain:gain }
+    : { h:[G.entry[0].h,G.entry[1].h], b:[G.entry[0].b,G.entry[1].b], gain:gain });
   var before=[G.scores[0],G.scores[1]];
   recompute();
-  G.entry=[{h:0,b:0},{h:0,b:0}];
+  G.entry=newEntry(G.game);
   buzz(gain[0]||gain[1] ? 18 : 8);
 
   if(G.over){ archiveGame(); applyMatchResult(); renderGame(); setTimeout(renderOver, 620); }
@@ -1952,7 +2171,7 @@ function validateRound(){
 function undoRound(){
   if(!G.rounds.length) return;
   G.rounds.pop();
-  G.entry=[{h:0,b:0},{h:0,b:0}];
+  G.entry=newEntry(G.game);
   afterHistoryChange();
 }
 
@@ -1998,6 +2217,8 @@ function buildRows(){
   wrap.style.flexDirection="column";
   wrap.style.gap="8px";
 
+  if(G.game==="palet") return buildPaletRows(wrap);
+
   G.teams.forEach(function(team,i){
     var row=el("div","crow");
     var who=el("div","who");
@@ -2028,12 +2249,49 @@ function buildRows(){
   });
 }
 
+/* Au palet, le compte saisi est le nombre de palets mieux places que le
+   meilleur adverse : une seule equipe peut en avoir, saisir pour l'une
+   remet donc l'autre a zero. Deux zeros valent mene nulle. */
+function buildPaletRows(wrap){
+  G.teams.forEach(function(team,i){
+    var row=el("div","crow solo");
+    var who=el("div","who");
+    var dot=el("span","dot");
+    dot.style.background=team.hex;
+    who.appendChild(dot);
+    who.appendChild(el("span",null,team.label));
+    row.appendChild(who);
+
+    var st=el("div","step");
+    st.style.setProperty("--team",team.hex);
+    var minus=el("button",null,"−");
+    minus.type="button";
+    minus.setAttribute("aria-label",t("game.rm.pt")+" — "+team.label);
+    var val=el("div","v","0");
+    var plus=el("button",null,"+");
+    plus.type="button";
+    plus.setAttribute("aria-label",t("game.add.pt")+" — "+team.label);
+    minus.addEventListener("click",function(){ bump(i,"p",-1); });
+    plus.addEventListener("click",function(){ bump(i,"p",1); });
+    st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
+    st.dataset.team=String(i); st.dataset.kind="p";
+    row.appendChild(st);
+    wrap.appendChild(row);
+  });
+}
+
 function bump(i,kind,d){
   var e=G.entry[i];
   var next=e[kind]+d;
   if(next<0) return;
-  if(e.h+e.b+d>BAGS) return;
-  e[kind]=next;
+  if(G.game==="palet"){
+    if(next>G.max) return;
+    e.p=next;
+    if(next>0) G.entry[1-i].p=0;
+  }else{
+    if(e.h+e.b+d>BAGS) return;
+    e[kind]=next;
+  }
   buzz(6);
   renderConsole();
   save();
@@ -2145,15 +2403,19 @@ function renderConsole(){
     val.textContent=v;
     val.classList.toggle("hot", v>0);
     st.children[0].disabled = v===0;
-    st.children[2].disabled = (e.h+e.b)>=BAGS;
+    st.children[2].disabled = (G.game==="palet") ? (v>=G.max) : ((e.h+e.b)>=BAGS);
   }
 
   var g=pending();
   var out=$("outcome");
   out.innerHTML="";
   if(!g[0] && !g[1]){
-    var any=G.entry[0].h+G.entry[0].b+G.entry[1].h+G.entry[1].b;
-    out.textContent = t(any ? "game.tie" : "game.none");
+    if(G.game==="palet"){
+      out.textContent = t("game.void");
+    }else{
+      var any=G.entry[0].h+G.entry[0].b+G.entry[1].h+G.entry[1].b;
+      out.textContent = t(any ? "game.tie" : "game.none");
+    }
   }else{
     var w=g[0]?0:1;
     outcomeInto(out, G.teams[w].label, g[w]);
@@ -2164,7 +2426,7 @@ function renderGame(rebuild, gains){
   if(rebuild){ buildFields(); buildRows(); }
 
   var ctx = (G.tour && T && T.matches[G.tour.mid]) ? roundName(T.matches[G.tour.mid].r)+" · " : "";
-  $("roundLabel").textContent = ctx+t("game.frame")+" "+(G.rounds.length+1);
+  $("roundLabel").textContent = ctx+tg("game.frame")+" "+(G.rounds.length+1);
   $("targetLabel").textContent = t("game.target")+" "+G.target;
 
   var ch=$("consoleTitle");
@@ -2175,8 +2437,14 @@ function renderGame(rebuild, gains){
     tb.addEventListener("click",doToss);
     ch.appendChild(tb);
   }else{
-    ch.textContent=tf("game.bags",{n:BAGS});
+    ch.textContent = (G.game==="palet")
+      ? tf("game.palets",{n:G.max})
+      : tf("game.bags",{n:BAGS});
   }
+  var pal=(G.game==="palet");
+  var cc=document.querySelectorAll(".ch-corn"), cp=document.querySelectorAll(".ch-palet"), z;
+  for(z=0;z<cc.length;z++) cc[z].hidden=pal;
+  for(z=0;z<cp.length;z++) cp[z].hidden=!pal;
 
   var fields=$("fields").children;
   for(var i=0;i<2;i++){
@@ -2216,6 +2484,7 @@ function renderSheet(){
   var body=$("sheetBody");
   body.innerHTML="";
 
+  $("undo").textContent = tg("sheet.undo");
   $("edSave").hidden = !EDIT;
   $("edDel").hidden  = !EDIT;
   $("undo").hidden   = !!EDIT;
@@ -2223,14 +2492,14 @@ function renderSheet(){
   if(EDIT){ renderEditor(body); return; }
 
   if(!G.rounds.length){
-    body.appendChild(el("p","empty",t("sheet.empty")));
+    body.appendChild(el("p","empty",tg("sheet.empty")));
     $("undo").disabled=true;
     return;
   }
   var table=el("table","log");
   var thead=el("thead");
   var tr=el("tr");
-  tr.appendChild(el("th",null,t("sheet.frame")));
+  tr.appendChild(el("th",null,tg("sheet.frame")));
   tr.appendChild(el("th",null,G.teams[0].label));
   tr.appendChild(el("th",null,G.teams[1].label));
   thead.appendChild(tr);
@@ -2253,7 +2522,7 @@ function renderSheet(){
     }
     row.setAttribute("role","button");
     row.tabIndex=0;
-    row.setAttribute("aria-label",tf("sheet.fix.aria",{n:idx+1}));
+    row.setAttribute("aria-label",tgf("sheet.fix.aria",{n:idx+1}));
     row.addEventListener("click",function(){ openEditor(idx); });
     row.addEventListener("keydown",function(ev){
       if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); openEditor(idx); }
@@ -2262,7 +2531,7 @@ function renderSheet(){
   });
   table.appendChild(tbody);
   body.appendChild(table);
-  body.appendChild(el("p","hint",t("sheet.hint")));
+  body.appendChild(el("p","hint",tg("sheet.hint")));
   $("undo").disabled=false;
 }
 
@@ -2272,7 +2541,9 @@ var EDIT=null;
 function openEditor(idx){
   var rd=G.rounds[idx];
   if(!rd) return;
-  EDIT={idx:idx, e:[{h:rd.h[0],b:rd.b[0]},{h:rd.h[1],b:rd.b[1]}]};
+  EDIT={idx:idx, e: (G.game==="palet")
+    ? [{p:(rd.p?rd.p[0]:rd.gain[0])},{p:(rd.p?rd.p[1]:rd.gain[1])}]
+    : [{h:rd.h[0],b:rd.b[0]},{h:rd.h[1],b:rd.b[1]}]};
   renderSheet();
 }
 function closeEditor(){ EDIT=null; renderSheet(); }
@@ -2280,29 +2551,40 @@ function closeEditor(){ EDIT=null; renderSheet(); }
 function editBump(i,kind,d){
   var e=EDIT.e[i];
   if(e[kind]+d<0) return;
-  if(e.h+e.b+d>BAGS) return;
-  e[kind]+=d;
+  if(G.game==="palet"){
+    if(e.p+d>G.max) return;
+    e.p+=d;
+    if(e.p>0) EDIT.e[1-i].p=0;
+  }else{
+    if(e.h+e.b+d>BAGS) return;
+    e[kind]+=d;
+  }
   buzz(6);
   renderSheet();
 }
 
 function renderEditor(body){
   var head=el("div","ed-head");
-  head.appendChild(el("p","eyebrow",tf("edit.title",{n:String(EDIT.idx+1).padStart(2,"0")})));
+  head.appendChild(el("p","eyebrow",tgf("edit.title",{n:String(EDIT.idx+1).padStart(2,"0")})));
   var back=el("button","ed-back",t("edit.cancel"));
   back.type="button";
   back.addEventListener("click",closeEditor);
   head.appendChild(back);
   body.appendChild(head);
 
-  var cols=el("div","ed-cols");
+  var pal=(G.game==="palet");
+  var cols=el("div","ed-cols"+(pal?" solo":""));
   cols.appendChild(el("p","eyebrow",""));
-  cols.appendChild(el("p","eyebrow",t("game.hole")));
-  cols.appendChild(el("p","eyebrow",t("game.board")));
+  if(pal){
+    cols.appendChild(el("p","eyebrow",t("over.points")));
+  }else{
+    cols.appendChild(el("p","eyebrow",t("game.hole")));
+    cols.appendChild(el("p","eyebrow",t("game.board")));
+  }
   body.appendChild(cols);
 
   G.teams.forEach(function(team,i){
-    var row=el("div","crow");
+    var row=el("div","crow"+(pal?" solo":""));
     var who=el("div","who");
     var dot=el("span","dot");
     dot.style.background=team.hex;
@@ -2310,20 +2592,20 @@ function renderEditor(body){
     who.appendChild(el("span",null,team.label));
     row.appendChild(who);
 
-    ["h","b"].forEach(function(kind){
+    (pal ? ["p"] : ["h","b"]).forEach(function(kind){
       var e=EDIT.e[i];
       var st=el("div","step");
       st.style.setProperty("--team",team.hex);
       var minus=el("button",null,"−");
       minus.type="button";
       minus.disabled = e[kind]===0;
-      minus.setAttribute("aria-label",t(kind==="h"?"game.rm.hole":"game.rm.board")+" — "+team.label);
+      minus.setAttribute("aria-label",t(pal?"game.rm.pt":(kind==="h"?"game.rm.hole":"game.rm.board"))+" — "+team.label);
       var val=el("div","v",String(e[kind]));
       if(e[kind]>0) val.classList.add("hot");
       var plus=el("button",null,"+");
       plus.type="button";
-      plus.disabled = (e.h+e.b)>=BAGS;
-      plus.setAttribute("aria-label",t(kind==="h"?"game.add.hole":"game.add.board")+" — "+team.label);
+      plus.disabled = pal ? (e.p>=G.max) : ((e.h+e.b)>=BAGS);
+      plus.setAttribute("aria-label",t(pal?"game.add.pt":(kind==="h"?"game.add.hole":"game.add.board"))+" — "+team.label);
       minus.addEventListener("click",function(){ editBump(i,kind,-1); });
       plus.addEventListener("click",function(){ editBump(i,kind,1); });
       st.appendChild(minus); st.appendChild(val); st.appendChild(plus);
@@ -2332,13 +2614,16 @@ function renderEditor(body){
     body.appendChild(row);
   });
 
-  var pts=[EDIT.e[0].h*3+EDIT.e[0].b, EDIT.e[1].h*3+EDIT.e[1].b];
-  var d=pts[0]-pts[1];
   var out=el("p","outcome ed-out");
-  if(d===0){
-    out.textContent = t((pts[0]+pts[1]) ? "game.tie" : "game.none");
+  if(pal){
+    var q=[EDIT.e[0].p, EDIT.e[1].p];
+    if(!q[0] && !q[1]) out.textContent = t("game.void");
+    else outcomeInto(out, G.teams[q[0]?0:1].label, q[0]||q[1]);
   }else{
-    outcomeInto(out, G.teams[d>0?0:1].label, Math.abs(d));
+    var pts=[EDIT.e[0].h*3+EDIT.e[0].b, EDIT.e[1].h*3+EDIT.e[1].b];
+    var d=pts[0]-pts[1];
+    if(d===0) out.textContent = t((pts[0]+pts[1]) ? "game.tie" : "game.none");
+    else outcomeInto(out, G.teams[d>0?0:1].label, Math.abs(d));
   }
   body.appendChild(out);
 }
@@ -2361,13 +2646,18 @@ function afterHistoryChange(){
 
 $("edSave").addEventListener("click",function(){
   if(!EDIT) return;
-  var pts=[EDIT.e[0].h*3+EDIT.e[0].b, EDIT.e[1].h*3+EDIT.e[1].b];
-  var d=pts[0]-pts[1];
-  G.rounds[EDIT.idx]={
-    h:[EDIT.e[0].h,EDIT.e[1].h],
-    b:[EDIT.e[0].b,EDIT.e[1].b],
-    gain: d>0 ? [d,0] : [0,-d]
-  };
+  if(G.game==="palet"){
+    var q=[EDIT.e[0].p, EDIT.e[1].p];
+    G.rounds[EDIT.idx]={ p:[q[0],q[1]], gain:[q[0],q[1]] };
+  }else{
+    var pts=[EDIT.e[0].h*3+EDIT.e[0].b, EDIT.e[1].h*3+EDIT.e[1].b];
+    var d=pts[0]-pts[1];
+    G.rounds[EDIT.idx]={
+      h:[EDIT.e[0].h,EDIT.e[1].h],
+      b:[EDIT.e[0].b,EDIT.e[1].b],
+      gain: d>0 ? [d,0] : [0,-d]
+    };
+  }
   EDIT=null;
   afterHistoryChange();
 });
@@ -2433,9 +2723,10 @@ function teamInk(hex){ return "color-mix(in oklab,"+hex+" 62%, var(--tone))"; }
 /* Une seule lecture de l'historique sert au graphe et au face-à-face :
    le cumul manche par manche, et les totaux de chaque équipe. */
 function overFacts(){
-  var f={ run:[[0],[0]], holes:[0,0], boards:[0,0], best:[0,0], won:[0,0] };
+  var f={ run:[[0],[0]], holes:[0,0], boards:[0,0], best:[0,0], won:[0,0], voids:0 };
   var s=[0,0];
   G.rounds.forEach(function(rd){
+    if(!rd.gain[0] && !rd.gain[1]) f.voids++;
     for(var i=0;i<2;i++){
       s[i]+=rd.gain[i];
       f.run[i].push(s[i]);
@@ -2589,6 +2880,7 @@ function overTale(w,l){
   var top=el("div","tale-top");
   top.appendChild(el("p","eyebrow",t(chart ? "over.prog" : "over.stats")));
   top.appendChild(el("p","eyebrow",tf("over.goal",{n:G.target})));
+  if(G.game==="palet" && f.voids) top.appendChild(el("p","eyebrow",t("over.void")+" · "+f.voids));
   card.appendChild(top);
   if(chart) card.appendChild(chart);
 
@@ -2600,13 +2892,25 @@ function overTale(w,l){
 
   var plain=function(v){ return String(v); };
   var gain =function(v){ return v>0 ? "+"+v : "—"; };
-  [
-    [t("over.points"), G.scores[w],  G.scores[l],  plain],
-    [t("over.won"),    f.won[w],     f.won[l],     plain],
-    [t("over.holes"),  f.holes[w],   f.holes[l],   plain],
-    [t("over.board"),  f.boards[w],  f.boards[l],  plain],
-    [t("over.best"),   f.best[w],    f.best[l],    gain]
-  ].forEach(function(r){
+  /* la moyenne s'ecrit avec la virgule partout sauf en anglais */
+  var dec=(LANG==="en") ? "." : ",";
+  var moy=function(i){ return f.won[i] ? (G.scores[i]/f.won[i]).toFixed(1).replace(".",dec) : "—"; };
+
+  var lignes = (G.game==="palet")
+    ? [
+        [t("over.points"), G.scores[w], G.scores[l], plain],
+        [tg("over.won"),   f.won[w],    f.won[l],    plain],
+        [tg("over.best"),  f.best[w],   f.best[l],   gain],
+        [t("over.avg"),    moy(w),      moy(l),      plain]
+      ]
+    : [
+        [t("over.points"), G.scores[w],  G.scores[l],  plain],
+        [tg("over.won"),   f.won[w],     f.won[l],     plain],
+        [t("over.holes"),  f.holes[w],   f.holes[l],   plain],
+        [t("over.board"),  f.boards[w],  f.boards[l],  plain],
+        [t("over.best"),   f.best[w],    f.best[l],    gain]
+      ];
+  lignes.forEach(function(r){
     card.appendChild(taleRow(r[0],w,l,r[1],r[2],r[3]));
   });
   return card;
@@ -2622,8 +2926,8 @@ function renderOver(){
 
   var head=el("div","over-head reveal");
   head.appendChild(el("p","eyebrow", tour
-    ? roundName(tour.r)+" · "+G.rounds.length+" "+t("over.frames").toLocaleLowerCase(LANG)
-    : tf("over.done",{n:G.rounds.length})));
+    ? roundName(tour.r)+" · "+G.rounds.length+" "+tg("over.frames").toLocaleLowerCase(LANG)
+    : tgf("over.done",{n:G.rounds.length})));
   head.appendChild(el("h2",null,tf("over.wins",{name:G.teams[w].label})));
   var fin=el("div","final");
   fin.appendChild(el("span","a",String(G.scores[w])));
@@ -2686,9 +2990,9 @@ var H=[];
 function archiveGame(){
   if(!G || G.archived || G.winner<0) return;
   var holes=[0,0];
-  G.rounds.forEach(function(r){ holes[0]+=r.h[0]; holes[1]+=r.h[1]; });
+  G.rounds.forEach(function(r){ if(r.h){ holes[0]+=r.h[0]; holes[1]+=r.h[1]; } });
   H.unshift({
-    d:Date.now(), mode:G.mode,
+    d:Date.now(), g:G.game, mode:G.mode,
     n:[G.teams[0].label,G.teams[1].label],
     c:[G.teams[0].hex,G.teams[1].hex],
     s:[G.scores[0],G.scores[1]],
@@ -2699,6 +3003,12 @@ function archiveGame(){
   G.archived=true;
 }
 
+/* Une victoire au cornhole et une au palet ne se comparent pas : le
+   palmares ne montre que les parties du jeu choisi. */
+function HG(){
+  return H.filter(function(x){ return (x.g||"cornhole")===S.game; });
+}
+
 function nameKey(s){ return (s||"").trim().toLocaleLowerCase("fr"); }
 
 /* Un nom peut désigner un joueur seul ou une équipe de deux : on relève le
@@ -2706,7 +3016,7 @@ function nameKey(s){ return (s||"").trim().toLocaleLowerCase("fr"); }
    Un nom apparu dans les deux ne reçoit aucune marque, elle mentirait. */
 function modeTags(){
   var m={};
-  H.forEach(function(g){
+  HG().forEach(function(g){
     for(var i=0;i<2;i++){
       var k=nameKey(g.n[i]);
       if(!k) continue;
@@ -2728,7 +3038,7 @@ function tagEl(tags,name){
 
 function standings(){
   var map={}, order=[];
-  H.forEach(function(g){
+  HG().forEach(function(g){
     for(var i=0;i<2;i++){
       var k=nameKey(g.n[i]);
       if(!k) continue;
@@ -2747,7 +3057,7 @@ function standings(){
 
 function duels(){
   var map={}, order=[];
-  H.forEach(function(g){
+  HG().forEach(function(g){
     var ka=nameKey(g.n[0]), kb=nameKey(g.n[1]);
     if(!ka || !kb || ka===kb) return;
     var flip = kb<ka;
@@ -2775,9 +3085,9 @@ function renderHall(){
   var body=$("hallBody");
   body.innerHTML="";
 
-  $("hallCount").textContent = tn("hall.count",H.length);
+  $("hallCount").textContent = tn("hall.count",HG().length);
 
-  if(!H.length){
+  if(!HG().length){
     body.appendChild(el("p","empty",t("hall.empty")));
     return;
   }
@@ -2860,7 +3170,7 @@ function renderHall(){
 
   /* dernières parties */
   var bl=blockOf(t("hall.recent"));
-  H.slice(0,8).forEach(function(g){
+  HG().slice(0,8).forEach(function(g){
     var row=el("div","rec");
     var dt=new Date(g.d);
     row.appendChild(el("p","d", dt.toLocaleDateString(DATE_LOCALE[LANG]||"en-GB",{day:"numeric",month:"short"})));
@@ -2880,8 +3190,8 @@ function renderHall(){
 
 function refreshHallLink(){
   var btn=$("openHall");
-  btn.hidden = !H.length;
-  btn.title = t("hall.aria")+" · "+tn("hall.count",H.length);
+  btn.hidden = !HG().length;
+  btn.title = t("hall.aria")+" · "+tn("hall.count",HG().length);
   btn.setAttribute("aria-label", btn.title);
 }
 
@@ -3090,7 +3400,7 @@ $("importFile").addEventListener("change",function(){
 $("aboutClose").addEventListener("click",closeAbout);
 $("aboutScrim").addEventListener("click",closeAbout);
 
-function openRules(){ $("rulesWrap").classList.add("on"); }
+function openRules(){ fillRules("rulesBody"); $("rulesWrap").classList.add("on"); }
 function closeRules(){ $("rulesWrap").classList.remove("on"); }
 $("openRules").addEventListener("click",openRules);
 $("openRulesT").addEventListener("click",openRules);
@@ -3111,7 +3421,7 @@ $("hallClear").addEventListener("click",function(){
   }
   b.dataset.armed="0";
   b.textContent=t("hall.clear");
-  H=[]; save();
+  H=H.filter(function(x){ return (x.g||"cornhole")!==S.game; }); save();
   renderHall(); refreshHallLink();
   show("setup");
 });
@@ -3181,6 +3491,7 @@ function buildTournament(){
     for(var i=0;i<count;i++) matches.push({r:r,i:i,a:null,b:null,winner:-1,score:[0,0],done:false,bye:false});
   }
   T={
+    game:S.game, max:paletMax(TS.mode,S.palets),
     teams:TS.teams.slice(0,n).map(function(team,k){
       return {name:(team.name||"").trim() || tf("tour.teamn",{n:k+1}), color:team.color};
     }),
@@ -3267,6 +3578,9 @@ function renderTRows(){
   }
 }
 function renderTRules(){
+  var gd=GAMES[S.game]||GAMES.cornhole;
+  if(gd.targets.indexOf(TS.target)<0) TS.target=gd.target;
+  fillChips($("ttarget"), gd.targets, TS.target, "target");
   var a=$("ttarget").children, i;
   for(i=0;i<a.length;i++) a[i].classList.toggle("on", +a[i].dataset.target===TS.target);
   var mm=$("tmode").children;
@@ -3458,9 +3772,9 @@ function playMatch(mid){
     }
   }
   G={
-    mode:T.mode, target:T.target,
+    game:T.game||"cornhole", mode:T.mode, target:T.target, max:T.max||4,
     teams:[{label:tName(m.a),mates:"",hex:hexA},{label:tName(m.b),mates:"",hex:hexB}],
-    rounds:[], entry:[{h:0,b:0},{h:0,b:0}],
+    rounds:[], entry:newEntry(T.game||"cornhole"),
     scores:[0,0], first:0, over:false, winner:-1,
     tour:{mid:mid, recorded:false}
   };
@@ -3485,7 +3799,8 @@ function applyMatchResult(){
 /* ------------------------------------------------------------------
    Navigation, persistance, écran allumé
 ------------------------------------------------------------------ */
-$("playCornhole").addEventListener("click",function(){ show("setup"); });
+$("playCornhole").addEventListener("click",function(){ applyGame("cornhole"); show("setup"); });
+$("playPalet").addEventListener("click",function(){ applyGame("palet"); show("setup"); });
 $("backToGames").addEventListener("click",function(){ show("games"); });
 
 $("openTour").addEventListener("click",function(){
@@ -3583,6 +3898,8 @@ function load(){
   try{ d=JSON.parse(raw); }catch(e){ return; }
   if(d && d.s){
     S=d.s;
+    if(S.game!=="palet") S.game="cornhole";
+    if(!S.palets) S.palets=paletDefault(S.mode);
     if(!S.teams || S.teams.length!==2) S.teams=[{name:"",mates:["",""],color:"rouge"},{name:"",mates:["",""],color:"bleu"}];
   }
   if(d && d.ts && d.ts.teams && d.ts.teams.length===16){
@@ -3598,7 +3915,9 @@ function load(){
 
   if(d && d.g && d.g.teams){
     G=d.g;
-    if(!G.entry) G.entry=[{h:0,b:0},{h:0,b:0}];
+    if(!G.game) G.game="cornhole";
+    if(!G.max) G.max=4;
+    if(!G.entry) G.entry=newEntry(G.game);
     recompute();
     if(G.over){ renderOver(); }
     else { show("game"); renderGame(true); keepAwake(); }
