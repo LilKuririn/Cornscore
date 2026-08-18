@@ -95,10 +95,15 @@ s'arrête dès qu'une équipe atteint le score visé, **21** par défaut, 11 ou 
 Sur planche, au laiton. Le **maître** est posé sur la planche par l'équipe qui a marqué, qui lance
 ensuite en premier ; l'autre relance jusqu'à reprendre le point ou épuiser ses palets.
 
+L'équipe qui pose le maître a **trois essais** pour l'y placer ; sans succès, l'adversaire tente à
+son tour, avec trois essais également.
+
 Seule l'équipe dont le palet est le plus proche du maître marque, **1 point par palet mieux placé
 que le meilleur adverse**. Un palet tombé de la planche ne compte pas. Si le **maître** quitte la
-planche, la mène est **nulle** et se rejoue — l'honneur ne change pas de main. Partie en **12
-points**, 11 ou 15 au choix.
+planche, la mène est **nulle** et se rejoue — l'honneur ne change pas de main.
+
+La partie se joue en **12 points**, la **belle en 15**. Chaque jeu garde son propre score : passer
+au palet ne touche pas au 21 du cornhole.
 
 Le nombre de **palets par joueur** se règle à 2, 3 ou 4, l'usage variant d'une fédération à l'autre.
 Par défaut 4 en simple et 2 en double, soit quatre palets par équipe dans les deux formats — c'est

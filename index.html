@@ -181,8 +181,6 @@ h1,h2,h3,p{margin:0}
 }
 .seg button .sub{font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
 .seg button.on{background:var(--panel-2);color:var(--ink)}
-.seg3{grid-template-columns:1fr 1fr 1fr}
-.seg3 button{font-size:14px}
 .seg4{grid-template-columns:1fr 1fr}
 .seg4 button{font-size:14px}
 
@@ -917,6 +915,7 @@ a.hall-link{text-decoration:none;color:inherit}
         <div class="opt">
           <p class="eyebrow" data-i18n="setup.target">Score à atteindre</p>
           <div class="opt-row" id="target"></div>
+          <p class="hint" id="targetHint" hidden data-i18n="setup.palet.hint">La partie se joue en 12 points, la belle en 15.</p>
         </div>
         <div class="opt" id="paletOpt" hidden>
           <p class="eyebrow" data-i18n="setup.palets">Palets par joueur</p>
@@ -1205,7 +1204,7 @@ var BAGS = 4;              /* sacs lancés par équipe et par manche */
    fédération à l'autre, on en fait un réglage plutôt qu'un dogme. */
 var GAMES = {
   cornhole:{ targets:[11,15,21], target:21 },
-  palet:   { targets:[11,12,15], target:12 }
+  palet:   { targets:[12,15], target:12 }
 };
 /* quatre palets par équipe dans les deux formats */
 function paletDefault(mode){ return mode==="double" ? 2 : 4; }
@@ -1238,7 +1237,7 @@ fr:{
   "player.a":"Joueur A", "player.b":"Joueur B",
   "team.name.aria":"Nom de l'équipe", "player.name.aria":"Nom du joueur",
   "team.player":"Joueur",
-  "team.color.aria":"Couleur de l'équipe", "color.aria":"Couleur",
+  "color.aria":"Couleur",
   "game.frame":"Manche", "game.target":"Objectif",
   "game.bags":"{n} sacs par équipe",
   "game.hole":"Trou", "game.hole.pts":"3 pts",
@@ -1355,13 +1354,13 @@ fr:{
   "prules.pt":"par palet mieux placé que le meilleur adverse",
   "prules.flow":"Déroulé",
   "prules.1a":"L'équipe qui a marqué pose le ","prules.1b":"maître","prules.1c":" sur la planche et lance en premier.",
-  "prules.2a":"L'équipe qui n'a pas le point relance ","prules.2b":"jusqu'à le reprendre","prules.2c":" ou épuiser ses palets.",
-  "prules.3a":"Seule l'équipe la plus proche marque : ","prules.3b":"1 point par palet","prules.3c":" mieux placé que le meilleur adverse.",
-  "prules.4a":"Un palet tombé de la planche ","prules.4b":"ne compte pas","prules.4c":".",
-  "prules.5a":"Si le maître quitte la planche, la mène est ","prules.5b":"nulle","prules.5c":" et se rejoue.",
+  "prules.2a":"Elle a ","prules.2b":"trois essais","prules.2c":" pour l'y placer ; sans succès, l'adversaire tente à son tour, trois essais aussi.",
+  "prules.3a":"L'équipe qui n'a pas le point relance ","prules.3b":"jusqu'à le reprendre","prules.3c":" ou épuiser ses palets.",
+  "prules.4a":"Seule l'équipe la plus proche marque : ","prules.4b":"1 point par palet","prules.4c":" mieux placé que le meilleur adverse.",
+  "prules.5a":"Un palet tombé de la planche ","prules.5b":"ne compte pas","prules.5c":".",
+  "prules.6a":"Si le maître quitte la planche, la mène est ","prules.6b":"nulle","prules.6c":" et se rejoue.",
   "over.void":"Mènes nulles",
   "over.avg":"Moyenne par mène",
-  "hall.game":"Jeu",
   "pal.game.frame":"Mène",
   "pal.sheet.frame":"Mène",
   "pal.sheet.empty":"Aucune mène jouée pour l'instant.",
@@ -1373,6 +1372,7 @@ fr:{
   "pal.over.done":"Partie terminée en {n} mènes",
   "pal.over.best":"Meilleure mène",
   "pal.over.won":"Mènes gagnées",
+  "setup.palet.hint":"La partie se joue en 12 points, la belle en 15.",
   "data.title":"Vos données",
   "data.export":"Exporter une sauvegarde",
   "data.import":"Restaurer une sauvegarde",
@@ -1408,7 +1408,7 @@ en:{
   "player.a":"Player A", "player.b":"Player B",
   "team.name.aria":"Team name", "player.name.aria":"Player name",
   "team.player":"Player",
-  "team.color.aria":"Team colour", "color.aria":"Colour",
+  "color.aria":"Colour",
   "game.frame":"Frame", "game.target":"Playing to",
   "game.bags":"{n} bags per team",
   "game.hole":"Hole", "game.hole.pts":"3 pts",
@@ -1525,13 +1525,13 @@ en:{
   "prules.pt":"per palet closer than the opponent's best",
   "prules.flow":"How it goes",
   "prules.1a":"The team that scored sets the ","prules.1b":"master","prules.1c":" on the board and throws first.",
-  "prules.2a":"The team without the point keeps throwing ","prules.2b":"until it takes it back","prules.2c":" or runs out of palets.",
-  "prules.3a":"Only the closest team scores: ","prules.3b":"1 point per palet","prules.3c":" closer than the opponent's best.",
-  "prules.4a":"A palet that falls off the board ","prules.4b":"does not count","prules.4c":".",
-  "prules.5a":"If the master leaves the board, the end is ","prules.5b":"void","prules.5c":" and is replayed.",
+  "prules.2a":"It gets ","prules.2b":"three attempts","prules.2c":" to land it; failing that, the opponent tries, also with three.",
+  "prules.3a":"The team without the point keeps throwing ","prules.3b":"until it takes it back","prules.3c":" or runs out of palets.",
+  "prules.4a":"Only the closest team scores: ","prules.4b":"1 point per palet","prules.4c":" closer than the opponent's best.",
+  "prules.5a":"A palet that falls off the board ","prules.5b":"does not count","prules.5c":".",
+  "prules.6a":"If the master leaves the board, the end is ","prules.6b":"void","prules.6c":" and is replayed.",
   "over.void":"Void ends",
   "over.avg":"Average per end",
-  "hall.game":"Game",
   "pal.game.frame":"End",
   "pal.sheet.frame":"End",
   "pal.sheet.empty":"No ends played yet.",
@@ -1543,6 +1543,7 @@ en:{
   "pal.over.done":"Game finished in {n} ends",
   "pal.over.best":"Best end",
   "pal.over.won":"Ends won",
+  "setup.palet.hint":"A game is played to 12 points, the decider to 15.",
   "data.title":"Your data",
   "data.export":"Export a backup",
   "data.import":"Restore a backup",
@@ -1578,7 +1579,7 @@ es:{
   "player.a":"Jugador A", "player.b":"Jugador B",
   "team.name.aria":"Nombre del equipo", "player.name.aria":"Nombre del jugador",
   "team.player":"Jugador",
-  "team.color.aria":"Color del equipo", "color.aria":"Color",
+  "color.aria":"Color",
   "game.frame":"Ronda", "game.target":"Se juega a",
   "game.bags":"{n} bolsas por equipo",
   "game.hole":"Hoyo", "game.hole.pts":"3 pts",
@@ -1695,13 +1696,13 @@ es:{
   "prules.pt":"por palete mejor colocado que el mejor rival",
   "prules.flow":"Desarrollo",
   "prules.1a":"El equipo que puntuó coloca el ","prules.1b":"maestro","prules.1c":" sobre la tabla y lanza primero.",
-  "prules.2a":"El equipo sin el punto vuelve a lanzar ","prules.2b":"hasta recuperarlo","prules.2c":" o agotar sus paletes.",
-  "prules.3a":"Solo puntúa el equipo más cercano: ","prules.3b":"1 punto por palete","prules.3c":" mejor colocado que el mejor rival.",
-  "prules.4a":"Un palete caído de la tabla ","prules.4b":"no cuenta","prules.4c":".",
-  "prules.5a":"Si el maestro sale de la tabla, la mano es ","prules.5b":"nula","prules.5c":" y se repite.",
+  "prules.2a":"Dispone de ","prules.2b":"tres intentos","prules.2c":" para colocarlo; si falla, lo intenta el rival, también con tres.",
+  "prules.3a":"El equipo sin el punto vuelve a lanzar ","prules.3b":"hasta recuperarlo","prules.3c":" o agotar sus paletes.",
+  "prules.4a":"Solo puntúa el equipo más cercano: ","prules.4b":"1 punto por palete","prules.4c":" mejor colocado que el mejor rival.",
+  "prules.5a":"Un palete caído de la tabla ","prules.5b":"no cuenta","prules.5c":".",
+  "prules.6a":"Si el maestro sale de la tabla, la mano es ","prules.6b":"nula","prules.6c":" y se repite.",
   "over.void":"Manos nulas",
   "over.avg":"Promedio por mano",
-  "hall.game":"Juego",
   "pal.game.frame":"Mano",
   "pal.sheet.frame":"Mano",
   "pal.sheet.empty":"Todavía no se ha jugado ninguna mano.",
@@ -1713,6 +1714,7 @@ es:{
   "pal.over.done":"Partida terminada en {n} manos",
   "pal.over.best":"Mejor mano",
   "pal.over.won":"Manos ganadas",
+  "setup.palet.hint":"La partida se juega a 12 puntos, la bella a 15.",
   "data.title":"Tus datos",
   "data.export":"Exportar una copia de seguridad",
   "data.import":"Restaurar una copia de seguridad",
@@ -1833,7 +1835,7 @@ function fillPaletRules(host){
   var deroule=el("div","block");
   deroule.appendChild(el("p","eyebrow",t("prules.flow")));
   var list=el("ul","rulist");
-  [1,2,3,4,5].forEach(function(k){
+  [1,2,3,4,5,6].forEach(function(k){
     var li=document.createElement("li");
     li.appendChild(document.createTextNode(t("prules."+k+"a")));
     li.appendChild(el("b",null,t("prules."+k+"b")));
@@ -1885,6 +1887,9 @@ function fillRules(id){
 /* état de préparation */
 var S = {
   game:"cornhole", mode:"simple", target:21, palets:4,
+  /* un score par jeu : jouer une belle au palet ne doit pas ramener
+     le cornhole a 15 au retour */
+  tgt:{cornhole:21, palet:12},
   teams:[
     {name:"", mates:["",""], color:"rouge"},
     {name:"", mates:["",""], color:"bleu"}
@@ -1920,7 +1925,7 @@ function langPicker(){
   var box=el("div","block");
   box.style.paddingTop="18px";
   box.appendChild(el("p","eyebrow",t("about.lang")));
-  /* Trois choix, dont le retour au suivi du téléphone : sans lui, une
+  /* Quatre choix, dont le retour au suivi du téléphone : sans lui, une
      langue choisie une fois ne se déchoisissait plus. */
   var choisi=null;
   try{ choisi=localStorage.getItem(LANG_KEY); }catch(e){}
@@ -2042,8 +2047,11 @@ function fillChips(host, vals, cur, attr){
 /* Bascule l'écran de préparation sur un jeu : titre, scores proposés,
    réglage des palets, cartes d'équipe et fiche de règles. */
 function applyGame(id){
+  if(!S.tgt) S.tgt={cornhole:21, palet:12};
+  S.tgt[S.game] = S.target;          /* on range le score du jeu qu'on quitte */
   S.game = id;
   var d = GAMES[id] || GAMES.cornhole;
+  S.target = S.tgt[id] || d.target;  /* et on ressort le sien */
   if(d.targets.indexOf(S.target)<0) S.target = d.target;
   if(id==="palet" && !S.palets) S.palets = paletDefault(S.mode);
   var h1=$("setupTitle");
@@ -2056,12 +2064,16 @@ function applyGame(id){
 }
 
 function renderRules(){
+  /* une cible retenue pour un jeu peut ne plus exister dans l'autre */
+  var gd=GAMES[S.game]||GAMES.cornhole;
+  if(gd.targets.indexOf(S.target)<0) S.target=gd.target;
   var h1=$("setupTitle");
   if(h1 && h1.firstChild) h1.firstChild.nodeValue = (S.game==="palet") ? t("palet.name") : "Cornhole";
   fillChips($("target"), (GAMES[S.game]||GAMES.cornhole).targets, S.target, "target");
   fillChips($("palets"), [2,3,4], S.palets, "palets");
   $("paletOpt").hidden = (S.game!=="palet");
-  var c=$("target").children, i;
+  $("targetHint").hidden = (S.game!=="palet");
+  var i;
   /* le mode n'était synchronisé qu'au clic : au rechargement d'une partie
      en double, la bascule restait affichée sur Simple. */
   var m=$("mode").children;
@@ -2100,6 +2112,8 @@ $("target").addEventListener("click",function(e){
   var b=e.target.closest("button[data-target]");
   if(!b) return;
   S.target=+b.dataset.target;
+  if(!S.tgt) S.tgt={cornhole:21, palet:12};
+  S.tgt[S.game]=S.target;
   renderRules(); save();
 });
 
@@ -3429,7 +3443,7 @@ $("hallClear").addEventListener("click",function(){
 /* ==================================================================
    TOURNOI — élimination directe
 ================================================================== */
-var TS = { count:4, mode:"simple", target:21, open:-1, teams:[] };
+var TS = { count:4, mode:"simple", target:21, open:-1, teams:[], tgt:{cornhole:21, palet:12} };
 for(var _i=0;_i<16;_i++) TS.teams.push({name:"", color:COLORS[_i%COLORS.length].id});
 
 var T = null;   /* tournoi en cours */
@@ -3579,6 +3593,12 @@ function renderTRows(){
 }
 function renderTRules(){
   var gd=GAMES[S.game]||GAMES.cornhole;
+  if(!TS.tgt) TS.tgt={cornhole:21, palet:12};
+  if(TS.game!==S.game){              /* on arrive depuis un autre jeu */
+    if(TS.game) TS.tgt[TS.game]=TS.target;
+    TS.target = TS.tgt[S.game] || gd.target;
+    TS.game = S.game;
+  }
   if(gd.targets.indexOf(TS.target)<0) TS.target=gd.target;
   fillChips($("ttarget"), gd.targets, TS.target, "target");
   var a=$("ttarget").children, i;
@@ -3899,6 +3919,7 @@ function load(){
   if(d && d.s){
     S=d.s;
     if(S.game!=="palet") S.game="cornhole";
+    if(!S.tgt) S.tgt={cornhole:21, palet:12};
     if(!S.palets) S.palets=paletDefault(S.mode);
     if(!S.teams || S.teams.length!==2) S.teams=[{name:"",mates:["",""],color:"rouge"},{name:"",mates:["",""],color:"bleu"}];
   }
