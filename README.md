@@ -96,7 +96,13 @@ Sur planche, au laiton. Le **maître** est posé sur la planche par l'équipe qu
 ensuite en premier ; l'autre relance jusqu'à reprendre le point ou épuiser ses palets.
 
 L'équipe qui pose le maître a **trois essais** pour l'y placer ; sans succès, l'adversaire tente à
-son tour, avec trois essais également.
+son tour, avec trois essais également, et ainsi de suite. **Celui qui le pose a la main** — l'honneur
+peut donc changer avant qu'un seul palet soit lancé, y compris après le tirage au sort d'ouverture.
+
+Une ligne discrète au-dessus de la saisie dit à qui revient le lancer, avec un bouton *Manqué* pour
+le passer à l'adversaire. Elle n'apparaît qu'au palet, et disparaît la partie finie. Les essais ne
+sont pas comptés : seul importe à qui revient le lancer, et c'est la seule chose que l'écran a
+besoin de dire.
 
 Seule l'équipe dont le palet est le plus proche du maître marque, **1 point par palet mieux placé
 que le meilleur adverse**. Un palet tombé de la planche ne compte pas. Si le **maître** quitte la

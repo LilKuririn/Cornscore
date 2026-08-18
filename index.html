@@ -361,6 +361,29 @@ h1,h2,h3,p{margin:0}
 .console-head b{color:color-mix(in oklab,var(--ink) 70%,var(--muted));font-weight:500}
 
 .crow{display:grid;grid-template-columns:1fr 92px 92px;align-items:center;gap:8px}
+/* qui doit poser le maitre — une ligne sobre, au-dessus de la saisie */
+.mtr{
+  display:flex;align-items:center;gap:9px;
+  height:40px;padding:0 4px 0 11px;margin-bottom:9px;
+  background:var(--panel-2);border-radius:10px;
+}
+.mtr i{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.mtr .lab{
+  flex:0 0 auto;font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+}
+.mtr .who{
+  flex:1;min-width:0;font-size:13.5px;font-weight:600;color:var(--ink);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mtr button{
+  flex:0 0 auto;height:32px;padding:0 11px;border-radius:8px;
+  background:var(--panel);border:1px solid var(--line);
+  font-size:12.5px;font-weight:600;color:var(--muted);
+  transition:color .14s ease, background .14s ease;
+}
+.mtr button:active{background:var(--line-2);color:var(--ink)}
+
 /* au palet une seule reglette par equipe : elle occupe la place des deux */
 .crow.solo{grid-template-columns:1fr 120px}
 .crow .who{display:flex;align-items:center;gap:7px;min-width:0}
@@ -1126,6 +1149,13 @@ a.hall-link{text-decoration:none;color:inherit}
         <p class="eyebrow ch-corn"><span data-i18n="game.board">Planche</span> <b data-i18n="game.board.pts">1 pt</b></p>
         <p class="eyebrow ch-palet" hidden><b data-i18n="game.perpalet">1 pt par palet</b></p>
       </div>
+      <div class="mtr" id="mtr" hidden>
+        <i id="mtrDot"></i>
+        <span class="lab" data-i18n="game.master">Maître</span>
+        <span class="who" id="mtrWho"></span>
+        <button type="button" id="mtrMiss" data-i18n="game.missed">Manqué</button>
+      </div>
+
       <div id="rows"></div>
       <div class="settle">
         <p class="outcome" id="outcome">Aucun sac compté</p>
@@ -1373,6 +1403,9 @@ fr:{
   "pal.over.best":"Meilleure mène",
   "pal.over.won":"Mènes gagnées",
   "setup.palet.hint":"La partie se joue en 12 points, la belle en 15.",
+  "game.master":"Maître",
+  "game.missed":"Manqué",
+  "game.missed.aria":"Maître manqué en trois essais : passer le lancer à {name}",
   "data.title":"Vos données",
   "data.export":"Exporter une sauvegarde",
   "data.import":"Restaurer une sauvegarde",
@@ -1544,6 +1577,9 @@ en:{
   "pal.over.best":"Best end",
   "pal.over.won":"Ends won",
   "setup.palet.hint":"A game is played to 12 points, the decider to 15.",
+  "game.master":"Master",
+  "game.missed":"Missed",
+  "game.missed.aria":"Master missed in three attempts: pass the throw to {name}",
   "data.title":"Your data",
   "data.export":"Export a backup",
   "data.import":"Restore a backup",
@@ -1715,6 +1751,9 @@ es:{
   "pal.over.best":"Mejor mano",
   "pal.over.won":"Manos ganadas",
   "setup.palet.hint":"La partida se juega a 12 puntos, la bella a 15.",
+  "game.master":"Maestro",
+  "game.missed":"Fallado",
+  "game.missed.aria":"Maestro fallado en tres intentos: pasar el lanzamiento a {name}",
   "data.title":"Tus datos",
   "data.export":"Exportar una copia de seguridad",
   "data.import":"Restaurar una copia de seguridad",
@@ -2130,7 +2169,7 @@ function newGame(){
     ],
     rounds:[],
     entry:newEntry(S.game),
-    scores:[0,0], first:0, over:false, winner:-1
+    scores:[0,0], first:0, mpass:0, over:false, winner:-1
   };
   show("game");
   renderGame(true);
@@ -2175,6 +2214,7 @@ function validateRound(){
   var before=[G.scores[0],G.scores[1]];
   recompute();
   G.entry=newEntry(G.game);
+  G.mpass=0;                  /* le maitre repart au vainqueur de la mene */
   buzz(gain[0]||gain[1] ? 18 : 8);
 
   if(G.over){ archiveGame(); applyMatchResult(); renderGame(); setTimeout(renderOver, 620); }
@@ -2186,6 +2226,7 @@ function undoRound(){
   if(!G.rounds.length) return;
   G.rounds.pop();
   G.entry=newEntry(G.game);
+  G.mpass=0;
   afterHistoryChange();
 }
 
@@ -2312,12 +2353,42 @@ function bump(i,kind,d){
 }
 
 /* --- tirage au sort du premier lanceur -------------------------- */
+/* Au palet, c'est celui qui pose le maitre qui a la main. Trois essais
+   manques et le lancer passe a l'adversaire, qui prend la main s'il y
+   parvient — et la rend sinon, indefiniment. Seule la parite des passes
+   compte, l'ecran n'ayant a dire qu'une chose : a qui revient le lancer.
+   `G.first` reste l'honneur herite de la mene precedente ; les passes le
+   decalent pour la mene en cours, et repartent de zero a la validation. */
+function handTeam(){
+  return (G.game==="palet") ? (G.first ^ ((G.mpass||0) & 1)) : G.first;
+}
+
 function paintHonor(){
   var fields=$("fields").children;
+  var k=handTeam();
   for(var i=0;i<2;i++){
     var h=fields[i] && fields[i].querySelector(".t-honor");
-    if(h) h.hidden = !(G.first===i && !G.over);
+    if(h) h.hidden = !(k===i && !G.over);
   }
+}
+
+function paintMaitre(){
+  var row=$("mtr");
+  var montrer = G && G.game==="palet" && !G.over && (G.tossed || G.rounds.length);
+  row.hidden = !montrer;
+  if(!montrer) return;
+  var k=handTeam();
+  $("mtrDot").style.background = G.teams[k].hex;
+  $("mtrWho").textContent = G.teams[k].label;
+  $("mtrMiss").setAttribute("aria-label", tf("game.missed.aria",{name:G.teams[1-k].label}));
+}
+
+function maitreMiss(){
+  if(!G || G.over) return;
+  G.mpass = (G.mpass||0)+1;
+  buzz(10);
+  paintHonor(); paintMaitre();
+  save();
 }
 var CELL=72;          /* hauteur d'une case du rouleau, cf. .cell */
 var tossLanded=false;
@@ -2362,6 +2433,7 @@ function doToss(){
     strip.style.transform="translateY("+(-cells*CELL)+"px)";
     G.first=final;
     G.tossFirst=final;
+    G.mpass=0;              /* le tire au sort pose le maitre le premier */
     tossLanded=true;
 
     reel.style.setProperty("--win",G.teams[final].hex);
@@ -2460,6 +2532,9 @@ function renderGame(rebuild, gains){
   for(z=0;z<cc.length;z++) cc[z].hidden=pal;
   for(z=0;z<cp.length;z++) cp[z].hidden=!pal;
 
+  paintMaitre();
+
+  var main=handTeam();
   var fields=$("fields").children;
   for(var i=0;i<2;i++){
     var f=fields[i];
@@ -2467,7 +2542,7 @@ function renderGame(rebuild, gains){
     var score=G.scores[i];
     num.textContent=score;
     f.classList.toggle("lead", score>G.scores[1-i]);
-    f.querySelector(".t-honor").hidden = !(G.first===i && !G.over);
+    f.querySelector(".t-honor").hidden = !(main===i && !G.over);
 
     var ticks=f.querySelectorAll(".ticks i");
     var filled=Math.min(score,G.target);
@@ -2644,6 +2719,7 @@ function renderEditor(body){
 
 function afterHistoryChange(){
   recompute();
+  G.mpass=0;
   buzz(10);
   save();
   if(G.over){
@@ -3795,7 +3871,7 @@ function playMatch(mid){
     game:T.game||"cornhole", mode:T.mode, target:T.target, max:T.max||4,
     teams:[{label:tName(m.a),mates:"",hex:hexA},{label:tName(m.b),mates:"",hex:hexB}],
     rounds:[], entry:newEntry(T.game||"cornhole"),
-    scores:[0,0], first:0, over:false, winner:-1,
+    scores:[0,0], first:0, mpass:0, over:false, winner:-1,
     tour:{mid:mid, recorded:false}
   };
   show("game");
@@ -3821,6 +3897,7 @@ function applyMatchResult(){
 ------------------------------------------------------------------ */
 $("playCornhole").addEventListener("click",function(){ applyGame("cornhole"); show("setup"); });
 $("playPalet").addEventListener("click",function(){ applyGame("palet"); show("setup"); });
+$("mtrMiss").addEventListener("click",maitreMiss);
 $("backToGames").addEventListener("click",function(){ show("games"); });
 
 $("openTour").addEventListener("click",function(){
@@ -3938,6 +4015,7 @@ function load(){
     G=d.g;
     if(!G.game) G.game="cornhole";
     if(!G.max) G.max=4;
+    if(G.mpass===undefined) G.mpass=0;
     if(!G.entry) G.entry=newEntry(G.game);
     recompute();
     if(G.over){ renderOver(); }
