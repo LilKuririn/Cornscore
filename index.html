@@ -2088,7 +2088,12 @@ function fillChips(host, vals, cur, attr){
 function applyGame(id){
   if(!S.tgt) S.tgt={cornhole:21, palet:12};
   S.tgt[S.game] = S.target;          /* on range le score du jeu qu'on quitte */
+  TOUR[S.game]  = T;                 /* ainsi que son tableau et son brouillon */
+  DRAFT[S.game] = TS;
   S.game = id;
+  T  = TOUR[id] || null;
+  TS = DRAFT[id] || freshDraft(id);
+  TS.open = -1;
   var d = GAMES[id] || GAMES.cornhole;
   S.target = S.tgt[id] || d.target;  /* et on ressort le sien */
   if(d.targets.indexOf(S.target)<0) S.target = d.target;
@@ -2099,6 +2104,9 @@ function applyGame(id){
   renderRules();
   renderCards();
   fillRules("rulesBody");
+  renderTSetup();
+  refreshTourBtn();
+  refreshHallLink();
   save();
 }
 
@@ -3385,7 +3393,8 @@ function exportName(){
 }
 
 function exportData(){
-  var payload=JSON.stringify({v:1, at:Date.now(), s:S, ts:TS, t:T, g:G, h:H}, null, 1);
+  TOUR[S.game]=T; DRAFT[S.game]=TS;
+  var payload=JSON.stringify({v:1, at:Date.now(), s:S, tg:TOUR, ds:DRAFT, g:G, h:H}, null, 1);
   var name=exportName();
   var b=bridge();
   if(b && b.saveFile){
@@ -3407,15 +3416,23 @@ function exportData(){
 function applyImport(text){
   var d;
   try{ d=JSON.parse(text); }catch(e){ toast(t("data.bad")); return; }
-  if(!d || typeof d!=="object" || (!d.h && !d.s && !d.t)){ toast(t("data.bad")); return; }
+  if(!d || typeof d!=="object" || (!d.h && !d.s && !d.t && !d.tg)){ toast(t("data.bad")); return; }
   if(!window.confirm(t("data.confirm"))) return;
 
   if(d.s && d.s.teams && d.s.teams.length===2) S=d.s;
-  if(d.ts && d.ts.teams && d.ts.teams.length===16){ TS=d.ts; TS.open=-1; }
-  T = (d.t && d.t.matches && d.t.teams) ? d.t : null;
+  if(S.game!=="palet") S.game="cornhole";
+  if(!S.tgt) S.tgt={cornhole:21, palet:12};
+  TOUR={cornhole:null, palet:null}; DRAFT={cornhole:null, palet:null};
+  adoptTour(d);
   H = (d.h && d.h.length) ? d.h : [];
   G = (d.g && d.g.teams) ? d.g : null;
-  if(G){ if(!G.entry) G.entry=[{h:0,b:0},{h:0,b:0}]; recompute(); }
+  if(G){
+    if(!G.game) G.game="cornhole";
+    if(!G.max) G.max=4;
+    if(G.mpass===undefined) G.mpass=0;
+    if(!G.entry) G.entry=newEntry(G.game);
+    recompute();
+  }
 
   save();
   closeAbout();
@@ -3519,8 +3536,21 @@ $("hallClear").addEventListener("click",function(){
 /* ==================================================================
    TOURNOI — élimination directe
 ================================================================== */
-var TS = { count:4, mode:"simple", target:21, open:-1, teams:[], tgt:{cornhole:21, palet:12} };
-for(var _i=0;_i<16;_i++) TS.teams.push({name:"", color:COLORS[_i%COLORS.length].id});
+/* Chaque jeu a son tableau et son brouillon. Sans cela, un tournoi de
+   cornhole en cours allumait la pastille du bouton en passant au palet,
+   et le brouillon gardait les noms saisis pour l'autre jeu. `T` et `TS`
+   restent les pointeurs actifs, echanges au changement de jeu. */
+var TOUR  = {cornhole:null, palet:null};
+var DRAFT = {cornhole:null, palet:null};
+
+function freshDraft(id){
+  var d = { game:id, count:4, mode:"simple",
+            target:(GAMES[id]||GAMES.cornhole).target, open:-1, teams:[] };
+  for(var i=0;i<16;i++) d.teams.push({name:"", color:COLORS[i%COLORS.length].id});
+  return d;
+}
+
+var TS = freshDraft("cornhole");
 
 var T = null;   /* tournoi en cours */
 
@@ -3582,6 +3612,7 @@ function buildTournament(){
   }
   T={
     game:S.game, max:paletMax(TS.mode,S.palets),
+    /* enregistre plus bas dans TOUR[S.game] */
     teams:TS.teams.slice(0,n).map(function(team,k){
       return {name:(team.name||"").trim() || tf("tour.teamn",{n:k+1}), color:team.color};
     }),
@@ -3669,12 +3700,6 @@ function renderTRows(){
 }
 function renderTRules(){
   var gd=GAMES[S.game]||GAMES.cornhole;
-  if(!TS.tgt) TS.tgt={cornhole:21, palet:12};
-  if(TS.game!==S.game){              /* on arrive depuis un autre jeu */
-    if(TS.game) TS.tgt[TS.game]=TS.target;
-    TS.target = TS.tgt[S.game] || gd.target;
-    TS.game = S.game;
-  }
   if(gd.targets.indexOf(TS.target)<0) TS.target=gd.target;
   fillChips($("ttarget"), gd.targets, TS.target, "target");
   var a=$("ttarget").children, i;
@@ -3961,6 +3986,7 @@ $("bkAbandon").addEventListener("click",function(){
   }
   closeBkSheet();
   T=null;
+  TOUR[S.game]=null;
   if(G && G.tour) G=null;      /* un match du tournoi n'a plus de tableau */
   buzz(12);
   save();
@@ -3985,7 +4011,22 @@ function show(name){
 }
 
 function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify({s:S,g:G,t:T,ts:TS,h:H})); }catch(e){}
+  TOUR[S.game]=T; DRAFT[S.game]=TS;   /* le jeu courant avant d'ecrire */
+  try{ localStorage.setItem(KEY, JSON.stringify({s:S,g:G,tg:TOUR,ds:DRAFT,h:H})); }catch(e){}
+}
+
+/* Les enregistrements d'avant le palet ne connaissent qu'un tableau et
+   qu'un brouillon : ils reviennent au cornhole. */
+function adoptTour(d){
+  if(d.tg) TOUR = {cornhole:d.tg.cornhole||null, palet:d.tg.palet||null};
+  else if(d.t && d.t.matches && d.t.teams) TOUR[d.t.game||"cornhole"] = d.t;
+
+  if(d.ds) DRAFT = {cornhole:d.ds.cornhole||null, palet:d.ds.palet||null};
+  else if(d.ts && d.ts.teams && d.ts.teams.length===16) DRAFT[d.ts.game||"cornhole"] = d.ts;
+
+  T  = TOUR[S.game] || null;
+  TS = DRAFT[S.game] || freshDraft(S.game);
+  TS.open = -1;
 }
 function load(){
   var raw;
@@ -4000,13 +4041,8 @@ function load(){
     if(!S.palets) S.palets=paletDefault(S.mode);
     if(!S.teams || S.teams.length!==2) S.teams=[{name:"",mates:["",""],color:"rouge"},{name:"",mates:["",""],color:"bleu"}];
   }
-  if(d && d.ts && d.ts.teams && d.ts.teams.length===16){
-    TS=d.ts; TS.open=-1;
-    renderTSetup();
-  }
-  if(d && d.t && d.t.matches && d.t.teams){
-    T=d.t;
-  }
+  adoptTour(d);
+  renderTSetup();
   if(d && d.h && d.h.length) H=d.h;
   refreshTourBtn();
   refreshHallLink();

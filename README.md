@@ -64,6 +64,10 @@ Le tournoi et la partie en cours sont sauvegardés séparément : un 1v1 improvi
 le tableau commencé. Et rien n'oblige à aller au bout — on peut repartir d'un nouveau tableau ou
 abandonner, en deux appuis pour éviter la fausse manœuvre.
 
+**Chaque jeu a son tableau**, et son brouillon de tableau. Un tournoi de cornhole en cours n'allume
+pas la pastille du bouton quand on passe au palet, et les noms d'équipes saisis d'un côté ne
+réapparaissent pas de l'autre. Les deux peuvent tourner en même temps sans se gêner.
+
 ## Palmarès
 
 Les parties terminées sont archivées, tournoi compris, pour répondre à la seule question qui fâche
