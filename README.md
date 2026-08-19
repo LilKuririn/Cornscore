@@ -15,9 +15,9 @@ intégralement hors ligne.
 
 | | |
 | --- | --- |
-| **Web** | <https://lilkuririn.github.io/Cornscore/> — *Ajouter à l'écran d'accueil* l'installe en plein écran, et elle fonctionne ensuite sans réseau |
-| **Android** | [`cornscore.apk`](https://github.com/LilKuririn/Cornscore/releases/download/apk/cornscore.apk) — installation directe, reconstruite à chaque modification |
-| **Play Store** | en test fermé — voir [le carnet de publication](store/publication.md) |
+| **Web** | <https://lilkuririn.github.io/ScoreToss/> — *Ajouter à l'écran d'accueil* l'installe en plein écran, et elle fonctionne ensuite sans réseau |
+| **Android** | [`cornscore.apk`](https://github.com/LilKuririn/ScoreToss/releases/download/apk/cornscore.apk) — installation directe, reconstruite à chaque modification |
+| **Play Store** | [ScoreToss](https://play.google.com/store/apps/details?id=com.scoretosslabs.cornscore) — voir [le carnet de publication](store/publication.md) |
 
 En local, ouvrir [`index.html`](index.html) dans un navigateur suffit.
 

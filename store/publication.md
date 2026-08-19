@@ -33,7 +33,7 @@ magasin, il ne pourrait pas s'installer par-dessus : les deux coexistent, sous l
 « ScoreToss » et « ScoreToss direct », avec des données séparées.
 
 La politique de confidentialité, exigée par la console, est en ligne :
-<https://lilkuririn.github.io/Cornscore/privacy.html>
+<https://lilkuririn.github.io/ScoreToss/privacy.html>
 
 ## Les pistes de test, et leur priorité
 
