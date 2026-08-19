@@ -110,17 +110,17 @@ besoin de dire.
 
 Seule l'équipe dont le palet est le plus proche du maître marque, **1 point par palet mieux placé
 que le meilleur adverse**. Un palet tombé de la planche ne compte pas. Si le **maître** quitte la
-planche, la mène est **nulle** et se rejoue — l'honneur ne change pas de main.
+planche, la manche est **nulle** et se rejoue — l'honneur ne change pas de main.
 
 La partie se joue en **12 points**, la **belle en 15**. Chaque jeu garde son propre score : passer
 au palet ne touche pas au 21 du cornhole.
 
 Le nombre de **palets par joueur** se règle à 2, 3 ou 4, l'usage variant d'une fédération à l'autre.
 Par défaut 4 en simple et 2 en double, soit quatre palets par équipe dans les deux formats — c'est
-le maximum qu'une mène peut rapporter.
+le maximum qu'une manche peut rapporter.
 
 La saisie s'en trouve simplifiée : une seule réglette par équipe, puisqu'une seule marque. Deux zéros
-valent mène nulle.
+valent manche nulle.
 
 ## Vos données restent chez vous
 
@@ -140,9 +140,9 @@ Le **thème clair ou sombre** se règle au même endroit, avec la même position
 défaut. Un choix explicite est posé avant le premier rendu, sans clignotement, et s'impose à la
 couleur de la barre système.
 
-Le vocabulaire suit celui de chaque fédération. Au cornhole, *frame* en anglais désigne la manche et
-*round* le tour de tournoi — deux mots que le français confond. Au palet, la manche est une **mène**,
-*end* en anglais, *mano* en espagnol : l'application change de mot avec le jeu.
+Le vocabulaire est **commun aux deux jeux** : on parle de manche partout, quel que soit ce que dit
+la fédération. En anglais, *frame* désigne la manche et *round* le tour de tournoi — deux mots que
+le français confond.
 
 ## Comment c'est fait
 
