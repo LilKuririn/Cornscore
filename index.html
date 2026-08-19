@@ -14,7 +14,7 @@ try{
 }catch(e){}
 </script>
 <meta name="theme-color" content="#EFF2F2" media="(prefers-color-scheme: light)">
-<meta name="description" content="Compteur de points pour les jeux d'extérieur : cornhole en simple, en double et en tournoi.">
+<meta name="description" content="Compteur de points pour les jeux d'extérieur : cornhole et palet breton, en simple, en double et en tournoi.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1275,7 +1275,7 @@ fr:{
   "games.cornhole.sub":"Simple, double et tournois",
   "games.soon":"En chantier", "games.soon.sub":"Mölkky, pétanque, palet vendéen…",
   "games.change":"Changer de jeu",
-  "app.desc":"Compteur de points pour les jeux d'extérieur. Cornhole en simple ou en double, tournois à élimination directe et palmarès entre joueurs.",
+  "app.desc":"Compteur de points pour les jeux d'extérieur. Cornhole et palet breton, en simple ou en double, tournois à élimination directe et palmarès entre joueurs.",
   "nav.home":"Accueil", "nav.close":"Fermer",
   "mode.single":"Simple", "mode.single.sub":"1 v 1",
   "mode.double":"Double", "mode.double.sub":"2 v 2",
@@ -1431,6 +1431,7 @@ fr:{
   "about.theme.auto":"Téléphone",
   "about.theme.light":"Clair",
   "about.theme.dark":"Sombre",
+  "pal.share.game":"{a} {sa} – {sb} {b} · {n} mènes · ScoreToss",
   "data.title":"Vos données",
   "data.export":"Exporter une sauvegarde",
   "data.import":"Restaurer une sauvegarde",
@@ -1453,7 +1454,7 @@ en:{
   "games.cornhole.sub":"Singles, doubles and tournaments",
   "games.soon":"In the works", "games.soon.sub":"Mölkky, pétanque, Vendée palet…",
   "games.change":"Change game",
-  "app.desc":"A score keeper for outdoor games. Cornhole singles and doubles, single-elimination tournaments, and a record of who beats whom.",
+  "app.desc":"A score keeper for outdoor games. Cornhole and Breton palet, singles or doubles, single-elimination tournaments, and a record of who beats whom.",
   "nav.home":"Home", "nav.close":"Close",
   "mode.single":"Singles", "mode.single.sub":"1 v 1",
   "mode.double":"Doubles", "mode.double.sub":"2 v 2",
@@ -1609,6 +1610,7 @@ en:{
   "about.theme.auto":"Phone",
   "about.theme.light":"Light",
   "about.theme.dark":"Dark",
+  "pal.share.game":"{a} {sa} – {sb} {b} · {n} ends · ScoreToss",
   "data.title":"Your data",
   "data.export":"Export a backup",
   "data.import":"Restore a backup",
@@ -1631,7 +1633,7 @@ es:{
   "games.cornhole.sub":"Individual, parejas y torneos",
   "games.soon":"En preparación", "games.soon.sub":"Mölkky, petanca, palet vendeano…",
   "games.change":"Cambiar de juego",
-  "app.desc":"Marcador para juegos de exterior. Cornhole individual o por parejas, torneos de eliminación directa e historial de enfrentamientos.",
+  "app.desc":"Marcador para juegos de exterior. Cornhole y palet bretón, individual o por parejas, torneos de eliminación directa e historial de enfrentamientos.",
   "nav.home":"Inicio", "nav.close":"Cerrar",
   "mode.single":"Individual", "mode.single.sub":"1 v 1",
   "mode.double":"Parejas", "mode.double.sub":"2 v 2",
@@ -1787,6 +1789,7 @@ es:{
   "about.theme.auto":"Teléfono",
   "about.theme.light":"Claro",
   "about.theme.dark":"Oscuro",
+  "pal.share.game":"{a} {sa} – {sb} {b} · {n} manos · ScoreToss",
   "data.title":"Tus datos",
   "data.export":"Exportar una copia de seguridad",
   "data.import":"Restaurar una copia de seguridad",
@@ -3403,7 +3406,7 @@ function refreshHallLink(){
 /* ------------------------------------------------------------------
    À propos
 ------------------------------------------------------------------ */
-var APP_VERSION = "1.0";
+var APP_VERSION = "2.0";
 
 /* Page de soutien. La vider fait disparaître la ligne dans À propos —
    mieux vaut rien qu'un lien mort.
@@ -3574,7 +3577,7 @@ function shareText(text){
 function shareGame(){
   if(!G) return;
   var w=G.winner>=0 ? G.winner : 0, l=1-w;
-  shareText(tf("share.game",{
+  shareText(tgf("share.game",{
     a:G.teams[w].label, sa:G.scores[w],
     b:G.teams[l].label, sb:G.scores[l],
     n:G.rounds.length
