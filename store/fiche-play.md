@@ -2,14 +2,17 @@
 
 Les limites de caractères sont celles de la console. Les compteurs indiqués sont vérifiés.
 
+**La console fait foi.** Ce fichier est un brouillon de travail : il peut avoir divergé de ce qui
+est réellement publié. Vérifier avant de s'y fier.
+
 ---
 
 ## English (langue par défaut de la fiche)
 
-**App name** *(30 max — 26 utilisés)*
+**App name** *(30 max — 24 utilisés)*
 
 ```
-ScoreToss: Cornhole Scores
+ScoreToss: Outdoor games
 ```
 
 **Short description** *(80 max — 77 utilisés)*
