@@ -15,57 +15,52 @@ est réellement publié. Vérifier avant de s'y fier.
 ScoreToss: Outdoor games
 ```
 
-**Short description** *(80 max — 77 utilisés)*
+**Short description** *(80 max — 74 utilisés)*
 
 ```
-Keep score at cornhole. Singles, doubles, tournaments. No ads, works offline.
+Score cornhole and Breton palet. Tournaments and records. No ads, offline.
 ```
 
-**Full description** *(4000 max)*
+**Full description** *(4000 max — 2781 utilisés)*
 
 ```
-A score keeper for cornhole, built to be read at a glance from the other end of the boards.
+A score keeper for outdoor games, built to be read at a glance from the other end of the boards.
 
-Two big numbers, each in its team's colour, and a row of ticks showing how close you are to the
-target. Nothing else competes for attention while you play.
+Two big numbers, each in its team's colour, and a row of ticks showing how close you are to the target. Nothing else competes for attention while you play.
 
-SCORING A FRAME
-Tap the bags — in the hole for 3, on the board for 1 — and ScoreToss works out the cancellation
-for you. It shows what the frame is worth before you confirm it, so nobody has to do arithmetic
-between throws. The team that scored throws first in the next frame, and the app keeps track.
+TWO GAMES
+Cornhole and Breton palet, singles or doubles. Pick one on the home screen — everything after that works the same way, frames, tournaments and records included.
+
+CORNHOLE
+Tap the bags — in the hole for 3, on the board for 1 — and ScoreToss works out the cancellation for you. It shows what the frame is worth before you confirm it, so nobody has to do arithmetic between throws. Play to 11, 15 or 21.
+
+BRETON PALET
+On the board, with brass palets. Only the team closest to the master scores, one point per palet better placed than the opponent's best. One stepper per team, because only one team ever scores. A game runs to 12, the decider to 15.
+
+Placing the master counts too: three attempts to land it on the board, then the throw passes to the other team, and whoever lands it throws first. A discreet line says whose turn it is, with one tap to hand it over.
 
 GOT IT WRONG? FIX IT
-Any frame can be corrected or deleted after the fact, however far back it is. The whole game is
-recalculated from the history, so a miscount in frame three is a five-second fix, not an argument.
+Any frame can be corrected or deleted after the fact, however far back it is. The whole game is recalculated from the history, so a miscount in frame three is a five-second fix, not an argument.
 
 TOURNAMENTS
-Enter 2 to 16 teams, name them, give them a colour, and the bracket builds itself with byes for the
-top seeds. The tree stays there to consult, the next match is always one tap away, and results
-climb the bracket on their own. Nothing forces you to finish: a bracket can be abandoned whenever
-the barbecue takes over.
+Enter 2 to 16 teams, name them, give them a colour, and the bracket builds itself with byes for the top seeds. The tree stays there to consult, the next match is always one tap away, and results climb the bracket on their own. Each game keeps its own bracket, so the two never get in each other's way.
 
 WHO'S ACTUALLY WINNING
-Finished games are kept, so the app can answer the only question that really matters between two
-barbecues: head-to-head records, wins and losses, and your recent games.
+Finished games are kept, so the app can answer the only question that really matters between two barbecues: head-to-head records, wins and losses, and your recent games. Each game keeps its own — a cornhole win and a palet win are not the same thing.
 
 SMALL THINGS THAT HELP
-· A coin toss decides who throws first
-· The screen stays awake while you play
-· A short buzz confirms each tap
-· Light and dark, following your phone
-· English, French and Spanish
-· Export a backup before switching phones
-· Share the final score or the bracket
+- A coin toss decides who throws first
+- The screen stays awake while you play
+- A short buzz confirms each tap
+- Light and dark, following your phone or set by hand
+- English, French and Spanish
+- Export a backup before switching phones
+- Share the final score or the bracket
 
 NO ADS, NO ACCOUNT, NO INTERNET
-ScoreToss collects nothing. There is no sign-up, no server and no tracking. Your games, tournaments
-and records are stored on your phone and never leave it. The app works entirely offline — in a
-garden, on a campsite, wherever the boards are.
+ScoreToss collects nothing. There is no sign-up, no server and no tracking. Your games, tournaments and records are stored on your phone and never leave it. The app works entirely offline — in a garden, on a campsite, wherever the boards are.
 
-Play to 11, 15 or 21. Four bags per team per frame; in doubles, two bags each.
-
-The game also goes by bags, baggo, sack toss or bean bag toss. If you throw corn-filled bags at a
-wooden board with a hole in it, this is your scoreboard.
+Cornhole also goes by bags, baggo, sack toss or bean bag toss. Breton palet is also known as palet sur planche or brass palet. If you throw corn-filled bags at a holed board, or brass discs at a wooden one, this is your scoreboard.
 
 Free, and free of everything else.
 ```
@@ -74,105 +69,58 @@ Free, and free of everything else.
 
 ## Français
 
-**Nom de l'application** *(30 max — 29 utilisés)*
+**Nom de l'application** *(30 max — 28 utilisés)*
 
 ```
-ScoreToss : score au cornhole
+ScoreToss : Jeux d'extérieur
 ```
 
-**Description courte** *(80 max — 79 utilisés)*
+**Description courte** *(80 max — 72 utilisés)*
 
 ```
-Comptez les points au cornhole. Simple, double, tournois. Sans pub, hors ligne.
+Comptez les points au cornhole et au palet breton. Sans pub, hors ligne.
 ```
 
-**Description complète** *(4000 max)*
+**Description complète** *(4000 max — 3067 utilisés)*
 
 ```
-Un compteur de points pour le cornhole, conçu pour se lire d'un coup d'œil depuis l'autre planche.
+Un compteur de points pour les jeux d'extérieur, conçu pour se lire d'un coup d'œil depuis l'autre planche.
 
-Deux grands chiffres, chacun dans la couleur de son équipe, et une réglette de crans qui montre la
-distance au score visé. Rien d'autre ne vient réclamer l'attention pendant la partie.
+Deux grands chiffres, chacun dans la couleur de son équipe, et une réglette de crans qui montre la distance au score visé. Rien d'autre ne vient réclamer l'attention pendant la partie.
 
-COMPTER UNE MANCHE
-On touche les sacs — 3 points dans le trou, 1 sur la planche — et ScoreToss calcule l'annulation.
-Le résultat de la manche s'affiche avant validation, personne n'a de soustraction à faire entre
-deux lancers. L'équipe qui a marqué lance en premier à la manche suivante, l'application suit.
+DEUX JEUX
+Le cornhole et le palet breton, en simple ou en double. On choisit sur l'écran d'accueil — tout le reste fonctionne pareil, manches, tournois et palmarès compris.
+
+CORNHOLE
+On touche les sacs — 3 points dans le trou, 1 sur la planche — et ScoreToss calcule l'annulation. Le résultat de la manche s'affiche avant validation, personne n'a de soustraction à faire entre deux lancers. Score à atteindre au choix : 11, 15 ou 21.
+
+PALET BRETON
+Sur planche, au laiton. Seule l'équipe la plus proche du maître marque, un point par palet mieux placé que le meilleur adverse. Une seule réglette par équipe, puisqu'une seule marque. La partie se joue en 12 points, la belle en 15.
+
+Poser le maître compte aussi : trois essais pour le placer sur la planche, puis le lancer passe à l'adversaire, et celui qui y parvient lance en premier. Une ligne discrète dit à qui revient le tour, avec un appui pour le passer.
 
 UNE ERREUR ? ON CORRIGE
-Chaque manche peut être corrigée ou supprimée après coup, aussi loin soit-elle. Le score est
-recalculé sur tout l'historique : une erreur de décompte à la manche trois se répare en cinq
-secondes au lieu de finir en discussion.
+Chaque manche peut être corrigée ou supprimée après coup, aussi loin soit-elle. Le score est recalculé sur tout l'historique : une erreur de décompte à la manche trois se répare en cinq secondes au lieu de finir en discussion.
 
 TOURNOIS
-De 2 à 16 équipes, nommées, colorées, et le tableau se construit tout seul avec les exemptions
-pour les têtes de série. L'arbre reste consultable, le prochain match est toujours à un appui, et
-les résultats remontent d'eux-mêmes. Rien n'oblige à aller au bout : un tableau s'abandonne quand
-le barbecue reprend le dessus.
+De 2 à 16 équipes, nommées, colorées, et le tableau se construit tout seul avec les exemptions pour les têtes de série. L'arbre reste consultable, le prochain match est toujours à un appui, et les résultats remontent d'eux-mêmes. Chaque jeu garde son propre tableau, les deux ne se gênent jamais.
 
 QUI MÈNE VRAIMENT
-Les parties terminées sont conservées, ce qui permet de répondre à la seule question qui fâche
-entre deux barbecues : les confrontations directes, les victoires, les défaites, et les dernières
-rencontres.
+Les parties terminées sont conservées, ce qui permet de répondre à la seule question qui fâche entre deux barbecues : les confrontations directes, les victoires, les défaites, et les dernières rencontres. Chaque jeu a le sien — une victoire au cornhole et une au palet ne se comparent pas.
 
 LES PETITS RIENS
-· Un tirage au sort désigne qui lance en premier
-· L'écran reste allumé pendant la partie
-· Une vibration brève confirme chaque appui
-· Thème clair et sombre, selon le téléphone
-· Français, anglais et espagnol
-· Sauvegarde exportable avant de changer de téléphone
-· Partage du score final ou du tableau
+- Un tirage au sort désigne qui lance en premier
+- L'écran reste allumé pendant la partie
+- Une vibration brève confirme chaque appui
+- Thème clair ou sombre, selon le téléphone ou réglé à la main
+- Français, anglais et espagnol
+- Sauvegarde exportable avant de changer de téléphone
+- Partage du score final ou du tableau
 
 SANS PUBLICITÉ, SANS COMPTE, SANS INTERNET
-ScoreToss ne collecte rien. Ni inscription, ni serveur, ni traceur. Vos parties, vos tournois et
-votre palmarès restent sur votre téléphone et n'en sortent jamais. L'application fonctionne
-intégralement hors ligne — dans un jardin, en camping, partout où sont les planches.
+ScoreToss ne collecte rien. Ni inscription, ni serveur, ni traceur. Vos parties, vos tournois et votre palmarès restent sur votre téléphone et n'en sortent jamais. L'application fonctionne intégralement hors ligne — dans un jardin, en camping, partout où sont les planches.
 
-Score à atteindre au choix : 11, 15 ou 21. Quatre sacs par équipe et par manche ; en double, deux
-sacs par joueur.
-
-Le jeu est aussi appelé jeu de poches, lancer de sacs, ou bags et baggo en anglais. Si vous lancez
-des sacs de maïs sur une planche percée d'un trou, voici votre tableau de marque.
+Le cornhole est aussi appelé jeu de poches, lancer de sacs, ou bags et baggo en anglais. Le palet breton est aussi connu comme palet sur planche ou palet laiton. Si vous lancez des sacs de maïs sur une planche percée, ou des palets de laiton sur une planche de hêtre, voici votre tableau de marque.
 
 Gratuite, et débarrassée du reste.
 ```
-
----
-
-## Réponses aux formulaires de la console
-
-| Question | Réponse |
-| --- | --- |
-| Accès à l'application | Toutes les fonctionnalités sont disponibles sans accès particulier |
-| Publicités | Non, l'application ne contient pas de publicités |
-| Classification du contenu | Utilitaire / Autre — aucune violence, aucun contenu sensible |
-| Public cible | 13 ans et plus *(voir la note ci-dessous)* |
-| Application d'actualités | Non |
-| Fonctionnalités financières | Non |
-| Application gouvernementale | Non |
-| Sécurité des données · collecte | **Non** — aucune donnée collectée ni partagée |
-| Sécurité des données · chiffrement en transit | Sans objet, aucune transmission |
-| URL de la politique de confidentialité | https://lilkuririn.github.io/Cornscore/privacy.html |
-| Catégorie | Application → Sport |
-| Gratuite ou payante | **Gratuite** — choix définitif, une application gratuite ne peut jamais devenir payante |
-
-## Captures d'écran
-
-À prendre sur ton téléphone, depuis l'APK installé — c'est la seule façon d'avoir des images qui
-représentent fidèlement l'application, ce que Play exige. Deux minimum, huit maximum. Dans cet
-ordre, la première étant celle qui s'affiche en premier dans le magasin :
-
-1. **Une partie en cours**, avec des noms et un score serré — c'est l'écran le plus caractéristique
-2. **L'accueil**, noms et couleurs saisis
-3. **Le tableau d'un tournoi** avec quelques résultats déjà remplis
-4. **Le palmarès**, avec deux ou trois confrontations
-5. **L'écran de victoire**
-
-Si la console refuse le format, envoie-les moi : je les recadre en 9:16 sur le fond de
-l'application.
-
-**Note sur le public cible.** Déclarer une tranche incluant les moins de 13 ans fait entrer
-l'application dans le programme « Familles », avec ses exigences supplémentaires. Comme ScoreToss
-ne collecte rien et n'affiche aucune publicité, elle y satisferait sans mal, mais cela ajoute des
-contrôles au moment de la revue. À 13 ans et plus, le parcours est plus court.
