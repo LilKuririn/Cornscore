@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0D1012" media="(prefers-color-scheme: dark)">
+<script>
+/* Le theme choisi doit etre pose avant que la page peigne quoi que ce soit,
+   sinon un theme force clignote au chargement. La cle est repetee ici a
+   dessein : ce bloc s'execute bien avant le script principal. */
+try{
+  var _th = localStorage.getItem("cornhole.theme");
+  if(_th==="light" || _th==="dark") document.documentElement.setAttribute("data-theme", _th);
+}catch(e){}
+</script>
 <meta name="theme-color" content="#EFF2F2" media="(prefers-color-scheme: light)">
 <meta name="description" content="Compteur de points pour les jeux d'extérieur : cornhole en simple, en double et en tournoi.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -181,6 +190,8 @@ h1,h2,h3,p{margin:0}
 }
 .seg button .sub{font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
 .seg button.on{background:var(--panel-2);color:var(--ink)}
+.seg3{grid-template-columns:1fr 1fr 1fr}
+.seg3 button{font-size:14px}
 .seg4{grid-template-columns:1fr 1fr}
 .seg4 button{font-size:14px}
 
@@ -226,12 +237,22 @@ h1,h2,h3,p{margin:0}
 .opt{display:flex;flex-direction:column;gap:9px}
 .opt + .opt{margin-top:16px}
 .opt-row{display:flex;gap:6px}
+/* Les non retenues sont de simples contours, la retenue est pleine et
+   cernee : l'ecart se voit d'un coup d'oeil. On evite le remplissage en
+   `--ink`, deja pris par la CTA, qui ferait lire la pastille comme
+   l'action principale de l'ecran. */
 .chip{
-  flex:1;padding:9px 6px;border-radius:9px;background:var(--panel-2);
+  flex:1;padding:10px 6px;border-radius:9px;background:transparent;
   font-size:14px;font-weight:600;color:var(--muted);text-align:center;
-  border:1px solid transparent;transition:color .16s ease,border-color .16s ease;
+  border:1px solid var(--line);
+  transition:color .16s ease,border-color .16s ease,background .16s ease;
 }
-.chip.on{color:var(--ink);border-color:var(--line-2)}
+.chip.on{
+  background:color-mix(in oklab,var(--ink) 13%,var(--panel-2));
+  color:var(--ink);font-weight:700;
+  border-color:color-mix(in oklab,var(--ink) 42%,transparent);
+}
+.chip:active{background:color-mix(in oklab,var(--ink) 7%,transparent)}
 .note{font-size:12.5px;line-height:1.5;color:var(--muted)}
 
 /* résumé des règles */
@@ -1406,6 +1427,10 @@ fr:{
   "game.master":"Maître",
   "game.missed":"Manqué",
   "game.missed.aria":"Maître manqué en trois essais : passer le lancer à {name}",
+  "about.theme":"Thème",
+  "about.theme.auto":"Téléphone",
+  "about.theme.light":"Clair",
+  "about.theme.dark":"Sombre",
   "data.title":"Vos données",
   "data.export":"Exporter une sauvegarde",
   "data.import":"Restaurer une sauvegarde",
@@ -1580,6 +1605,10 @@ en:{
   "game.master":"Master",
   "game.missed":"Missed",
   "game.missed.aria":"Master missed in three attempts: pass the throw to {name}",
+  "about.theme":"Theme",
+  "about.theme.auto":"Phone",
+  "about.theme.light":"Light",
+  "about.theme.dark":"Dark",
   "data.title":"Your data",
   "data.export":"Export a backup",
   "data.import":"Restore a backup",
@@ -1754,6 +1783,10 @@ es:{
   "game.master":"Maestro",
   "game.missed":"Fallado",
   "game.missed.aria":"Maestro fallado en tres intentos: pasar el lanzamiento a {name}",
+  "about.theme":"Tema",
+  "about.theme.auto":"Teléfono",
+  "about.theme.light":"Claro",
+  "about.theme.dark":"Oscuro",
   "data.title":"Tus datos",
   "data.export":"Exportar una copia de seguridad",
   "data.import":"Restaurar una copia de seguridad",
@@ -1771,6 +1804,57 @@ es:{
   "color.rose":"Rosa","color.ardoise":"Pizarra"
 }
 };
+
+/* Le theme suit l'appareil par defaut ; un choix explicite le fige via
+   l'attribut `data-theme`, que la feuille de style traite deja. */
+var THEME_KEY = "cornhole.theme";
+var THEME = null;
+
+function detectTheme(){
+  var v=null;
+  try{ v=localStorage.getItem(THEME_KEY); }catch(e){}
+  return (v==="light" || v==="dark") ? v : null;
+}
+
+/* La couleur de barre systeme est declaree par deux balises `media` qui
+   suivent l'appareil. Un choix explicite doit passer devant : on insere
+   une balise sans `media` en tete, la premiere qui correspond gagnant. */
+function paintThemeColor(){
+  var m=document.getElementById("tcFixed");
+  if(m && m.parentNode) m.parentNode.removeChild(m);
+  if(!THEME) return;
+  m=document.createElement("meta");
+  m.id="tcFixed";
+  m.setAttribute("name","theme-color");
+  m.setAttribute("content", THEME==="dark" ? "#0D1012" : "#EFF2F2");
+  document.head.insertBefore(m, document.head.firstChild);
+}
+
+function applyTheme(){
+  if(THEME) document.documentElement.setAttribute("data-theme", THEME);
+  else document.documentElement.removeAttribute("data-theme");
+  paintThemeColor();
+}
+
+var REOPEN_KEY = "cornhole.reopenAbout";
+
+function setTheme(v){
+  THEME = (v==="light" || v==="dark") ? v : null;
+  try{
+    if(THEME) localStorage.setItem(THEME_KEY, THEME);
+    else localStorage.removeItem(THEME_KEY);
+  }catch(e){}
+  applyTheme();
+  buzz(6);
+
+  /* Les valeurs `color-mix()` ne se recalculent pas quand `data-theme`
+     change en cours de route : le chrome garderait des morceaux de
+     l'ancien thème, couleurs d'équipe comprises. On recharge donc — tout
+     l'état vit dans localStorage — et on rouvre la feuille pour que le
+     choix se poursuive sans à-coup. */
+  try{ sessionStorage.setItem(REOPEN_KEY,"1"); }catch(e){}
+  location.reload();
+}
 
 var LANG = "fr";
 var DATE_LOCALE = {fr:"fr-FR", en:"en-GB", es:"es-ES"};
@@ -1958,6 +2042,23 @@ function outcomeInto(host, name, n){
   host.appendChild(document.createTextNode(parts[0]||""));
   host.appendChild(el("b",null,name));
   host.appendChild(document.createTextNode(parts[1]||""));
+}
+
+function themePicker(){
+  var box=el("div","block");
+  box.style.paddingTop="18px";
+  box.appendChild(el("p","eyebrow",t("about.theme")));
+  var seg=el("div","seg seg3");
+  [[null,t("about.theme.auto")],["light",t("about.theme.light")],["dark",t("about.theme.dark")]]
+    .forEach(function(o){
+      var b=el("button",null,o[1]);
+      b.type="button";
+      if(THEME===o[0]) b.classList.add("on");
+      b.addEventListener("click",function(){ setTheme(o[0]); });
+      seg.appendChild(b);
+    });
+  box.appendChild(seg);
+  return box;
 }
 
 function langPicker(){
@@ -3365,6 +3466,7 @@ function fillAbout(){
   data.appendChild(el("p","hint",t("data.hint")));
   body.appendChild(data);
 
+  body.appendChild(themePicker());
   body.appendChild(langPicker());
   body.appendChild(el("p","about-foot",t("about.foot")));
 }
@@ -4071,6 +4173,8 @@ document.addEventListener("visibilitychange",function(){
 
 $("start").addEventListener("click",newGame);
 
+THEME=detectTheme();
+applyTheme();
 LANG=detectLang();
 document.documentElement.lang=LANG;
 applyStaticText();
@@ -4084,6 +4188,14 @@ load();
 renderCards();
 renderRules();
 fillRules("rulesBody");
+
+/* retour d'un changement de thème : on rouvre là où l'on était */
+try{
+  if(sessionStorage.getItem(REOPEN_KEY)==="1"){
+    sessionStorage.removeItem(REOPEN_KEY);
+    openAbout();
+  }
+}catch(e){}
 renderTSetup();
 refreshTourBtn();
 refreshHallLink();

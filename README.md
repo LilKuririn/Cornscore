@@ -131,10 +131,14 @@ avec l'application.
 Une **sauvegarde** exportable en JSON permet de tout emporter avant de changer de téléphone, et de
 le restaurer ensuite.
 
-## Langues
+## Langues et apparence
 
 Français, anglais et espagnol. La langue suit celle du téléphone au premier lancement et se change
 depuis la fiche *À propos*, où une position « Téléphone » permet de revenir au suivi automatique.
+
+Le **thème clair ou sombre** se règle au même endroit, avec la même position « Téléphone » par
+défaut. Un choix explicite est posé avant le premier rendu, sans clignotement, et s'impose à la
+couleur de la barre système.
 
 Le vocabulaire suit celui de chaque fédération. Au cornhole, *frame* en anglais désigne la manche et
 *round* le tour de tournoi — deux mots que le français confond. Au palet, la manche est une **mène**,
