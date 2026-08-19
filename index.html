@@ -1836,7 +1836,19 @@ function applyTheme(){
   paintThemeColor();
 }
 
-var REOPEN_KEY = "cornhole.reopenAbout";
+/* Chromium ne réévalue pas `color-mix()` sur les éléments déjà construits
+   quand une propriété personnalisée change : un élément créé après la
+   bascule prend la bonne valeur, ses voisins gardent l'ancienne — et
+   trente-cinq règles en dépendent, couleurs d'équipe comprises. Masquer
+   puis réafficher la racine force un restyle complet. Tout tient dans la
+   même tâche, le navigateur ne peignant qu'à la fin : aucune image
+   intermédiaire, donc aucun clignotement. */
+function forceRestyle(){
+  var h=document.documentElement, d=h.style.display;
+  h.style.display="none";
+  void h.offsetHeight;
+  h.style.display=d;
+}
 
 function setTheme(v){
   THEME = (v==="light" || v==="dark") ? v : null;
@@ -1845,15 +1857,9 @@ function setTheme(v){
     else localStorage.removeItem(THEME_KEY);
   }catch(e){}
   applyTheme();
+  forceRestyle();
   buzz(6);
-
-  /* Les valeurs `color-mix()` ne se recalculent pas quand `data-theme`
-     change en cours de route : le chrome garderait des morceaux de
-     l'ancien thème, couleurs d'équipe comprises. On recharge donc — tout
-     l'état vit dans localStorage — et on rouvre la feuille pour que le
-     choix se poursuive sans à-coup. */
-  try{ sessionStorage.setItem(REOPEN_KEY,"1"); }catch(e){}
-  location.reload();
+  fillAbout();          /* repeindre la position retenue du sélecteur */
 }
 
 var LANG = "fr";
@@ -4189,13 +4195,6 @@ renderCards();
 renderRules();
 fillRules("rulesBody");
 
-/* retour d'un changement de thème : on rouvre là où l'on était */
-try{
-  if(sessionStorage.getItem(REOPEN_KEY)==="1"){
-    sessionStorage.removeItem(REOPEN_KEY);
-    openAbout();
-  }
-}catch(e){}
 renderTSetup();
 refreshTourBtn();
 refreshHallLink();
