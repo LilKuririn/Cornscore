@@ -35,6 +35,40 @@ changer de langue, et que tout survive à la fermeture de l'application.
 
 ---
 
+## Première release en production — 1.0.31
+
+Dernier build d'avant le palet : la version qui sort du test fermé ne compte que le cornhole, et
+les notes s'y tiennent. Le palet paraîtra dans la release suivante, avec la fiche mise à jour.
+
+Première version visible du grand public : les notes présentent l'application plutôt qu'un journal
+des changements, personne n'ayant de version antérieure à comparer.
+
+### en-US *(467 / 500)*
+
+```
+First public release of ScoreToss.
+
+A score keeper for cornhole, readable at a glance from the other end of the boards. Singles or doubles, team names and colours, frame-by-frame scoring with the cancellation worked out for you, and any past frame can be corrected.
+
+Single-elimination tournaments up to 16 teams, head-to-head records, and a coin toss for the first throw.
+
+No ads, no account, nothing to sign up for. Everything stays on your phone and works offline.
+```
+
+### fr-FR *(487 / 500)*
+
+```
+Première version publique de ScoreToss.
+
+Compteur de points pour le cornhole, lisible d'un coup d'œil depuis l'autre planche. Simple ou double, noms et couleurs d'équipes, saisie manche par manche avec l'annulation calculée pour vous, et toute manche passée se corrige.
+
+Tournois à élimination directe jusqu'à 16 équipes, palmarès des confrontations, tirage au sort du premier lanceur.
+
+Sans publicité, sans compte ni inscription. Tout reste sur votre téléphone et fonctionne hors ligne.
+```
+
+---
+
 ## Modèle pour les suivantes
 
 Court, factuel, du point de vue de l'utilisateur. Pas de numéro de version — la console l'affiche
